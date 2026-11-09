@@ -486,9 +486,23 @@ S.spots = {
 -- Sub-zones (matched by name, English and French)
 ---------------------------------------------------------------------------
 S.subzones = {
-  { id = "sw_trade", names = { "trade district", "quartier commerçant" },
+  { id = "sw_trade", names = { "trade district", "quartier commerçant", "the gilded rose", "la rose dorée" },
     ambient = {
       { en = "Merchants' signs creak in the breeze.", fr = "Les enseignes des marchands grincent dans la brise.", when = OUT },
+    },
+    hearth = { -- the Gilded Rose, next to the bank and the auction house: always busy
+      { en = "Back at the Gilded Rose, packed as always: voices everywhere, people coming and going, and barely room to squeeze through.",
+        fr = "De retour à la Rose dorée, bondée comme toujours : des voix de partout, des allées et venues, et à peine de quoi se faufiler.",
+        when = { indoors = true, crowd = "crowded" } },
+      { en = "The Gilded Rose is buzzing, as usual. With the bank and the auction house right next door, half of Stormwind seems to pass through here.",
+        fr = "La Rose dorée bourdonne d'activité, comme d'habitude. Avec la banque et l'hôtel des ventes juste à côté, la moitié de Hurlevent semble passer par ici.",
+        when = { indoors = true, crowd = { "lively", "crowded" } } },
+      { en = "For once, the Gilded Rose is almost quiet. Enjoy the calm: it never lasts long here.",
+        fr = "Pour une fois, la Rose dorée est presque calme. Profitez-en : ici, ça ne dure jamais longtemps.",
+        when = { indoors = true, crowd = "quiet" } },
+      { en = "Back at the Gilded Rose, right in the bustle of the Trade District.",
+        fr = "De retour à la Rose dorée, en plein cœur de l'animation du Quartier commerçant.",
+        when = { indoors = true } },
     } },
   { id = "sw_canals", names = { "the canals", "les canaux" },
     arrive = {
