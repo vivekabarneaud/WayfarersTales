@@ -64,6 +64,7 @@ function S.Context()
   ctx.weather = S.Weather()
   ctx.crowd, ctx.players, ctx.chatter = S.Crowd()
   ctx.subLower = (ctx.sub or ""):lower()
+  ctx.moving = GetUnitSpeed and (GetUnitSpeed("player") or 0) > 0 or false
   return ctx
 end
 
@@ -77,6 +78,7 @@ local function Check(when, ctx)
   if when.indoors ~= nil and when.indoors ~= ctx.indoors then return false, when.indoors and "indoors" or "outdoors" end
   if when.resting and not ctx.resting then return false, "resting" end
   if when.swimming and not ctx.swimming then return false, "swimming" end
+  if when.moving and not ctx.moving then return false, "moving" end
   if when.airBelow and not ((ctx.air or 15) < when.airBelow) then return false, "airBelow" end
   if when.airAbove and not ((ctx.air or 15) > when.airAbove) then return false, "airAbove" end
   if when.notBiomes and when.notBiomes[ctx.biome] then return false, "biome" end
@@ -208,7 +210,7 @@ local function StyleFactor(c)
   if not c.line.long then return 1 end
   local style = KT.GetDB().settings.sensesStyle or "mixed"
   if style == "short" then return 0 end
-  if c.kind == "arrive" then return style == "rich" and 6 or 4 end
+  if c.kind == "arrive" or c.kind == "quiet" then return style == "rich" and 6 or 4 end
   return style == "rich" and 1.5 or 0.35
 end
 
@@ -250,7 +252,9 @@ end
 
 -- preview = from the dev panel's ">" button: shown, but not "consumed"
 -- extra = a text added after the line (e.g. a danger feeling on a first visit)
-function S.Show(c, preview, extra)
+-- lead = a text put before it (e.g. "You stop for a moment.")
+-- vars = values for {item}... in the line
+function S.Show(c, preview, extra, vars, lead)
   if not c then return end
   if not preview then
     Remember(c.id)
@@ -258,8 +262,9 @@ function S.Show(c, preview, extra)
     state.lastLine = time()
   end
   local text = S.LineText(c.line)
+  if lead then text = lead .. " " .. text end
   if extra then text = text .. " " .. extra end
-  KT.NarrateText("senses", c.id, text, nil, true)
+  KT.NarrateText("senses", c.id, text, vars, true)
 end
 
 -- An arrival line, with the danger feeling added to it if this place is risky
@@ -297,6 +302,7 @@ function S.Tags(c, ctx)
     if w.indoors ~= nil then add(w.indoors and T.indoors or T.outdoors, w.indoors == ctx.indoors) end
     if w.resting then add(T.resting, ctx.resting) end
     if w.swimming then add(T.swimming, ctx.swimming) end
+    if w.moving then add(T.moving, ctx.moving) end
     if w.subMatch then
       local found = false
       for _, s in ipairs(w.subMatch) do
@@ -386,8 +392,17 @@ local function AmbientTick()
   local r = RHYTHM[Rhythm()]
   if not r or time() - (state.lastLine or 0) < r.gap then return end
   if math.random() >= r.chance then return end
-  S.Show(S.Pick(S.Context(), "ambient"))
+  local ctx = S.Context()
+  if ctx.eating or ctx.drinking then return end -- you're busy with your meal (it has its own line)
+  S.Show(S.Pick(ctx, "ambient"))
 end
+
+-- for Moments.lua (little moments: after a fight, eating, dawn...)
+S.Check = Check
+S.CanSpeak = CanSpeak
+S.Rhythm = Rhythm
+S.RHYTHM = RHYTHM
+function S.State() return state end
 
 -- Flying over a place doesn't count as visiting it (the game doesn't explore
 -- the map from a flight path either). We check again once you land.

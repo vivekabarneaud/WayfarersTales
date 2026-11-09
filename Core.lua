@@ -907,13 +907,29 @@ local function ResolveFeed(itemID, link)
   end
 end
 
+-- Sure the pet won't touch this food? (its diet is known, the food type too, and it
+-- has never eaten this item) - or it's the food it dislikes.
+local function PetRefuses(itemID, link)
+  if not itemID or pet.foods[itemID] then return false end
+  local k = FoodKind(itemID, link)
+  if not k then return false end
+  if pet.tastes and k == pet.tastes.dislike then return true end
+  return diet ~= nil and diet.count < 6 and not diet[k]
+end
+
 local function OnPlayerEat(itemID, link)
   if not PetAlive() or InCombat() or state.meal then return end
   if db.settings.chatty == 0 then return end
+  -- food it won't eat: a sniff and a face, now and then
+  if PetRefuses(itemID, link) then
+    if Ready("mealSniff", D.MEAL_SNIFF_COOLDOWN) and Chance(0.5) then
+      Mark("mealSniff")
+      Say("mealSniff", { item = link })
+    end
+    return
+  end
   if not Ready("mealRequest", D.MEAL_COOLDOWN) then return end
   if not PetCanEat(itemID, link) then Debug("pet probably doesn't eat", itemID) return end
-  local k = FoodKind(itemID, link)
-  if k and pet.tastes and k == pet.tastes.dislike then return end -- wouldn't ask for food it dislikes
   if not Chance(0.6 * MoodMult("meal")) then return end
   Mark("mealRequest")
   state.meal = { itemID = itemID, link = link, expires = GetTime() + D.MEAL_WINDOW }
@@ -1000,9 +1016,10 @@ local function OnAuraGained(unit, spellID, name)
   if unit == "player" then
     if spellID == D.SPELL_FOOD_AURA or (name and name == SpellName(D.SPELL_FOOD_AURA)) then
       -- the food item leaves the bag around the same moment; look shortly after
-      After(0.7, function()
+      -- (a bit after the Senses eating line, so you sit down before your pet begs)
+      After(1.3, function()
         local f = state.lastFoodDrop
-        if f and GetTime() - f.t < 3 then OnPlayerEat(f.id, f.link) end
+        if f and GetTime() - f.t < 4 then OnPlayerEat(f.id, f.link) end
       end)
     elseif spellID == D.AURA_CAMP_WELCOME then
       -- you sat down at the fire (the 60-second "stay seated" buff): resting together
@@ -1133,6 +1150,13 @@ local function OnItemDecreased(id, link)
     end
   end
   if IsFoodItem(id) then state.lastFoodDrop = { id = id, link = link, t = GetTime() } end
+end
+
+-- The food or drink that just left your bags (for the Senses eating line), or nil.
+-- Only known while Kindred is on (it's the one watching the bags).
+function KT.LastFood(maxAge)
+  local f = state.lastFoodDrop
+  if f and GetTime() - f.t <= (maxAge or 5) then return f.id, f.link end
 end
 
 local function DiffBags()

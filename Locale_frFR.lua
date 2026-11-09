@@ -529,6 +529,11 @@ M.mealRequest = {
   "{pet} vous tapote doucement le bras, les yeux rivés sur votre {item}.",
   "{pet} renifle avec espoir pendant que vous mangez votre {item}...",
 }
+M.mealSniff = {
+  "{pet} s'approche de votre {item}... et recule aussitôt. Non merci.",
+  "{pet} jette un œil à votre {item} et se détourne, l'air pas du tout impressionné.",
+  "{pet} lance un regard méfiant à votre {item}, puis un regard franchement vexé.",
+}
 M.mealShared = {
   "Vous partagez votre {item} avec {pet}. Un repas, c'est meilleur à deux !",
   "{pet} savoure avec joie ce que vous avez partagé. Quel festin !",
@@ -909,7 +914,7 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit",
+  long = "longue", spot = "cet endroit", moving = "en marchant",
 }
 L.SN_POS = "Position : %s   Endroit : %s"
 L.SN_LANDSCAPE = "Paysage : %s   Niveaux de la zone : %s"
@@ -982,7 +987,7 @@ L.SN_REASONS = {
   biome = "pas dans ce paysage", sub = "seulement dans un lieu précis",
   weatherWait = "en attente des données météo", weather = "pas avec cette météo",
   crowdUnknown = "a besoin de savoir qui est là", crowd = "pas avec ce monde-là",
-  cooldown = "déjà jouée, revient dans %s",
+  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant",
 }
 L.SN_BIOMES = {
   forest = "forêt", plains = "plaines", farmland = "terres agricoles sèches", hills = "collines", mountain = "montagnes", snow = "neige",
@@ -995,6 +1000,7 @@ L.SN_GUIDE = table.concat({
   "|cffffd100Ambiance (Senses)|r",
   "De temps en temps, une courte ligne décrit le monde autour de vous : une odeur, un bruit, le vent, la météo. La première fois que vous arrivez dans un nouveau lieu, il vous accueille avec sa propre ligne.",
   "En entrant dans un lieu que vous connaissez déjà (un village, une ferme, un quartier), une ligne peut aussi l'évoquer, au plus une fois toutes les 10 minutes (15 avec le rythme Rare, 5 avec Souvent).",
+  "Les petits moments ont aussi leurs lignes, chacun avec son propre minuteur : un combat difficile, un repas, une cueillette ou une extraction de minerai, le dépeçage, votre pierre de foyer, l'atterrissage après un long vol, l'aube et le crépuscule, entrer ou sortir d'un bâtiment, la banque, la boîte aux lettres, l'hôtel des ventes, votre maître de métier ou de classe, le retour à la vie, ou simplement rester immobile un moment.",
   "Les lignes dépendent du paysage, du lieu précis, du jour ou de la nuit, de l'intérieur ou de l'extérieur, de la météo et du monde autour de vous.",
   "L'onglet Ambiance montre ce que l'addon voit là où vous êtes, et toutes les lignes qui pourraient apparaître ici. Si une ligne vous semble fausse, signalez-la avec /wt nope.",
 }, "\n")

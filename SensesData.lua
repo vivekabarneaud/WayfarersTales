@@ -9,6 +9,7 @@
 --   indoors = true / false
 --   resting = true              in a city or an inn
 --   swimming = true
+--   moving = true               only while you walk / ride (e.g. "under your feet")
 --   weather = "clear" / "rain" / "snow" / "sand"
 --   crowd = "quiet" or { "lively", "crowded" }
 --   airBelow = 5 / airAbove = 25    air temperature in °C
@@ -68,6 +69,7 @@ D.WEATHER_TYPES = { [0] = "clear", [1] = "rain", [2] = "snow", [3] = "sand" }
 D.WEATHER_CONFIRMED = { clear = true }
 
 local OUT = { indoors = false }
+local OUT_WALK = { indoors = false, moving = true } -- lines about your steps: only while you walk
 -- landscapes where "fresh air" would be wrong (foul, dusty or dry air)
 local NOT_FOUL_AIR = { volcanic = true, plague = true, swamp = true, undercity = true, corrupted = true,
   farmland = true, desert = true, savanna = true, badlands = true, canyon = true, wasteland = true, forge = true }
@@ -182,7 +184,7 @@ S.biomes = {
       -- ideas from Kitty's walk around Westfall
       { en = "The air smells of dry fields and dusty soil.", fr = "L'air sent les champs secs et la terre poussiéreuse.", when = { indoors = false, weather = "clear" } },
       { en = "It smells of dry grass, warmed by the day.", fr = "Ça sent l'herbe sèche, chauffée par la journée.", when = { indoors = false, night = false, weather = "clear" } },
-      { en = "The parched, cracked ground crunches under your feet.", fr = "Le sol sec et craquelé croustille sous vos pas.", when = { indoors = false, weather = "clear" } },
+      { en = "The parched, cracked ground crunches under your feet.", fr = "Le sol sec et craquelé croustille sous vos pas.", when = { indoors = false, weather = "clear", moving = true } },
       { en = "The smell of hay drifts over from the farm.", fr = "Une odeur de foin vous arrive de la ferme.",
         when = { indoors = false, subMatch = { "farm", "ferme" } } },
       { en = "A whiff of manure reminds you this is a working farm.", fr = "Une bouffée de fumier vous rappelle qu'ici, on travaille la terre.",
@@ -221,7 +223,7 @@ S.biomes = {
       { en = "Everything is hushed under the snow.", fr = "Tout est feutré sous la neige.", when = OUT },
     },
     ambient = {
-      { en = "Snow crunches under your feet.", fr = "La neige crisse sous vos pas.", when = OUT },
+      { en = "Snow crunches under your feet.", fr = "La neige crisse sous vos pas.", when = OUT_WALK },
       { en = "A gust lifts a veil of powdery snow.", fr = "Une rafale soulève un voile de neige poudreuse.", when = OUT },
       { en = "Your fingers ache with the cold.", fr = "Vos doigts vous font mal à cause du froid.", when = { indoors = false, airBelow = 0 } },
     },
@@ -237,12 +239,12 @@ S.biomes = {
     },
     ambient = {
       { en = "Sand gets everywhere. Absolutely everywhere.", fr = "Le sable s'infiltre partout. Vraiment partout.", when = OUT },
-      { en = "The sand shifts beneath your feet.", fr = "Le sable glisse sous vos pas.", when = OUT },
+      { en = "The sand shifts beneath your feet.", fr = "Le sable glisse sous vos pas.", when = OUT_WALK },
     },
   },
   savanna = {
     arrive = {
-      { en = "Dry grass crackles underfoot.", fr = "L'herbe sèche craque sous vos pas.", when = OUT },
+      { en = "Dry grass crackles underfoot.", fr = "L'herbe sèche craque sous vos pas.", when = OUT_WALK },
       { en = "The plains stretch out, golden and endless.", fr = "Les plaines s'étendent, dorées et sans fin.", when = { indoors = false, night = false } },
     },
     ambient = {
@@ -289,7 +291,7 @@ S.biomes = {
   },
   marsh = {
     arrive = {
-      { en = "The ground squelches beneath your feet.", fr = "Le sol spongieux gargouille sous vos pas.", when = OUT },
+      { en = "The ground squelches beneath your feet.", fr = "Le sol spongieux gargouille sous vos pas.", when = OUT_WALK },
     },
     ambient = {
       { en = "Frogs croak somewhere in the reeds.", fr = "Des grenouilles coassent quelque part dans les roseaux.", when = OUT },

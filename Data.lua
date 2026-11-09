@@ -15,6 +15,7 @@ D.SPELL_FEED_PET   = 6991
 D.SPELL_REVIVE_PET = 982
 D.SPELL_FOOD_AURA  = 433   -- "Food" buff while eating
 D.SPELL_DRINK_AURA = 430   -- "Drink" buff
+D.AURA_RES_SICKNESS = 15007 -- "Resurrection Sickness" (after the spirit healer)
 D.SPELL_FISHING    = { [7620] = true, [7731] = true, [7732] = true, [18248] = true }
 
 -- Campfire auras (confirmed; both you and your pet get them)
@@ -109,6 +110,7 @@ D.ATTENTION_WINDOW   = 120   -- seconds to answer a petting request
 D.ATTENTION_COOLDOWN = 2400
 D.IDLE_COOLDOWN      = 600
 D.MEAL_COOLDOWN      = 1200
+D.MEAL_SNIFF_COOLDOWN = 1200 -- pet makes a face at food it won't eat
 D.COMFORT_WINDOW     = 300
 D.FISHING_WINDOW     = 40
 D.FLAVOR_COOLDOWN    = 25    -- minimum gap between two random flavor messages

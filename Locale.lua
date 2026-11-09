@@ -533,6 +533,12 @@ M.mealRequest = {
   "{pet} gently paws at your arm, eyes fixed on your {item}.",
   "{pet} sniffs hopefully as you eat your {item}...",
 }
+-- you eat something your pet won't touch
+M.mealSniff = {
+  "{pet} leans in toward your {item}... and backs off right away. No, thank you.",
+  "{pet} takes one look at your {item} and turns away, deeply unimpressed.",
+  "{pet} gives your {item} a suspicious look, then a slightly offended one.",
+}
 M.mealShared = {
   "You share your {item} with {pet}. A meal is better together!",
   "{pet} happily eats the {item} you shared. What a feast!",
@@ -916,7 +922,7 @@ L.SN_TAGS = {
   day = "daytime", night = "night", indoors = "indoors", outdoors = "outdoors", resting = "city or inn",
   swimming = "swimming", weather = "weather: %s", crowd = "crowd: %s",
   airBelow = "air below %s", airAbove = "air above %s", notBiomes = "not in: %s", place = "place: %s",
-  long = "long", spot = "this spot",
+  long = "long", spot = "this spot", moving = "walking",
 }
 L.SN_POS = "Position: %s   Spot: %s"
 L.SN_LANDSCAPE = "Landscape: %s   Zone levels: %s"
@@ -988,7 +994,7 @@ L.SN_REASONS = {
   airAbove = "only when warmer", biome = "not in this landscape", sub = "only in a particular place",
   weatherWait = "waiting for weather data", weather = "not in this weather",
   crowdUnknown = "needs to know who's around", crowd = "not with this crowd",
-  cooldown = "already played, back in %s",
+  cooldown = "already played, back in %s", moving = "only while walking",
 }
 L.SN_BIOMES = {
   forest = "forest", plains = "plains", farmland = "dry farmland", hills = "hills", mountain = "mountains", snow = "snow",
@@ -1001,6 +1007,7 @@ L.SN_GUIDE = table.concat({
   "|cffffd100Ambiance (Senses)|r",
   "Now and then, a short line describes the world around you: a smell, a sound, the wind, the weather. The first time you reach a new place, it greets you with a line of its own.",
   "Walking into a place you already know (a village, a farm, a district) can bring a line about it too, at most once every 10 minutes (15 with the Rare rhythm, 5 with Often).",
+  "Little moments get a line too, each on its own timer: a hard fight, a meal, gathering herbs or ore, skinning, your hearthstone, landing after a long flight, dawn and dusk, stepping indoors or out, the bank, the mailbox, the auction house, your trainer, coming back to life, or simply standing still for a while.",
   "Lines depend on the landscape, the exact place, day or night, indoors or out, the weather and how many people are around.",
   "The Ambiance tab shows what the addon sees where you stand, and every line that could appear here. If a line ever feels wrong, flag it with /wt nope.",
 }, "\n")
