@@ -605,7 +605,7 @@ local function BuildOptions(parent)
   Label(bLabel, "UI_OPT_BODYSTYLE")
   y = y - 24
   p.bodyStyleButtons = {}
-  for i, bs in ipairs({ "bars", "icons" }) do
+  for i, bs in ipairs({ "none", "icons", "bars" }) do
     local b = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
     b:SetSize(114, 24)
     b:SetPoint("TOPLEFT", 10 + (i - 1) * 118, y)
@@ -662,7 +662,6 @@ local function BuildOptions(parent)
   end
   Check("minimap", "UI_OPT_MINIMAP", function() KT.UpdateMinimapButton() end)
   Check("showHeart", "UI_OPT_HEART", function() api.UpdateHeart() end)
-  Check("showBody", "UI_OPT_BODY", function() if KT.Elements then KT.Elements.UpdateIcons() end end)
   Check("showThermo", "UI_OPT_THERMO", function() if KT.Elements then KT.Elements.UpdateThermo() end end)
   Check("label", "UI_OPT_LABEL")
   Check("sound", "UI_OPT_SOUND")
@@ -937,7 +936,7 @@ function KT.RefreshPanel()
     for st, b in pairs(p.styleButtons) do
       if st == style then b:LockHighlight() else b:UnlockHighlight() end
     end
-    local bstyle = db.settings.bodyStyle or "bars"
+    local bstyle = db.settings.bodyStyle or "none"
     for bs, b in pairs(p.bodyStyleButtons) do
       if bs == bstyle then b:LockHighlight() else b:UnlockHighlight() end
     end

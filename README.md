@@ -12,8 +12,9 @@ English and French.
 - **Kindred**: build a bond with your hunter pet. Affection grows with cuddles, meals,
   campfires and adventures. Emote reactions, a secret favorite food, moods, memories,
   sounds, and a pet that reacts to its surroundings.
-- **Elements**: how your character feels. Temperature (with a thermometer by the
-  minimap), wetness, thirst, hunger and energy, shown as small bars by your portrait.
+- **Elements**: how your character feels. Cold and heat (with a thermometer by the
+  minimap), wetness, thirst, hunger and tiredness. Your body tells you in the chat;
+  the details are in the window.
 - **Senses**: short immersion lines about the world around you: smells, sounds, the
   wind, the weather, first visits to new places, and the feeling of danger.
 

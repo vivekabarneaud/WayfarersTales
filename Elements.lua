@@ -515,13 +515,15 @@ end
 
 function E.UpdateIcons()
   if not strip then return end
-  if not state or not KT.ModuleOn("elements") or KT.GetDB().settings.showBody == false then
+  local bodyStyle = KT.GetDB().settings.bodyStyle or "none"
+  -- "none" (default): your body only speaks through the chat
+  if not state or not KT.ModuleOn("elements") or KT.GetDB().settings.showBody == false or bodyStyle == "none" then
     strip:Hide()
     return
   end
 
   -- "bars" style: always the five gauges
-  if (KT.GetDB().settings.bodyStyle or "bars") == "bars" then
+  if bodyStyle == "bars" then
     for _, slot in ipairs(strip.icons) do slot:Hide() end
     local rows = E.Rows()
     local keys = { "temp", "wet", "thirst", "hunger", "energy" }

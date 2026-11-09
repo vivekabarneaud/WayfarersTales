@@ -775,7 +775,7 @@ L.EL_PAGE_INTRO   = "Ce que ressent votre personnage. Purement cosmétique : rie
 L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp, une auberge, un toit au-dessus de la tête.\nSe rafraîchir : rentrer à l'intérieur, attendre la nuit, se baigner.\nSe sécher : le temps, et bien plus vite près d'un feu.\nLa soif : buvez n'importe quoi. Elle monte plus vite quand il fait chaud.\nLa faim : asseyez-vous et mangez.\nL'énergie : reposez-vous dans une auberge ou en ville, asseyez-vous au coin du feu, ou somnolez un moment."
 L.EL_GUIDE = table.concat({
   "|cffffd100Confort du corps (Elements)|r",
-  "Votre personnage ressent le froid, la chaleur, l'eau et la soif. De petites icônes apparaissent sous le cadre de votre personnage quand quelque chose ne va pas (survolez-les pour les détails, Maj + glisser pour les déplacer).",
+  "Votre personnage ressent le froid, la chaleur, l'eau, la soif, la faim et la fatigue, et vous le dit dans le chat. L'onglet Corps montre les détails. (Dans les Options, vous pouvez aussi afficher des icônes ou des barres près de votre portrait.)",
   "|cffff8fb1Froid et chaleur|r  Chaque zone a son climat. Les nuits sont plus fraîches dehors. Feux de camp, auberges et toits vous réchauffent ; être mouillé vous refroidit.",
   "|cffff8fb1Humidité|r  Nager vous trempe. Vous séchez avec le temps, plus vite à la chaleur ou près d'un feu.",
   "|cffff8fb1Soif|r  Monte doucement avec le temps, plus vite dans les zones chaudes et en combat. Boire n'importe quoi vous désaltère.",
@@ -969,7 +969,7 @@ M.petDangerNear_chitin = { "{pet} cliquette nerveusement, les yeux rivés sur le
 L.CMD_RESET_VISITS = "Lieux visités et repos des lignes oubliés : toutes les lignes peuvent rejouer."
 L.UI_OPT_STYLE = "Longueur des lignes d'ambiance"
 L.UI_OPT_BODYSTYLE = "Confort du corps à côté de votre portrait"
-L.UI_BODYSTYLE = { bars = "Barres", icons = "Icônes" }
+L.UI_BODYSTYLE = { none = "Texte seul", bars = "Barres", icons = "Icônes" }
 L.UI_STYLE     = { short = "Courtes", mixed = "Mélangées", rich = "Riches" }
 L.SN_PROPOSE_LABEL = "Proposer une ligne pour ce lieu :"
 L.SN_PROPOSE      = "Proposer"

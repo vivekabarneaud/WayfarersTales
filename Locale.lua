@@ -782,7 +782,7 @@ L.EL_PAGE_INTRO   = "How your character feels. Pure flavor: nothing here changes
 L.EL_PAGE_TIPS    = "Warm up: a campfire, an inn, any roof over your head.\nCool down: get indoors, wait for the night, take a swim.\nDry off: time, and much faster by a fire.\nThirst: drink anything. It drops faster in the heat.\nHunger: sit down and eat.\nEnergy: rest at an inn or in a city, sit by a campfire, or doze off a while."
 L.EL_GUIDE = table.concat({
   "|cffffd100Body comfort (Elements)|r",
-  "Your character feels the cold, the heat, the water and thirst. Small icons appear under your character frame when something is off (hover them for details, Shift + drag to move them).",
+  "Your character feels the cold, the heat, the water, thirst, hunger and tiredness, and tells you about it in the chat. The Body tab shows the details. (In Options, you can also show icons or bars by your portrait.)",
   "|cffff8fb1Cold & heat|r  Each zone has its own climate. Nights are colder outside. Campfires, inns and roofs warm you up; being wet chills you.",
   "|cffff8fb1Wetness|r  Swimming soaks you. You dry off over time, faster in the heat or by a fire.",
   "|cffff8fb1Thirst|r  Slowly grows over time, faster in hot zones and in combat. Drinking anything quenches it.",
@@ -974,7 +974,7 @@ M.petDangerNear_chitin = { "{pet} clicks nervously, staring at the danger." }
 L.CMD_RESET_VISITS = "Visited places and line cooldowns forgotten: every line can play again."
 L.UI_OPT_STYLE = "Immersion line length"
 L.UI_OPT_BODYSTYLE = "Body comfort next to your character frame"
-L.UI_BODYSTYLE = { bars = "Bars", icons = "Icons" }
+L.UI_BODYSTYLE = { none = "Text only", bars = "Bars", icons = "Icons" }
 L.UI_STYLE     = { short = "Short", mixed = "Mixed", rich = "Rich" }
 L.SN_PROPOSE_LABEL = "Propose a line for this place:"
 L.SN_PROPOSE      = "Propose"
