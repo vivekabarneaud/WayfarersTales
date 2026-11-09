@@ -30,6 +30,12 @@ D.MOMENT_RULES = {
   familiarDrink   = { cd = 900,  chance = 1,   gap = 20, shares = "drink" },
   foodMilestone   = { cd = 0,    chance = 1,   gap = 10, shares = "eat" },
   drinkMilestone  = { cd = 0,    chance = 1,   gap = 10, shares = "drink" },
+  lootRare        = { cd = 300,  chance = 1,   gap = 0 },
+  lootEpic        = { cd = 0,    chance = 1,   gap = 0 },
+  lootLegendary   = { cd = 0,    chance = 1,   gap = 0 },
+  craftRare       = { cd = 300,  chance = 1,   gap = 0 },
+  craftEpic       = { cd = 0,    chance = 1,   gap = 0 },
+  craftFirst      = { cd = 600,  chance = 0.6, gap = 20 },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -428,6 +434,45 @@ D.MOMENTS = {
     { en = "A new recipe: {item}. You can't wait to try it.", fr = "Nouvelle recette : {item}. Vous avez hâte d'essayer." },
     { en = "You go over the steps of the recipe in your head, again and again: {item}.", fr = "Vous repassez les étapes de la recette dans votre tête, encore et encore : {item}." },
     { en = "You carefully commit it to memory: {item}.", fr = "Vous la gravez soigneusement dans votre mémoire : {item}." },
+  },
+
+  -- Looting (or receiving as a quest reward) a rare, epic or legendary item. {item} = its link
+  lootRare = {
+    { en = "Your heart skips a beat: {item}. Something this fine doesn't come along every day.",
+      fr = "Votre cœur fait un bond : {item}. Une pièce de cette qualité, ça ne se trouve pas tous les jours." },
+    { en = "You turn {item} over in your hands, almost unable to believe your luck.",
+      fr = "Vous retournez {item} entre vos mains, n'en croyant presque pas votre chance." },
+    { en = "{item}! A little thrill runs through you. Today is a good day.",
+      fr = "{item} ! Un petit frisson vous parcourt. Aujourd'hui est un bon jour." },
+  },
+  lootEpic = {
+    { en = "You stare at {item}, breathless. Your hands are trembling a little. This is the kind of find people tell stories about.",
+      fr = "Vous fixez {item}, le souffle coupé. Vos mains tremblent un peu. C'est le genre de trouvaille dont on parle encore des années après." },
+    { en = "{item}... For a long moment, you can't take your eyes off it. Nobody is going to believe you.",
+      fr = "{item}... Pendant un long moment, vous ne pouvez pas en détacher les yeux. Personne ne va vous croire." },
+  },
+  lootLegendary = {
+    { en = "{item}. Your heart pounds so hard you can hear it. Some things are bigger than you, and this is one of them.",
+      fr = "{item}. Votre cœur bat si fort que vous l'entendez. Certaines choses vous dépassent, et celle-ci en fait partie." },
+  },
+
+  -- Crafting
+  craftRare = {
+    { en = "You step back to look at what you've made: {item}. Fine work, and you know it.",
+      fr = "Vous prenez un peu de recul pour admirer votre ouvrage : {item}. Du beau travail, et vous le savez." },
+    { en = "{item}, made with your own hands. A warm wave of pride washes over you.",
+      fr = "{item}, de vos propres mains. Une vague de fierté vous envahit." },
+  },
+  craftEpic = {
+    { en = "{item}. You can hardly believe it came from your own hands. All those hours were worth it.",
+      fr = "{item}. Vous avez du mal à croire que c'est sorti de vos mains. Toutes ces heures en valaient la peine." },
+  },
+  -- the first time you ever make an item (any quality)
+  craftFirst = {
+    { en = "{item}, for the very first time! Maybe not perfect, but it's yours.",
+      fr = "{item}, pour la toute première fois ! Ce n'est peut-être pas parfait, mais c'est de vous." },
+    { en = "You look over your creation with quiet pride: {item}, a first.",
+      fr = "Vous examinez votre création avec une fierté discrète : {item}, une première." },
   },
 
   -- Back to life

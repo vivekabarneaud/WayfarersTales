@@ -279,6 +279,7 @@ local function ToPattern(fmt)
   if type(fmt) ~= "string" then return nil end
   local p = fmt:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
   p = p:gsub("%%%%s", "(.+)")
+  p = p:gsub("%%%%d", "%%d+")
   return "^" .. p .. "$"
 end
 
@@ -342,6 +343,58 @@ local function OnSystemMessage(msg)
   if recipe and GetTime() - professionAt > 10 then
     Play("learnRecipe", { item = recipe })
   end
+end
+
+-- Loot and crafting, from the game's own loot messages ("You receive loot: ...",
+-- "You receive item: ..." for quest rewards, "You create: ...").
+local LOOT_FORMATS = { "LOOT_ITEM_SELF", "LOOT_ITEM_SELF_MULTIPLE", "LOOT_ITEM_PUSHED_SELF", "LOOT_ITEM_PUSHED_SELF_MULTIPLE" }
+local CREATE_FORMATS = { "LOOT_ITEM_CREATED_SELF", "LOOT_ITEM_CREATED_SELF_MULTIPLE" }
+local patternCache = {}
+local function MatchAny(msg, names)
+  for _, n in ipairs(names) do
+    local p = patternCache[n]
+    if p == nil then p = ToPattern(_G[n]) or false; patternCache[n] = p end
+    if p then
+      local item = msg:match(p)
+      if item then return item end
+    end
+  end
+end
+
+-- Item quality (3 = rare, 4 = epic, 5 = legendary) and ID, from a link
+local QUALITY_COLORS = { ff0070dd = 3, ffa335ee = 4, ffff8000 = 5 }
+local function Quality(link)
+  local id = tonumber(link:match("item:(%d+)"))
+  if id and C_Item and C_Item.GetItemQualityByID then
+    local ok, q = pcall(C_Item.GetItemQualityByID, id)
+    if ok and type(q) == "number" then return q, id end
+  end
+  local color = link:match("|c(%x%x%x%x%x%x%x%x)")
+  return color and QUALITY_COLORS[color:lower()] or nil, id
+end
+
+local function OnLootMessage(msg)
+  if type(msg) ~= "string" then return end
+  local created = MatchAny(msg, CREATE_FORMATS)
+  if created then
+    local q, id = Quality(created)
+    local state = S.State()
+    local n
+    if state and id then
+      state.crafted = state.crafted or {}
+      n = (state.crafted[id] or 0) + 1
+      state.crafted[id] = n
+    end
+    if q and q >= 4 then Play("craftEpic", { item = created })
+    elseif q == 3 then Play("craftRare", { item = created })
+    elseif n == 1 then Play("craftFirst", { item = created }) end
+    return
+  end
+  local looted = MatchAny(msg, LOOT_FORMATS)
+  if not looted then return end
+  local q = Quality(looted)
+  if not q or q < 3 then return end
+  Play((q >= 5 and "lootLegendary") or (q == 4 and "lootEpic") or "lootRare", { item = looted })
 end
 
 ---------------------------------------------------------------------------
@@ -415,7 +468,7 @@ end
 local ERRANDS = { BANKFRAME_OPENED = "bank", MAIL_SHOW = "mail", AUCTION_HOUSE_SHOW = "auction", TRAINER_SHOW = "trainer" }
 
 local f = CreateFrame("Frame")
-for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM",
+for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW" }) do
   pcall(f.RegisterEvent, f, ev)
 end
@@ -438,6 +491,9 @@ f:SetScript("OnEvent", function(_, event, ...)
       fightStart = GetTime()
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
+    elseif event == "CHAT_MSG_LOOT" then
+      local msg = ...
+      After(0.5, function() OnLootMessage(msg) end, "loot") -- after the game's own message
     elseif event == "CHAT_MSG_SYSTEM" then
       local msg = ...
       After(0.5, function() OnSystemMessage(msg) end, "learn") -- after the game's own message
