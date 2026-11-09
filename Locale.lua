@@ -159,7 +159,11 @@ L.CMD_HELP = {
   "/wt chatty 0-3 - how often your pet speaks up: 0 = only big moments, 1 = quiet, 2 = normal (default), 3 = very chatty",
   "/wt debug - show technical info (for testing)",
   "/wt nope - flag the last line as wrong or odd",
+  "/wt sound - hear your pet's sounds",
+  "/wt guide, /wt journal, /wt options - open a tab of the window",
+  "/wt resetvisits - forget visited places and line cooldowns (for testing)",
 }
+L.CMD_STATUS_HINT = "Type |cffffd100/wt help|r for all commands."
 L.CMD_NO_PET     = "No hunter pet is out right now."
 L.CMD_CHATTY     = "Chattiness set to %d."
 L.CMD_DEBUG      = "Debug mode: %s"

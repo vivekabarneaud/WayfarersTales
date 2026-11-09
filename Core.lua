@@ -44,6 +44,14 @@ local function Debug(...)
 end
 
 local function After(sec, fn) C_Timer.After(sec, fn) end
+
+-- Is this chat sender you? (exact name: "Ann" must not match "Annabelle";
+-- the realm part "-Realm" is ignored)
+function KT.IsMe(sender)
+  if not sender then return false end
+  local name = tostring(sender):match("^([^%-]+)")
+  return name ~= nil and name == UnitName("player")
+end
 local function Today() return date("%Y-%m-%d") end
 local function InCombat() return UnitAffectingCombat("player") end
 local function Pick(pool) return pool[math.random(#pool)] end
@@ -492,6 +500,7 @@ end
 
 -- First visit of a zone together -> message + memory.
 local function CheckZone()
+  if not KT.ModuleOn("kindred") then return end
   if not pet or not UnitExists("pet") or UnitIsDead("pet") then return end
   -- flying over a zone isn't visiting it; we check again after landing
   if (UnitOnTaxi and UnitOnTaxi("player")) or (IsFlying and IsFlying()) then return end
@@ -1365,12 +1374,20 @@ function H.PLAYER_LOGIN()
   if SendChatMessage then hooksecurefunc("SendChatMessage", OnChatSend) end
 end
 
+-- Start fresh: remember what's in the bags and on you right now (no "changes" yet).
+-- Also used when the pet module is turned back on mid-session.
+local function Rebaseline()
+  bagReady = false
+  DiffBags()
+  bagReady = true
+  auraBaseline.player = true
+  ScanAuras("player")
+end
+
 function H.PLAYER_ENTERING_WORLD()
   if not KT.ModuleOn("kindred") then return end
-  auraBaseline.player = true
-  After(1, function() ScanAuras("player") end)
   After(2, QueuePetAppear)
-  After(3, function() DiffBags(); bagReady = true end)
+  After(3, Rebaseline)
 end
 
 function H.PLAYER_LOGOUT()
@@ -1419,9 +1436,7 @@ function H.BAG_UPDATE()
 end
 
 function H.CHAT_MSG_TEXT_EMOTE(text, sender)
-  if not PetAlive() or not text or not sender then return end
-  local me = UnitName("player")
-  if not me or not tostring(sender):find(me, 1, true) then return end
+  if not PetAlive() or not text or not KT.IsMe(sender) then return end
   local targeted = text:find(pet.name, 1, true) ~= nil
   local token = (GetTime() - lastEmote.t < 3) and lastEmote.token or nil
   lastEmote.token = nil
@@ -1641,7 +1656,7 @@ SlashCmdList.WAYFARERSTALES = function(msg)
     end
     local s = pet.stats
     Print(string.format(L.TT_TOGETHER, FormatDuration(s.minutes)) .. " - " .. string.format(L.TT_STATS, s.kills, s.meals, s.campfires))
-    Print("Type |cffffd100/kt help|r for all commands.")
+    Print(L.CMD_STATUS_HINT)
   end
 end
 
@@ -1739,5 +1754,5 @@ KT.api = {
   FormatDuration = FormatDuration,
   UpdateHeart = function() UpdateHeart() end,
   Print = Print,
-  Rescan = function() QueuePetAppear() end, -- look at the current pet again
+  Rescan = function() Rebaseline(); QueuePetAppear() end, -- module turned back on
 }

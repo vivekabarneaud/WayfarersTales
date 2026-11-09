@@ -158,7 +158,11 @@ L.CMD_HELP = {
   "/wt chatty 0-3 - fréquence des réactions : 0 = grands moments seulement, 1 = discret, 2 = normal (par défaut), 3 = bavard",
   "/wt debug - informations techniques (pour les tests)",
   "/wt nope - signaler la dernière ligne comme fausse ou bizarre",
+  "/wt sound - écouter les sons de votre familier",
+  "/wt guide, /wt journal, /wt options - ouvrir un onglet de la fenêtre",
+  "/wt resetvisits - oublier les lieux visités et le repos des lignes (pour les tests)",
 }
+L.CMD_STATUS_HINT = "Tapez |cffffd100/wt help|r pour toutes les commandes."
 L.CMD_NO_PET    = "Aucun familier de chasseur n'est invoqué pour le moment."
 L.CMD_CHATTY    = "Fréquence des réactions réglée sur %d."
 L.CMD_DEBUG     = "Mode débogage : %s"

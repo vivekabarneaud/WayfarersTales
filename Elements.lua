@@ -144,8 +144,8 @@ function E.Tick()
   -- Back after a long time away: warmed up, dried off, fed, rested.
   if state.needsReset then
     state.needsReset = nil
+    state.wet = 0 -- dry first, so the warmth below isn't computed with old wetness
     state.temp = E.Target(env)
-    state.wet = 0
     state.thirst = math.max(state.thirst, 80)
     state.hunger = math.max(state.hunger, 80)
     state.energy = 100
@@ -685,11 +685,12 @@ f:SetScript("OnEvent", function(_, event)
       if not state.last or time() - state.last > 7200 then state.needsReset = true end
       CreateStrip()
       CreateThermo()
-      C_Timer.NewTicker(TICK, function()
+      local function SafeTick()
         local ok2, err2 = pcall(E.Tick)
         if not ok2 then KT.LogError("Elements tick", err2) end
-      end)
-      C_Timer.After(3, E.Tick)
+      end
+      C_Timer.NewTicker(TICK, SafeTick)
+      C_Timer.After(3, SafeTick)
     elseif event == "PLAYER_LOGOUT" and state then
       state.last = time()
     end

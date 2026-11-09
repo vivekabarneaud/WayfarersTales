@@ -577,8 +577,7 @@ f:SetScript("OnEvent", function(_, event, ...)
     else
       -- someone else talking or emoting near you: the place is lively
       local sender = select(2, ...)
-      local me = UnitName("player")
-      if sender and me and not tostring(sender):find(me, 1, true) then
+      if sender and not KT.IsMe(sender) then
         chatter[#chatter + 1] = GetTime()
       end
     end
