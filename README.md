@@ -33,6 +33,11 @@ Copy the `WayfarersTales` folder into
 | `/wt sound` | hear your pet's sounds |
 | `/wt debug` | technical messages |
 
+## License
+
+MIT: you're free to reuse and adapt this addon, as long as you keep the copyright notice
+(see `LICENSE`).
+
 ## Writing lines
 
 Immersion lines live in `SensesData.lua`: English and French side by side, with
