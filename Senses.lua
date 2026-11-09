@@ -59,12 +59,20 @@ function S.Crowd()
   return nil, players, talk
 end
 
+-- Are you walking / riding? The game may hide some numbers in combat ("secret
+-- values" that can't be compared): then we just say no.
+function S.Moving()
+  if not GetUnitSpeed then return false end
+  local ok, moving = pcall(function() return (GetUnitSpeed("player") or 0) > 0 end)
+  return ok and moving or false
+end
+
 function S.Context()
   local ctx = KT.World.Snapshot()
   ctx.weather = S.Weather()
   ctx.crowd, ctx.players, ctx.chatter = S.Crowd()
   ctx.subLower = (ctx.sub or ""):lower()
-  ctx.moving = GetUnitSpeed and (GetUnitSpeed("player") or 0) > 0 or false
+  ctx.moving = S.Moving()
   return ctx
 end
 

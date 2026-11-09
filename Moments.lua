@@ -118,23 +118,30 @@ local function Revive()
   Play(HasDebuff(D.AURA_RES_SICKNESS) and "reviveSick" or "revive")
 end
 
--- Fights: how long, and how low your health went
-local fightStart, minHealth
+-- Fights: how long it lasted, and how much health you have left once it's over.
+-- (During combat the game hides health numbers from addons - "secret values" -
+-- so we only look once the fight is over. nil = can't tell.)
+local fightStart
 local function HealthPct()
-  local max = UnitHealthMax("player") or 0
-  if max <= 0 then return 1 end
-  return (UnitHealth("player") or max) / max
+  local ok, pct = pcall(function()
+    local cur, max = UnitHealth("player"), UnitHealthMax("player")
+    if issecretvalue and (issecretvalue(cur) or issecretvalue(max)) then return nil end
+    if not cur or not max or max <= 0 then return nil end
+    return cur / max
+  end)
+  return ok and pct or nil
 end
 
 local function FightEnded()
   if not fightStart then return end
-  local duration, low = GetTime() - fightStart, minHealth or 1
-  fightStart, minHealth = nil, nil
+  local duration = GetTime() - fightStart
+  fightStart = nil
   After(2.5, function()
     if UnitIsDeadOrGhost("player") or UnitAffectingCombat("player") then return end
-    if low < D.CLOSE_FIGHT_HEALTH then
+    local left = HealthPct()
+    if left and left < D.CLOSE_FIGHT_HEALTH then
       Play("afterFightClose")
-    elseif low < D.HARD_FIGHT_HEALTH or duration >= D.HARD_FIGHT_TIME then
+    elseif (left and left < D.HARD_FIGHT_HEALTH) or duration >= D.HARD_FIGHT_TIME then
       Play("afterFight")
     end
   end, "fight")
@@ -208,8 +215,6 @@ local function Tick()
   wasDead = dead
   if dead then stillSince = nil return end
 
-  if fightStart then minHealth = math.min(minHealth or 1, HealthPct()) end
-
   -- landing after a long flight
   local onTaxi = UnitOnTaxi and UnitOnTaxi("player") or false
   if onTaxi then
@@ -241,9 +246,8 @@ local function Tick()
   lastIndoors = indoors
 
   -- standing still for a while (not AFK, not fighting, not swimming)
-  local moving = GetUnitSpeed and (GetUnitSpeed("player") or 0) > 0
   local busy = onTaxi or UnitAffectingCombat("player") or UnitIsAFK("player") or IsSwimming()
-  if moving or busy then
+  if busy or S.Moving() then
     stillSince, quietDone = nil, nil
   else
     stillSince = stillSince or now
@@ -266,7 +270,7 @@ for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENA
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
-for _, ev in ipairs({ "UNIT_AURA", "UNIT_HEALTH", "UNIT_HEALTH_FREQUENT", "UNIT_SPELLCAST_SUCCEEDED" }) do
+for _, ev in ipairs({ "UNIT_AURA", "UNIT_SPELLCAST_SUCCEEDED" }) do
   if not (f.RegisterUnitEvent and pcall(f.RegisterUnitEvent, f, ev, "player")) then
     pcall(f.RegisterEvent, f, ev)
   end
@@ -279,7 +283,7 @@ f:SetScript("OnEvent", function(_, event, ...)
       wasEating = W.HasAura(D.SPELL_FOOD_AURA, true)
       wasDrinking = W.HasAura(D.SPELL_DRINK_AURA, true)
     elseif event == "PLAYER_REGEN_DISABLED" then
-      fightStart, minHealth = GetTime(), HealthPct()
+      fightStart = GetTime()
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
     elseif ERRANDS[event] then
@@ -292,8 +296,6 @@ f:SetScript("OnEvent", function(_, event, ...)
         CheckMeal()
       elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
         OnSpell(select(3, ...))
-      elseif fightStart then -- UNIT_HEALTH
-        minHealth = math.min(minHealth or 1, HealthPct())
       end
     end
   end, ...)
