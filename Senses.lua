@@ -11,11 +11,13 @@ local lastWeatherName
 local chatter = {}          -- times other people spoke / emoted near you
 
 -- Rhythm: chance per minute to show an ambient line, and minimum gap between two.
+-- entry = minimum gap between two "you walk into a sub-zone" lines (its own timer).
 local RHYTHM = {
-  [1] = { chance = 0.06, gap = 900 },  -- rare
-  [2] = { chance = 0.12, gap = 480 },  -- normal
-  [3] = { chance = 0.25, gap = 240 },  -- chatty
+  [1] = { chance = 0.06, gap = 900, entry = 900 },  -- rare
+  [2] = { chance = 0.12, gap = 480, entry = 600 },  -- normal
+  [3] = { chance = 0.25, gap = 240, entry = 300 },  -- chatty
 }
+local ENTRY_AFTER_LINE = 90 -- never right after another line
 local RECENT_MAX = 15
 
 ---------------------------------------------------------------------------
@@ -393,10 +395,9 @@ function S.InFlight()
   return (UnitOnTaxi and UnitOnTaxi("player")) or (IsFlying and IsFlying()) or false
 end
 
--- First time in a zone or sub-zone: an arrival line (if there is one)
-local function CheckArrival()
-  if not CanSpeak() or S.InFlight() then return end
-  local ctx = S.Context()
+-- First time in a zone or sub-zone: an arrival line (if there is one).
+-- Returns true if a line was shown.
+local function FirstVisit(ctx)
   local subKey = ctx.subLower ~= "" and ("subname:" .. ctx.subLower) or nil
 
   -- a new zone: its arrival line (long ones favoured), and its sub-zone counts as visited
@@ -404,8 +405,8 @@ local function CheckArrival()
     state.visited[ctx.mapID] = time()
     if subKey then state.visited[subKey] = time() end
     local c = S.Pick(ctx, "arrive")
-    if c then ShowArrival(c, ctx) end
-    return
+    if c then ShowArrival(c, ctx) return true end
+    return false
   end
 
   -- a spot you've never stood in (e.g. the inn at Sentinel Hill)
@@ -419,7 +420,7 @@ local function CheckArrival()
           list[#list + 1] = { line = line, weight = 4, id = "spot:" .. sp.id .. ":arrive:" .. i, src = "spot", kind = "arrive" }
         end
         local c = S.PickFrom(list, ctx)
-        if c then ShowArrival(c, ctx) return end
+        if c then ShowArrival(c, ctx) return true end
       end
     end
   end
@@ -428,8 +429,39 @@ local function CheckArrival()
   if subKey and not state.visited[subKey] then
     state.visited[subKey] = time()
     local c = S.PickFrom(SubzoneArrivals(ctx), ctx)
-    if c then ShowArrival(c, ctx) end
+    if c then ShowArrival(c, ctx) return true end
   end
+  return false
+end
+
+-- Walking into a sub-zone you already know: an ambient line about this place, on
+-- its own timer (see RHYTHM.entry), so moving around brings the world to life
+-- without a line at every border. Most precise lines first, as always; generic
+-- lines are left out, they don't feel like "arriving somewhere".
+local function EnteredSubzone(ctx)
+  local r = RHYTHM[Rhythm()]
+  if not r or time() - (state.lastEntry or 0) < r.entry then return end
+  if time() - (state.lastLine or 0) < ENTRY_AFTER_LINE then return end
+  local list = {}
+  for _, c in ipairs(S.Candidates(ctx, "ambient")) do
+    if c.src ~= "generic" then list[#list + 1] = c end
+  end
+  local c = S.PickFrom(list, ctx)
+  if c then
+    state.lastEntry = time()
+    S.Show(c) -- also restarts the regular timer, so two lines don't follow each other
+  end
+end
+
+local lastSub -- the sub-zone at the previous check (nil right after login: no line then)
+
+local function CheckArrival()
+  if not CanSpeak() or S.InFlight() then return end
+  local ctx = S.Context()
+  local prevSub = lastSub
+  lastSub = ctx.subLower
+  if FirstVisit(ctx) then return end
+  if prevSub and ctx.subLower ~= "" and ctx.subLower ~= prevSub then EnteredSubzone(ctx) end
 end
 
 -- Recommended levels of a zone: from the game if it knows, else the classic table.

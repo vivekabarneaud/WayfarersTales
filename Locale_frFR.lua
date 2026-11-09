@@ -994,6 +994,7 @@ L.SN_BIOMES = {
 L.SN_GUIDE = table.concat({
   "|cffffd100Ambiance (Senses)|r",
   "De temps en temps, une courte ligne décrit le monde autour de vous : une odeur, un bruit, le vent, la météo. La première fois que vous arrivez dans un nouveau lieu, il vous accueille avec sa propre ligne.",
+  "En entrant dans un lieu que vous connaissez déjà (un village, une ferme, un quartier), une ligne peut aussi l'évoquer, au plus une fois toutes les 10 minutes (15 avec le rythme Rare, 5 avec Souvent).",
   "Les lignes dépendent du paysage, du lieu précis, du jour ou de la nuit, de l'intérieur ou de l'extérieur, de la météo et du monde autour de vous.",
   "L'onglet Ambiance montre ce que l'addon voit là où vous êtes, et toutes les lignes qui pourraient apparaître ici. Si une ligne vous semble fausse, signalez-la avec /wt nope.",
 }, "\n")

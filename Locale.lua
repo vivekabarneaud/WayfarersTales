@@ -1000,6 +1000,7 @@ L.SN_BIOMES = {
 L.SN_GUIDE = table.concat({
   "|cffffd100Ambiance (Senses)|r",
   "Now and then, a short line describes the world around you: a smell, a sound, the wind, the weather. The first time you reach a new place, it greets you with a line of its own.",
+  "Walking into a place you already know (a village, a farm, a district) can bring a line about it too, at most once every 10 minutes (15 with the Rare rhythm, 5 with Often).",
   "Lines depend on the landscape, the exact place, day or night, indoors or out, the weather and how many people are around.",
   "The Ambiance tab shows what the addon sees where you stand, and every line that could appear here. If a line ever feels wrong, flag it with /wt nope.",
 }, "\n")

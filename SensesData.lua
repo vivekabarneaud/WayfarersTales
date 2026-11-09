@@ -17,7 +17,8 @@
 -- French may use {masculine|feminine|neutral} forms for your character.
 --
 -- Layers, from general to precise: generic -> biome -> zone (map ID) -> sub-zone.
--- "arrive" lines play the first time you enter a place; "ambient" ones now and then.
+-- "arrive" lines play the first time you enter a place; "ambient" ones now and then,
+-- and also when you walk into a sub-zone you already know (on a separate timer).
 
 local _, KT = ...
 local D = KT.Data
@@ -174,7 +175,7 @@ S.biomes = {
       { en = "The wind smells of dry earth and old harvests.", fr = "Le vent sent la terre sèche et les vieilles moissons.", when = OUT },
     },
     ambient = {
-      { en = "Dry stalks rattle in the wind.", fr = "Des tiges sèches craquent dans le vent.", when = OUT },
+      { en = "Dry stalks rattle in the wind, a brittle whisper running across the fields.", fr = "Des tiges sèches craquent dans le vent, et ce murmure fragile court à travers les champs.", when = OUT },
       { en = "Dust gets in your eyes.", fr = "La poussière vous pique les yeux.", when = { indoors = false, weather = "clear" } },
       { en = "The dry fields stretch as far as the eye can see.", fr = "Les champs secs s'étendent à perte de vue.", when = OUT },
       { en = "Crickets chirp in the dry grass.", fr = "Des grillons chantent dans l'herbe sèche.", when = { indoors = false, night = true } },
