@@ -257,7 +257,7 @@ function S.Show(c, preview, extra)
   end
   local text = S.LineText(c.line)
   if extra then text = text .. " " .. extra end
-  KT.NarrateText("senses", c.id, text, true)
+  KT.NarrateText("senses", c.id, text, nil, true)
 end
 
 -- An arrival line, with the danger feeling added to it if this place is risky
@@ -487,7 +487,7 @@ local function CheckDanger()
   local flavor = (level ~= "None") and D.DANGER_FLAVOR[ctx.biome]
   if flavor then parts[#parts + 1] = KT.PoolText("dangerFlavor_" .. flavor) end
   parts[#parts + 1] = KT.PoolText("danger" .. level)
-  KT.NarrateText("senses", "danger" .. level, table.concat(parts, " "), true)
+  KT.NarrateText("senses", "danger" .. level, table.concat(parts, " "), nil, true)
   KT.PetSenseDanger(level)
 end
 

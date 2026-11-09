@@ -25,7 +25,8 @@ local tip                 -- the hover panel with bars (created on first hover)
 local function Clamp(x) return math.max(0, math.min(100, x)) end
 local function Round(x) return math.floor(x + 0.5) end
 
-local function Say(poolKey, important, vars)
+-- same argument order as KT.Narrate: (what, vars, important)
+local function Say(poolKey, vars, important)
   KT.Narrate("elements", poolKey, vars, important)
 end
 
@@ -89,10 +90,10 @@ local function CheckStates(env)
   if ts ~= prev then
     local r, pr = TEMP_RANK[ts], TEMP_RANK[prev]
     if r ~= 0 and math.abs(r) > math.abs(pr) and r * pr >= 0 then
-      Say(ts .. "Enter", true)
+      Say(ts .. "Enter", nil, true)
       Mark("tempRemind")
     elseif ts == "ok" then
-      Say(pr < 0 and "warmBack" or "coolBack", true)
+      Say(pr < 0 and "warmBack" or "coolBack", nil, true)
     end
     state.tempState = ts
   elseif ts ~= "ok" and Ready("tempRemind", 600) and KT.Chance(0.8) then
@@ -107,10 +108,10 @@ local function CheckStates(env)
     local s = NeedState(state[n.key], p, n.states)
     if s ~= p then
       if NeedRank(s, n.states) > NeedRank(p, n.states) then
-        Say("body_" .. s, true)
+        Say("body_" .. s, nil, true)
         Mark(n.key .. "Remind")
       elseif s == "ok" then
-        Say(n.relief, true)
+        Say(n.relief, nil, true)
       end
       state[sk] = s
     elseif s ~= "ok" and Ready(n.key .. "Remind", n.remind) and KT.Chance(0.8) then

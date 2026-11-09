@@ -1640,7 +1640,8 @@ end
 -- Narrate: show a line from a message pool, like the pet's lines (emote style,
 -- journal, never the same line twice in a row). important = shown even at chattiness 0.
 -- NarrateText: same, with a ready-made text (Senses brings its own lines).
-function KT.NarrateText(module, key, text, important, vars)
+-- Both take their arguments in the same order: (module, what, vars, important).
+function KT.NarrateText(module, key, text, vars, important)
   if not KT.ModuleOn(module) then return end
   if not important and db.settings.chatty == 0 then return end
   text = Fill(text, vars or {})
@@ -1655,7 +1656,7 @@ function KT.Narrate(module, poolKey, vars, important)
   local pool = M[poolKey]
   if not pool then Debug("missing pool", poolKey) return end
   if not KT.ModuleOn(module) then return end
-  KT.NarrateText(module, poolKey, PickLine(poolKey, pool), important, vars)
+  KT.NarrateText(module, poolKey, PickLine(poolKey, pool), vars, important)
 end
 -- Errors: saved (once each) so they can be read later or sent in the report,
 -- and mentioned once per session in the chat.
