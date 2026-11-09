@@ -46,6 +46,13 @@ D.MOMENT_RULES = {
   reviveSick      = { cd = 0,    chance = 1,   gap = 0, shares = "revive" },
 }
 
+-- Each profession's own lines use the timer of the general ones
+for _, k in ipairs({ "alchemy", "blacksmithing", "enchanting", "engineering", "herbalism", "leatherworking",
+  "mining", "skinning", "tailoring", "cooking", "firstaid", "fishing" }) do
+  D.MOMENT_RULES["learn_" .. k] = { cd = 0,   chance = 1, gap = 0, shares = "learnProfession" }
+  D.MOMENT_RULES["rank_" .. k]  = { cd = 600, chance = 1, gap = 0, shares = "craftRankUp" }
+end
+
 -- How long you stand still (not AFK, not fighting) before a quiet moment
 D.QUIET_AFTER = 150
 -- A fight counts as hard if it lasted this long, or left you below this much health
@@ -222,6 +229,93 @@ D.MOMENTS = {
     { en = "A few more secrets of {skill}, entrusted to you. There's always more to learn.",
       fr = "Quelques secrets de plus en {skill}, rien que pour vous. Il y a toujours plus à apprendre." },
   },
+  -- Each profession's own lines: learn_<key> (learning it) and rank_<key> (a new
+  -- rank). Keys come from the profession spells (see PROFESSION_KEYS in Moments.lua).
+  learn_alchemy = {
+    { en = "Alchemy: vials, herbs and strange vapors. You'll have to get used to the smell.", fr = "L'alchimie : des fioles, des herbes et d'étranges vapeurs. Il va falloir vous habituer à l'odeur." },
+    { en = "Your first lesson in alchemy: measure twice, pour once. And never sniff an unknown vial.", fr = "Première leçon d'alchimie : mesurer deux fois, verser une seule. Et ne jamais renifler une fiole inconnue." },
+  },
+  rank_alchemy = {
+    { en = "Your potions are getting clearer, your measures more precise. Alchemy is starting to make sense.", fr = "Vos potions gagnent en pureté, vos dosages en précision. L'alchimie commence à prendre tout son sens." },
+  },
+  learn_blacksmithing = {
+    { en = "Blacksmithing: fire, iron and a heavy hammer. Your arms are going to remember this.", fr = "La forge : du feu, du fer et un lourd marteau. Vos bras vont s'en souvenir." },
+    { en = "You learn to read the color of hot metal: red, orange, then that pale yellow that means it's time to strike.", fr = "Vous apprenez à lire la couleur du métal chaud : rouge, orange, puis ce jaune pâle qui annonce qu'il est temps de frapper." },
+  },
+  rank_blacksmithing = {
+    { en = "Your hammer blows grow steadier, your metal truer. The anvil is starting to know you.", fr = "Vos coups de marteau se font plus sûrs, votre métal plus droit. L'enclume commence à vous connaître." },
+  },
+  learn_enchanting = {
+    { en = "Enchanting: drawing the magic out of objects and weaving it into others. Your fingertips tingle just thinking about it.", fr = "L'enchantement : tirer la magie des objets pour la tisser dans d'autres. Rien que d'y penser, le bout de vos doigts picote." },
+    { en = "You learn to feel the faint hum of magic sleeping inside things. Enchanting has begun.", fr = "Vous apprenez à sentir le léger bourdonnement de la magie endormie dans les choses. L'enchantement commence." },
+  },
+  rank_enchanting = {
+    { en = "The arcane currents feel clearer now, easier to bend. Your enchantments hold better.", fr = "Les courants arcaniques vous semblent plus clairs, plus faciles à plier. Vos enchantements tiennent mieux." },
+  },
+  learn_engineering = {
+    { en = "Engineering: gears, blasting powder and a healthy dose of luck. What could possibly go wrong?", fr = "L'ingénierie : des engrenages, de la poudre explosive et une bonne dose de chance. Qu'est-ce qui pourrait mal tourner ?" },
+    { en = "You leave with a head full of schematics and a strong urge to blow something up. Carefully. Probably.", fr = "Vous repartez la tête pleine de schémas et une furieuse envie de faire exploser quelque chose. Prudemment. Sans doute." },
+  },
+  rank_engineering = {
+    { en = "Fewer singed eyebrows, more working gadgets. Your engineering is coming along nicely.", fr = "Moins de sourcils roussis, plus de gadgets qui marchent. Votre ingénierie fait de beaux progrès." },
+  },
+  learn_herbalism = {
+    { en = "Herbalism: from now on, every flower along the road is worth a second look.", fr = "L'herboristerie : désormais, chaque fleur au bord du chemin mérite un second regard." },
+    { en = "You learn to tell a precious herb from a common weed, and to pick it gently so it grows back.", fr = "Vous apprenez à distinguer une herbe précieuse d'une mauvaise herbe, et à la cueillir en douceur pour qu'elle repousse." },
+  },
+  rank_herbalism = {
+    { en = "You spot herbs faster now, even half hidden in the grass.", fr = "Vous repérez les herbes plus vite désormais, même à moitié cachées dans la végétation." },
+  },
+  learn_leatherworking = {
+    { en = "Leatherworking: hides, needles and thread. And patience, mostly.", fr = "Le travail du cuir : des peaux, des aiguilles et du fil. Et surtout de la patience." },
+    { en = "You run your fingers over a piece of leather and start to see what it could become.", fr = "Vous passez les doigts sur un morceau de cuir et commencez à entrevoir ce qu'il pourrait devenir." },
+  },
+  rank_leatherworking = {
+    { en = "Your stitches are tighter, your leather more supple. The craft is in your hands now.", fr = "Vos coutures sont plus serrées, votre cuir plus souple. Le métier est entre vos mains." },
+  },
+  learn_mining = {
+    { en = "Mining: from now on, every vein of ore in the rock is calling your name.", fr = "Le minage : désormais, chaque filon dans la roche vous appelle." },
+    { en = "You learn where to strike so the rock gives way: along the vein, never against it.", fr = "Vous apprenez où frapper pour que la roche cède : le long du filon, jamais contre." },
+  },
+  rank_mining = {
+    { en = "Your pick finds the weak spot in the rock faster now.", fr = "Votre pioche trouve plus vite le point faible de la roche." },
+  },
+  learn_skinning = {
+    { en = "Skinning: not the most glamorous craft, but nothing goes to waste.", fr = "Le dépeçage : pas le métier le plus glamour, mais rien ne se perd." },
+    { en = "You learn to work the knife slowly and cleanly along the hide. Your stomach will get used to it.", fr = "Vous apprenez à manier le couteau lentement et proprement, le long de la peau. Votre estomac s'y fera." },
+  },
+  rank_skinning = {
+    { en = "Your knife moves surer now, and the hides come off whole.", fr = "Votre couteau se fait plus sûr, et les peaux viennent entières." },
+  },
+  learn_tailoring = {
+    { en = "Tailoring: needle, thread and a lot of cloth. Every scrap of fabric you find just became interesting.", fr = "La couture : du fil, une aiguille et beaucoup de tissu. Chaque bout d'étoffe que vous trouverez devient intéressant." },
+    { en = "You learn to measure, cut and stitch. Somewhere, a very fine robe is waiting to be made.", fr = "Vous apprenez à mesurer, couper et coudre. Quelque part, une très belle robe attend d'être faite." },
+  },
+  rank_tailoring = {
+    { en = "Your stitches are finer, your seams straighter. Tailoring suits you.", fr = "Vos points sont plus fins, vos coutures plus droites. La couture vous va bien." },
+  },
+  learn_cooking = {
+    { en = "Cooking: a warm meal after a long day is worth more than gold.", fr = "La cuisine : un bon repas chaud après une longue journée vaut plus que de l'or." },
+    { en = "You learn the basics: a good fire, the right moment, and a pinch of salt. Your companions will thank you.", fr = "Vous apprenez les bases : un bon feu, le bon moment, et une pincée de sel. Vos compagnons vous remercieront." },
+  },
+  rank_cooking = {
+    { en = "Less burnt, more delicious. Your cooking is getting better.", fr = "Moins de brûlé, plus de délicieux. Votre cuisine s'améliore." },
+  },
+  learn_firstaid = {
+    { en = "First aid: clean bandages and steady hands. One day, this will save a life. Maybe yours.", fr = "Le secourisme : des bandages propres et des mains sûres. Un jour, ça sauvera une vie. Peut-être la vôtre." },
+    { en = "You learn to wrap a wound tight, but not too tight. It's harder than it looks.", fr = "Vous apprenez à bander une plaie bien serré, mais pas trop. C'est plus difficile qu'il n'y paraît." },
+  },
+  rank_firstaid = {
+    { en = "Your bandages are tighter, cleaner, faster. You could patch up a whole army.", fr = "Vos bandages sont plus serrés, plus propres, plus rapides. Vous pourriez soigner toute une armée." },
+  },
+  learn_fishing = {
+    { en = "Fishing: a line, a hook, and all the patience in the world.", fr = "La pêche : une ligne, un hameçon, et toute la patience du monde." },
+    { en = "From now on, every pond and every river looks a little different. What might be hiding down there?", fr = "Désormais, chaque mare et chaque rivière vous semble un peu différente. Qu'est-ce qui peut bien se cacher là-dessous ?" },
+  },
+  rank_fishing = {
+    { en = "You read the water better now: the ripples, the shadows, the right moment to pull.", fr = "Vous lisez mieux l'eau désormais : les rides, les ombres, le bon moment pour ferrer." },
+  },
+
   learnRecipe = {
     { en = "A new recipe: {item}. You can't wait to try it.", fr = "Nouvelle recette : {item}. Vous avez hâte d'essayer." },
     { en = "You go over the steps of the recipe in your head, again and again: {item}.", fr = "Vous repassez les étapes de la recette dans votre tête, encore et encore : {item}." },

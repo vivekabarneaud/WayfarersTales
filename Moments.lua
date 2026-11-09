@@ -249,19 +249,26 @@ local function ToPattern(fmt)
   return "^" .. p .. "$"
 end
 
--- Profession names in your language, from their spells (all ranks share the name)
-local PROFESSION_SPELLS = { 2259, 2018, 7411, 4036, 2366, 2108, 2575, 8613, 3908, 2550, 3273, 7620 }
-local professionNames -- lowercase name -> true
-local function IsProfession(name)
+-- Profession names in your language, from their spells (all ranks share the name).
+-- Spell ID -> key of the profession's own lines in MomentsData.lua (learn_<key>, rank_<key>).
+local PROFESSION_KEYS = {
+  [2259] = "alchemy", [2018] = "blacksmithing", [7411] = "enchanting", [4036] = "engineering",
+  [2366] = "herbalism", [2108] = "leatherworking", [2575] = "mining", [8613] = "skinning",
+  [3908] = "tailoring", [2550] = "cooking", [3273] = "firstaid", [7620] = "fishing",
+}
+local professionNames -- lowercase name -> key
+-- The profession's key if this name is a profession, else nil
+local function ProfessionKey(name)
   if not professionNames then
-    professionNames = { herbalism = true, herboristerie = true }
-    for _, id in ipairs(PROFESSION_SPELLS) do
+    professionNames = { herbalism = "herbalism", herboristerie = "herbalism" }
+    for id, key in pairs(PROFESSION_KEYS) do
       local n = SpellName(id)
-      if n then professionNames[n:lower()] = true end
+      if n then professionNames[n:lower()] = key end
     end
   end
-  return name and professionNames[name:lower()] or false
+  return name and professionNames[name:lower()] or nil
 end
+local function IsProfession(name) return ProfessionKey(name) ~= nil end
 
 -- Professions this character already had (so a new rank isn't taken for a new craft)
 local function KnownProfessions(state)
@@ -285,16 +292,16 @@ local function OnSystemMessage(msg)
   local spell = ToPattern(ERR_LEARN_SPELL_S) and msg:match(ToPattern(ERR_LEARN_SPELL_S))
   if spell then
     local name = spell:match("%[(.-)%]") or spell
-    if not IsProfession(name) then return end
+    local pkey = ProfessionKey(name)
+    if not pkey then return end
     local known = KnownProfessions(state)
     local key = name:lower()
     professionAt = GetTime() -- the recipes that come with it don't get their own line
-    if known[key] then
-      Play("craftRankUp", { skill = name })
-    else
-      known[key] = true
-      Play("learnProfession", { skill = name })
-    end
+    -- the profession's own lines if it has some, else the general ones
+    local general = known[key] and "craftRankUp" or "learnProfession"
+    local own = (known[key] and "rank_" or "learn_") .. pkey
+    known[key] = true
+    Play(D.MOMENTS[own] and own or general, { skill = name })
     return
   end
 
