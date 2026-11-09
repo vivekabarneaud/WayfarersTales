@@ -106,6 +106,25 @@ S.genericArrive = {
     when = { indoors = true, subMatch = { "inn", "auberge", "tavern", "taverne" } } },
 }
 
+-- Arriving with your hearthstone: the second half of the hearthstone line
+-- (the first half, about the magic, is in MomentsData.lua). The hearthstone
+-- always brings you next to your innkeeper, so the place you land in tells us
+-- which inn it is: zones, sub-zones and spots can have their own "hearth" lines,
+-- and these generic ones are used when there's nothing more precise.
+S.genericHearth = {
+  { en = "The familiar smell of the inn wraps around you: stew, spilled ale and woodsmoke. It feels good to be back.",
+    fr = "L'odeur familière de l'auberge vous enveloppe : ragoût, bière renversée et feu de bois. Ça fait du bien d'être de retour.",
+    when = { indoors = true, subMatch = { "inn", "auberge", "tavern", "taverne" } } },
+  { en = "Familiar walls around you again. It feels a little like coming home.",
+    fr = "Des murs familiers vous entourent à nouveau. Un peu comme rentrer chez soi.",
+    when = { indoors = true, resting = true } },
+  { en = "Familiar surroundings take shape around you. You're back, safe for a while.",
+    fr = "Des lieux familiers se dessinent autour de vous. Vous voilà de retour, à l'abri pour un moment.",
+    when = { indoors = false, resting = true } },
+  { en = "A familiar place, at last. You can finally catch your breath.",
+    fr = "Un lieu familier, enfin. Vous pouvez souffler un peu." },
+}
+
 ---------------------------------------------------------------------------
 -- Weather (asleep until each type is confirmed)
 ---------------------------------------------------------------------------
@@ -438,6 +457,10 @@ S.spots = {
         en = "The inn is little more than a battered barn. Through the gaping roof you can see the sky, and the wind carries in a smell of dust and old straw.",
         fr = "L'auberge n'est guère plus qu'une grange malmenée. Par le toit éventré, on aperçoit le ciel, et le vent apporte une odeur de poussière et de vieille paille." },
     },
+    hearth = {
+      { en = "Back in the old barn. The wind whistles through the broken roof, and it smells of dust and old straw. Not the coziest of inns, but it will do.",
+        fr = "De retour dans la vieille grange. Le vent siffle à travers le toit éventré, et ça sent la poussière et la vieille paille. Pas l'auberge la plus douillette, mais elle fera l'affaire." },
+    },
     ambient = {
       { en = "The wind whistles through the holes in the roof.", fr = "Le vent siffle à travers les trous du toit." },
       { en = "Loose planks creak overhead.", fr = "Des planches mal fixées grincent au-dessus de vous." },
@@ -452,9 +475,14 @@ S.spots = {
 -- Sub-zones (matched by name, English and French)
 ---------------------------------------------------------------------------
 S.subzones = {
-  { id = "sw_trade", names = { "trade district", "quartier commerçant" },
+  { id = "sw_trade", names = { "trade district", "quartier commerçant", "the gilded rose", "la rose dorée" },
     ambient = {
       { en = "Merchants' signs creak in the breeze.", fr = "Les enseignes des marchands grincent dans la brise.", when = OUT },
+    },
+    hearth = { -- Stormwind's inn, the Gilded Rose
+      { en = "Back at the Gilded Rose. After the road, the calm of a fine city inn feels almost luxurious.",
+        fr = "De retour dans la belle auberge de Hurlevent. Après la route, le calme d'une auberge de ville semble presque luxueux.",
+        when = { indoors = true } },
     } },
   { id = "sw_canals", names = { "the canals", "les canaux" },
     arrive = {
@@ -493,7 +521,12 @@ S.subzones = {
       { en = "A smell of machine oil and hot metal hangs in the air.", fr = "Une odeur d'huile de machine et de métal chaud flotte dans l'air.", when = OUT },
       { en = "Somewhere in the field, gears creak and grind.", fr = "Quelque part dans le champ, des engrenages grincent.", when = OUT },
     } },
-  { id = "goldshire", names = { "goldshire", "comté-de-l'or" },
+  { id = "goldshire", names = { "goldshire", "comté-de-l'or", "lion's pride inn", "auberge de la fierté du lion" },
+    hearth = {
+      { en = "The warmth of the Lion's Pride Inn closes around you again, with its smell of stew and woodsmoke. Your stomach is already growling.",
+        fr = "La chaleur de l'auberge de Comté-de-l'Or se referme à nouveau sur vous, avec son odeur de ragoût et de feu de bois. Votre estomac gargouille déjà.",
+        when = { indoors = true } },
+    },
     arrive = {
       { long = true,
         en = "The roofs of Goldshire appear between the trees. The smell of the inn's kitchen drifts across the road, and your stomach answers.",
@@ -502,6 +535,12 @@ S.subzones = {
     },
     ambient = {
       { en = "The smell of the inn's kitchen drifts across the road.", fr = "L'odeur des cuisines de l'auberge flotte jusqu'au chemin.", when = OUT },
+    } },
+  { id = "darkshire", names = { "darkshire", "sombre-comté", "scarlet raven tavern" }, -- Duskwood
+    hearth = {
+      { en = "Darkshire's inn is dim and hushed, and outside, the night never ends. Still, four walls and a roof are something.",
+        fr = "L'auberge de Sombre-Comté est sombre et feutrée, et dehors, la nuit ne finit jamais. Mais quatre murs et un toit, c'est déjà ça.",
+        when = { indoors = true } },
     } },
   { id = "if_forge", names = { "the great forge", "la grande forge" },
     arrive = {

@@ -922,7 +922,7 @@ L.SN_TAGS = {
   day = "daytime", night = "night", indoors = "indoors", outdoors = "outdoors", resting = "city or inn",
   swimming = "swimming", weather = "weather: %s", crowd = "crowd: %s",
   airBelow = "air below %s", airAbove = "air above %s", notBiomes = "not in: %s", place = "place: %s",
-  long = "long", spot = "this spot", moving = "walking",
+  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone",
 }
 L.SN_POS = "Position: %s   Spot: %s"
 L.SN_LANDSCAPE = "Landscape: %s   Zone levels: %s"

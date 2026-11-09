@@ -100,6 +100,23 @@ local function Quiet()
   S.Show(c, false, nil, nil, S.LineText(lead))
 end
 
+-- Arrived with the hearthstone: the magic, then the place you land in
+-- (most precise first: this spot, this sub-zone... then a generic line).
+local function Hearth()
+  local rule, state = Ready("hearth")
+  if not rule then return end
+  local ctx = S.Context()
+  local lead, i = PickLine("hearth", state, ctx)
+  local place = S.PickFrom(S.Candidates(ctx, "hearth"), ctx)
+  if not lead and not place then return end
+  Commit("hearth", rule, state)
+  if place then
+    S.Show(place, false, nil, nil, lead and S.LineText(lead))
+  else
+    S.Show({ line = lead, id = "moment:hearth:" .. i, src = "moment", kind = "moment" })
+  end
+end
+
 ---------------------------------------------------------------------------
 -- What happens to you
 ---------------------------------------------------------------------------
@@ -227,7 +244,7 @@ local function Tick()
 
   -- arrived with the hearthstone
   if hearthAt and now - hearthAt > 3 then
-    if now - hearthAt < 120 then Play("hearth") end
+    if now - hearthAt < 120 then Hearth() end
     hearthAt = nil
   end
 

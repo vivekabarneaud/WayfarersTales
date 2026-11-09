@@ -109,11 +109,13 @@ D.MOMENTS = {
   },
 
   -- Travel
+  -- First half of the hearthstone line: the magic. The second half describes the
+  -- place you land in (SensesData.lua: "hearth" lines of spots, sub-zones, zones,
+  -- and S.genericHearth).
   hearth = {
     { en = "Your head still spins a little from the hearthstone's magic.", fr = "La magie de la pierre de foyer vous fait encore un peu tourner la tête." },
     { en = "The pull of the hearthstone fades, and the world settles around you again.", fr = "L'attraction de la pierre de foyer s'estompe, et le monde se remet en place autour de vous." },
-    { en = "Familiar walls around you again. It feels a little like coming home.", fr = "Des murs familiers vous entourent à nouveau. Un peu comme rentrer chez soi.",
-      when = { indoors = true } },
+    { en = "The hearthstone's magic lets go of you, leaving a slight dizziness behind.", fr = "La magie de la pierre de foyer vous relâche, en laissant derrière elle un léger vertige." },
   },
   landing = {
     { en = "Solid ground again. It takes your legs a moment to remember it.", fr = "Enfin la terre ferme. Vos jambes mettent un moment à s'en souvenir." },

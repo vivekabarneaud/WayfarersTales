@@ -167,6 +167,8 @@ function S.Candidates(ctx, kind)
   if kind == "ambient" then
     add("weather", D.SENSES.weather, 1.5, "weather")
     add("generic", D.SENSES.generic, 0.5, "generic")
+  elseif kind == "hearth" then
+    add("generic", D.SENSES.genericHearth, 1, "genericHearth") -- landing at your inn
   else
     add("generic", D.SENSES.genericArrive, 1, "genericArrive") -- e.g. walking into an inn
   end
@@ -301,7 +303,8 @@ function S.Tags(c, ctx)
   elseif c.src == "zone" then add(T.zone)
   elseif c.src == "biome" then add(string.format(T.biome, L.SN_BIOMES[c.biome] or tostring(c.biome)))
   else add(T.generic) end
-  if c.kind == "arrive" then add((L.SN_ARRIVE_TAG:gsub("[()]", ""))) end
+  if c.kind == "arrive" then add((L.SN_ARRIVE_TAG:gsub("[()]", "")))
+  elseif c.kind == "hearth" then add(T.hearth) end
   if c.line and c.line.long then add(T.long) end
 
   local w = c.line and c.line.when
@@ -361,7 +364,7 @@ end
 function S.LinesHere()
   local ctx = S.Context()
   local out = {}
-  for _, kind in ipairs({ "arrive", "ambient" }) do
+  for _, kind in ipairs({ "arrive", "ambient", "hearth" }) do
     for _, c in ipairs(S.Candidates(ctx, kind)) do
       local ok, reason = Check(c.line.when, ctx)
       if ok then

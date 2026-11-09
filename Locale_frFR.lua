@@ -914,7 +914,7 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit", moving = "en marchant",
+  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer",
 }
 L.SN_POS = "Position : %s   Endroit : %s"
 L.SN_LANDSCAPE = "Paysage : %s   Niveaux de la zone : %s"
