@@ -1,4 +1,4 @@
--- Kindred Tales - textes en français.
+-- Wayfarer's Tales - textes en français.
 -- Remplace les textes anglais de Locale.lua quand la langue est le français.
 -- Tout ce qui manque ici reste en anglais.
 -- On ne connaît pas le sexe du familier : pas de "il/elle", et pas d'adjectifs
@@ -55,13 +55,10 @@ L.MEMORY = {
 
 L.TT_SCORE      = "Affection : %d / 100"
 L.TT_NEXT       = "Palier suivant : %s à %d"
-L.TT_MAX        = "Vous avez atteint le lien le plus profond."
 L.TT_LOYALTY    = "Loyauté : %s"
 L.TT_HAPPINESS  = "Bonheur : %s"
 L.TT_TOGETHER   = "Temps passé ensemble : %s"
 L.TT_STATS      = "%d aventures, %d repas partagés, %d feux de camp"
-L.TT_TODAY      = "Gagné aujourd'hui : +%s"
-L.TT_MEMORY     = "Dernier souvenir : %s"
 L.TT_MEAL       = "%s attend une bouchée de votre repas !"
 L.TT_HINT       = "Cliquez ou tapez /wt pour en savoir plus."
 L.TT_MOOD       = "Humeur du jour : %s"
@@ -92,7 +89,6 @@ L.UI_OPT_LABEL    = "Afficher « Wayfarer's Tales » devant les messages du fami
 L.UI_TAB_JOURNAL  = "Journal"
 L.UI_MODULES      = "Modules"
 L.UI_MOD_KINDRED  = "Compagnie du familier (Kindred)"
-L.UI_MOD_SOON     = "Bientôt : ambiance (Senses), confort du corps (Elements)."
 L.UI_KINDRED_OFF  = "Le module du familier est désactivé. Vous pouvez le réactiver dans l'onglet Options."
 L.UI_JOURNAL_EMPTY = "Votre journal est vide pour l'instant. Chaque ligne de votre histoire sera écrite ici."
 L.UI_JOURNAL_PAGE  = "Page %d / %d"
@@ -746,8 +742,6 @@ M.idle_chitin = {
 
 L.UI_TAB_BODY     = "Corps"
 L.UI_MOD_ELEMENTS = "Confort du corps (Elements) : froid, chaleur, humidité, soif"
-L.UI_MOD_SOON     = "Bientôt : ambiance (Senses)."
-L.UI_OPT_BODY     = "Afficher les icônes de confort sous le cadre du personnage"
 L.EL_TITLE        = "Confort du corps"
 L.EL_TEMP         = "Température : %s"
 L.EL_TEMP_STATES  = { freezing = "Glacial", cold = "Froid", ok = "Confortable", hot = "Chaud", overheat = "Étouffant" }
@@ -896,7 +890,6 @@ L.UI_RHYTHM       = { [0] = "Jamais", [1] = "Rare", [2] = "Normal", [3] = "Souve
 L.SN_OFF          = "Le module d'ambiance est désactivé. Vous pouvez le réactiver dans l'onglet Options."
 L.SN_YES, L.SN_NO = "oui", "non"
 L.SN_PLACE        = "Lieu : %s  (carte %s)"
-L.SN_LANDSCAPE    = "Paysage : %s"
 L.SN_WEATHER      = "Météo : %s"
 L.SN_WEATHER_NONE = "inconnue"
 L.SN_WEATHER_UNKNOWN = "type %s, intensité %s (pas encore identifiée : dites-moi ce que vous voyez !)"
@@ -912,7 +905,7 @@ L.SN_ARRIVE_TAG   = "(première visite)"
 L.SN_TAGS = {
   generic = "partout", biome = "paysage : %s", zone = "cette zone", subzone = "ce lieu précis",
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
-  swimming = "en nageant", inn = "auberge", weather = "météo : %s", crowd = "monde : %s",
+  swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
   long = "longue", spot = "cet endroit",
 }

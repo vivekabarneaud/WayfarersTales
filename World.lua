@@ -63,8 +63,6 @@ D.CLIMATE = {
 }
 D.CLIMATE_DEFAULT = { temp = 0, biome = "unknown" }
 
--- Aura IDs confirmed in Forever
-D.AURA_CAMP_NEAR = D.AURA_CAMP_NEAR or 1283391
 
 function W.MapID()
   if not (C_Map and C_Map.GetBestMapForUnit) then return nil end
@@ -139,9 +137,9 @@ function W.Snapshot()
     zone = GetRealZoneText(),
     sub = GetSubZoneText(),
     afk = UnitIsAFK("player") and true or false,
-    seatedAtFire = W.HasAura(1229739), -- the 60s "stay seated" campfire buff
-    eating = W.HasAura(D.SPELL_FOOD_AURA or 433, true),
-    drinking = W.HasAura(D.SPELL_DRINK_AURA or 430, true),
+    seatedAtFire = W.HasAura(D.AURA_CAMP_WELCOME), -- the 60s "stay seated" campfire buff
+    eating = W.HasAura(D.SPELL_FOOD_AURA, true),
+    drinking = W.HasAura(D.SPELL_DRINK_AURA, true),
   }
   env.air = W.AirTemp(env)
   -- your position on the zone map, in % like the coordinates under the minimap

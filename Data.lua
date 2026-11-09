@@ -1,4 +1,5 @@
--- Wayfarer's Tales - game data and tuning numbers (Kindred module for now).
+-- Wayfarer's Tales - game data, tuning numbers and default settings.
+-- (Climate per zone is in World.lua, immersion lines in SensesData.lua.)
 -- IDs below were confirmed in WoW Forever 1.60.1 with the Companion Scout addon
 -- unless marked otherwise.
 
@@ -8,7 +9,6 @@ KT.Data = D
 
 -- Bond stages (minimum affection for each). Names live in Locale.lua.
 D.TIERS = { 0, 20, 40, 60, 80, 100 }
-D.TIER_COLORS = { "ffc0c0c0", "ffffc0cb", "ffff9ab5", "ffff6f9a", "ffff4070", "ffff2050" }
 
 -- Spells (confirmed)
 D.SPELL_FEED_PET   = 6991
@@ -64,7 +64,7 @@ D.MOOD_MULT = {
   hungry  = { meal = 1.6, loot = 1.3 },
 }
 
--- Days together worth celebrating (counted from when Kindred Tales met the pet).
+-- Days together worth celebrating (counted from when the addon first met the pet).
 D.DAY_MILESTONES = { 7, 30, 100 }
 
 -- Pet stance tokens (same in every language)
@@ -218,7 +218,26 @@ D.POOL_SOUND = {
   treatGiven = "happy", celebrated = "excited",
   petDangerHigh = "excited", petDangerNear = "excited",
 }
-D.SOUND_GAP = 3 -- seconds between two sounds at most
+
+-- Default settings (applied once, for any setting not saved yet).
+-- tempUnit isn't here on purpose: without a choice it follows the game's language.
+D.DEFAULTS = {
+  chatty = 2,              -- how often the pet speaks up (0-3)
+  sound = true,
+  label = false,           -- "Wayfarer's Tales" before the pet's lines
+  language = "auto",
+  gender = "auto",         -- your character's grammatical gender (French)
+  debug = false,
+  minimap = true,
+  minimapAngle = 200,
+  showHeart = true,
+  showThermo = true,
+  thermoAngle = 15,
+  bodyStyle = "none",      -- body comfort by your portrait: none / icons / bars
+  sensesRhythm = 2,        -- how often immersion lines appear (0-3)
+  sensesStyle = "mixed",   -- line length: short / mixed / rich
+}
+D.SOUND_GAP = 3 -- minimum seconds between two animal sounds (chimes ignore it)
 
 -- Your own icon art: set to a path like "Interface\\AddOns\\WayfarersTales\\Media\\heart"
 -- once the file exists (a missing file shows as a green square).

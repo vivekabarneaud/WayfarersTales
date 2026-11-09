@@ -1,4 +1,4 @@
--- Kindred Tales - texts (English, the reference language).
+-- Wayfarer's Tales - texts (English, the reference language).
 -- Every player-facing sentence lives here. Translations (Locale_frFR.lua...)
 -- only replace what they define; anything missing stays in English.
 -- {pet}, {item}, {tier}, {loyalty}, {old}, {days}, {count} are filled in at runtime.
@@ -57,13 +57,10 @@ L.MEMORY = {
 -- Tooltip / command texts
 L.TT_SCORE      = "Affection: %d / 100"
 L.TT_NEXT       = "Next: %s at %d"
-L.TT_MAX        = "You have reached the deepest bond."
 L.TT_LOYALTY    = "Loyalty: %s"
 L.TT_HAPPINESS  = "Happiness: %s"
 L.TT_TOGETHER   = "Time together: %s"
 L.TT_STATS      = "%d adventures, %d shared meals, %d campfires"
-L.TT_TODAY      = "Gained today: +%s"
-L.TT_MEMORY     = "Latest memory: %s"
 L.TT_MEAL       = "%s is waiting for a bite of your food!"
 L.TT_HINT       = "Click or type /wt for more."
 L.TT_MOOD       = "Mood today: %s"
@@ -95,7 +92,6 @@ L.UI_OPT_LABEL   = "Show \"Wayfarer's Tales\" before your pet's messages"
 L.UI_TAB_JOURNAL = "Journal"
 L.UI_MODULES     = "Modules"
 L.UI_MOD_KINDRED = "Pet companionship (Kindred)"
-L.UI_MOD_SOON    = "Coming soon: immersion lines (Senses)."
 L.UI_KINDRED_OFF = "The pet companionship module is turned off. You can turn it back on in the Options tab."
 L.UI_JOURNAL_EMPTY = "Your journal is empty for now. Every line of your story will be written here."
 L.UI_JOURNAL_PAGE  = "Page %d / %d"
@@ -754,7 +750,6 @@ M.loyaltyUp = {
 
 L.UI_TAB_BODY     = "Body"
 L.UI_MOD_ELEMENTS = "Body comfort (Elements): cold, heat, wetness, thirst"
-L.UI_OPT_BODY     = "Show the body comfort icons under your character frame"
 L.EL_TITLE        = "Body comfort"
 L.EL_TEMP         = "Temperature: %s"
 L.EL_TEMP_STATES  = { freezing = "Freezing", cold = "Cold", ok = "Comfortable", hot = "Hot", overheat = "Overheating" }
@@ -901,7 +896,6 @@ L.UI_RHYTHM       = { [0] = "Never", [1] = "Rare", [2] = "Normal", [3] = "Often"
 L.SN_OFF          = "The immersion module is turned off. You can turn it back on in the Options tab."
 L.SN_YES, L.SN_NO = "yes", "no"
 L.SN_PLACE        = "Place: %s  (map %s)"
-L.SN_LANDSCAPE    = "Landscape: %s"
 L.SN_WEATHER      = "Weather: %s"
 L.SN_WEATHER_NONE = "unknown"
 L.SN_WEATHER_UNKNOWN = "type %s, intensity %s (not identified yet: please tell what you see!)"
@@ -917,7 +911,7 @@ L.SN_ARRIVE_TAG   = "(first visit)"
 L.SN_TAGS = {
   generic = "anywhere", biome = "landscape: %s", zone = "this zone", subzone = "this exact place",
   day = "daytime", night = "night", indoors = "indoors", outdoors = "outdoors", resting = "city or inn",
-  swimming = "swimming", inn = "inn", weather = "weather: %s", crowd = "crowd: %s",
+  swimming = "swimming", weather = "weather: %s", crowd = "crowd: %s",
   airBelow = "air below %s", airAbove = "air above %s", notBiomes = "not in: %s", place = "place: %s",
   long = "long", spot = "this spot",
 }

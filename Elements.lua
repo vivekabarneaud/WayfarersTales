@@ -49,7 +49,6 @@ local function TempState(t, prev)
   if t > 65 - (r >= 1 and 3 or 0) then return "hot" end
   return "ok"
 end
-E.TempState = function(t) return TempState(t) end
 
 -- Needs: thirst, hunger, energy. Each has an ok / mild / serious state.
 local NEEDS = {
@@ -240,7 +239,6 @@ function E.Tick()
   CheckStates(env)
   lastEnv = env
   state.last = time()
-  E.target = target
   E.env = env
   E.UpdateIcons()
   E.UpdateThermo()
@@ -517,7 +515,7 @@ function E.UpdateIcons()
   if not strip then return end
   local bodyStyle = KT.GetDB().settings.bodyStyle or "none"
   -- "none" (default): your body only speaks through the chat
-  if not state or not KT.ModuleOn("elements") or KT.GetDB().settings.showBody == false or bodyStyle == "none" then
+  if not state or not KT.ModuleOn("elements") or bodyStyle == "none" then
     strip:Hide()
     return
   end

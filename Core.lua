@@ -7,7 +7,6 @@ local L, M, D = KT.L, KT.Messages, KT.Data
 local db        -- WayfarersTalesDB (SavedVariables)
 local pet       -- record of the hunter pet currently out, or nil
 local diet      -- set of food types the current pet eats (nil = unknown)
-local errSeen = {}
 
 local lastEmote = { token = nil, t = 0 } -- last emote command typed
 local manualAfkAt = 0                    -- when you last typed /afk yourself
@@ -243,7 +242,6 @@ local function AddJournal(module, key, text, delta)
   while #j > MAX_JOURNAL do table.remove(j, 1) end
   if KT.RefreshPanel then KT.RefreshPanel() end
 end
-KT.AddJournal = AddJournal
 
 function KT.ModuleOn(name)
   return db and db.modules and db.modules[name] ~= false
@@ -568,7 +566,7 @@ local function CheckMilestones()
 end
 
 local function OnPetAppear()
-  local hasUI, isHunterPet = HasPetUI()
+  local _, isHunterPet = HasPetUI()
   if not UnitExists("pet") or not isHunterPet then
     pet, diet = nil, nil
     UpdateHeart()
@@ -1174,25 +1172,6 @@ local function ShowTooltip(self)
   GameTooltip:Show()
 end
 
--- A round icon in a golden ring, like the buttons around the minimap.
--- The frame should be ~1.8x the icon size (the ring is thick). Returns the icon texture.
-function KT.RoundIcon(frame, iconSize)
-  local k = iconSize / 17 -- minimap buttons: 17px icon inside a 53px ring texture, at (7, -6)
-  local bg = frame:CreateTexture(nil, "BACKGROUND")
-  bg:SetTexture("Interface\\Minimap\\UI-Minimap-Background")
-  bg:SetSize(iconSize + 3, iconSize + 3)
-  bg:SetPoint("CENTER", frame, "CENTER", 0, 0)
-  local icon = frame:CreateTexture(nil, "ARTWORK")
-  icon:SetSize(iconSize, iconSize)
-  icon:SetPoint("CENTER", frame, "CENTER", 0, 0)
-  pcall(icon.SetMask, icon, "Interface\\CharacterFrame\\TempPortraitAlphaMask")
-  local ring = frame:CreateTexture(nil, "OVERLAY")
-  ring:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
-  ring:SetSize(53 * k, 53 * k)
-  ring:SetPoint("TOPLEFT", icon, "TOPLEFT", -7 * k, 6 * k)
-  return icon
-end
-
 -- A square icon in a thin golden frame (the game's tooltip border, tinted gold),
 -- close to the look of the pet happiness icon. Returns the icon texture.
 function KT.SquareIcon(frame, size)
@@ -1256,21 +1235,14 @@ function H.ADDON_LOADED(name)
   db.pets = db.pets or {}
   db.settings = db.settings or {}
   local s = db.settings
-  if s.chatty == nil then s.chatty = 2 end
-  s.drops = nil -- option removed in 0.3: small drops are part of the story
-  if s.minimap == nil then s.minimap = true end
-  if s.label == nil then s.label = false end
-  if s.sound == nil then s.sound = true end
-  if s.showBody == nil then s.showBody = true end
-  if s.showThermo == nil then s.showThermo = true end
-  if s.gender == nil then s.gender = "auto" end
-  if s.sensesRhythm == nil then s.sensesRhythm = 2 end
-  if s.sensesStyle == nil then s.sensesStyle = "mixed" end
-  if s.language == nil then s.language = "auto" end
+  -- every setting starts from its default (D.DEFAULTS in Data.lua)
+  for key, value in pairs(D.DEFAULTS) do
+    if s[key] == nil then s[key] = value end
+  end
+  -- settings and data from older versions, no longer used
+  s.drops, s.showBody, s.bodyPos, s.bodyPos2, s.bodyPos3 = nil, nil, nil, nil, nil
+  db.probes = nil
   KT.ApplyLanguage()
-  if s.showHeart == nil then s.showHeart = true end
-  if s.minimapAngle == nil then s.minimapAngle = 200 end
-  if s.debug == nil then s.debug = false end
   if not db.welcomed then
     db.welcomed = true
     After(5, function() Print(L.LOADED_FIRST) end)
@@ -1278,8 +1250,9 @@ function H.ADDON_LOADED(name)
 end
 
 ---------------------------------------------------------------------------
--- Weather recorder (development data for the coming Senses/Elements modules):
--- writes what C_Weather says to the saved file, only when it changes.
+-- Weather recorder: writes to the saved file what C_Weather says, but only for
+-- weather types not identified yet (see D.WEATHER_CONFIRMED in SensesData.lua),
+-- so we can learn which numbers mean rain, snow or sandstorm.
 ---------------------------------------------------------------------------
 
 local function Serialize(v, depth)
@@ -1306,6 +1279,12 @@ local function RecordWeather(reason, extra)
   local value = table.concat(parts, ", ")
   if value == lastWeather and not extra then return end
   lastWeather = value
+  -- only weather types we haven't identified yet are worth writing down
+  local w = r[1] and r[2]
+  if type(w) == "table" and D.WEATHER_TYPES and D.WEATHER_CONFIRMED
+    and D.WEATHER_CONFIRMED[D.WEATHER_TYPES[w.type] or ""] then
+    return
+  end
   local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
   local h, m = GetGameTime()
   db.weatherLog = db.weatherLog or {}
@@ -1316,7 +1295,6 @@ local function RecordWeather(reason, extra)
   while #db.weatherLog > 300 do table.remove(db.weatherLog, 1) end
   Debug("weather", value)
 end
-KT.RecordWeather = RecordWeather
 
 function KT.StartWeatherRecorder()
   if not C_Weather then return end
@@ -1618,29 +1596,6 @@ SlashCmdList.WAYFARERSTALES = function(msg)
       wipe(s.recent or {})
     end
     Print(L.CMD_RESET_VISITS)
-  elseif cmd == "probe" then
-    -- looks for anything weather-related the game lets addons see
-    local found = {}
-    for k, v in pairs(_G) do
-      if type(k) == "string" then
-        if k:lower():find("weather") then found[#found + 1] = k .. " (" .. type(v) .. ")" end
-        if k:sub(1, 2) == "C_" and type(v) == "table" then
-          for k2 in pairs(v) do
-            if type(k2) == "string" and k2:lower():find("weather") then found[#found + 1] = k .. "." .. k2 end
-          end
-        end
-      end
-    end
-    local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-    local line = date("%Y-%m-%d %H:%M") .. " weather: " .. (#found > 0 and table.concat(found, ", ") or "nothing found")
-      .. " | mapID=" .. tostring(mapID) .. " indoors=" .. tostring(IsIndoors and IsIndoors())
-      .. " resting=" .. tostring(IsResting()) .. " swimming=" .. tostring(IsSwimming())
-      .. " zone=" .. tostring(GetRealZoneText()) .. " subzone=" .. tostring(GetSubZoneText())
-      .. " gametime=" .. string.format("%02d:%02d", GetGameTime())
-    Print(line)
-    db.probes = db.probes or {}
-    table.insert(db.probes, line) -- saved for later reading
-    while #db.probes > 200 do table.remove(db.probes, 1) end
   elseif cmd == "guide" or cmd == "options" or cmd == "journal" then
     if KT.TogglePanel then KT.TogglePanel(cmd) end
   elseif cmd == "" and KT.TogglePanel then
