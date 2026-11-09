@@ -101,6 +101,7 @@ local function Check(when, ctx)
     if not D.WEATHER_CONFIRMED[when.weather] then return false, "weatherWait" end
     if not ctx.weather or ctx.weather.name ~= when.weather then return false, "weather" end
   end
+  if when.calm and (ctx.crowd == "lively" or ctx.crowd == "crowded") then return false, "calm" end
   if when.crowd then
     if not ctx.crowd then return false, "crowdUnknown" end
     local ok = false
@@ -314,6 +315,7 @@ function S.Tags(c, ctx)
     if w.resting then add(T.resting, ctx.resting) end
     if w.swimming then add(T.swimming, ctx.swimming) end
     if w.moving then add(T.moving, ctx.moving) end
+    if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
     if w.subMatch then
       local found = false
       for _, s in ipairs(w.subMatch) do

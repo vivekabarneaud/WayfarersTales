@@ -182,8 +182,12 @@ D.MOMENTS = {
 
   -- Stepping indoors and out (one shared timer)
   goIn = {
-    { en = "The sounds of the outside fade as you step inside.", fr = "Les bruits du dehors s'estompent quand vous entrez." },
-    { en = "Inside, the air is still.", fr = "À l'intérieur, l'air est immobile." },
+    -- calm = only when no crowd is seen around you
+    { en = "The sounds of the outside fade as you step inside.", fr = "Les bruits du dehors s'estompent quand vous entrez.", when = { calm = true } },
+    { en = "Inside, everything is calm and quiet.", fr = "À l'intérieur, tout est calme et paisible.", when = { calm = true } },
+    { en = "You step into the bustle: voices everywhere, people coming and going.", fr = "Vous entrez dans l'agitation : des voix de partout, des allées et venues.",
+      when = { crowd = { "lively", "crowded" } } },
+    { en = "It's packed in here. You have to squeeze your way through.", fr = "C'est bondé ici. Il faut jouer des coudes pour avancer.", when = { crowd = "crowded" } },
     { en = "Your eyes take a moment to adjust to the dimmer light.", fr = "Vos yeux mettent un instant à s'habituer à la pénombre.",
       when = { night = false, notBiomes = NO_DARK } },
   },

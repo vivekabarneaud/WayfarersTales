@@ -914,7 +914,7 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer",
+  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule",
 }
 L.SN_POS = "Position : %s   Endroit : %s"
 L.SN_LANDSCAPE = "Paysage : %s   Niveaux de la zone : %s"
@@ -987,7 +987,7 @@ L.SN_REASONS = {
   biome = "pas dans ce paysage", sub = "seulement dans un lieu précis",
   weatherWait = "en attente des données météo", weather = "pas avec cette météo",
   crowdUnknown = "a besoin de savoir qui est là", crowd = "pas avec ce monde-là",
-  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant",
+  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule",
 }
 L.SN_BIOMES = {
   forest = "forêt", plains = "plaines", farmland = "terres agricoles sèches", hills = "collines", mountain = "montagnes", snow = "neige",
