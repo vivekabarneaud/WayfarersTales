@@ -18,6 +18,11 @@ D.MOMENT_RULES = {
   eatItem         = { cd = 900,  chance = 0.6, gap = 20, shares = "eat" },
   drink           = { cd = 900,  chance = 0.5, gap = 20 },
   drinkItem       = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
+  drinkWater      = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
+  drinkConjured   = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
+  drinkMilk       = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
+  drinkJuice      = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
+  drinkDew        = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -34,6 +39,9 @@ D.MOMENT_RULES = {
   mail            = { cd = 1800, chance = 0.6, gap = 20 },
   auction         = { cd = 1800, chance = 0.6, gap = 20 },
   trainer         = { cd = 1800, chance = 0.6, gap = 20 },
+  learnProfession = { cd = 0,    chance = 1,   gap = 0 },
+  craftRankUp     = { cd = 600,  chance = 1,   gap = 0 },
+  learnRecipe     = { cd = 1800, chance = 0.35, gap = 30 },
   revive          = { cd = 0,    chance = 1,   gap = 0 },
   reviveSick      = { cd = 0,    chance = 1,   gap = 0, shares = "revive" },
 }
@@ -47,7 +55,17 @@ D.CLOSE_FIGHT_HEALTH = 0.2
 -- Flights shorter than this don't get a landing line
 D.LONG_FLIGHT = 60
 
-local NO_DARK = { gloom = true, undercity = true } -- places where day and night barely show
+-- Kinds of drinks, from words in the item's name (English and French, lowercase).
+-- First match wins: "Conjured Water" is conjured, not plain water.
+D.DRINK_WORDS = {
+  { "Conjured", { "conjured", "invoqu" } },
+  { "Milk",     { "milk", "lait" } },
+  { "Dew",      { "dew", "rosée" } },
+  { "Juice",    { "juice", "jus ", "nectar" } },
+  { "Water",    { "water", "eau " } },
+}
+
+local NO_DARK ={ gloom = true, undercity = true } -- places where day and night barely show
 
 D.MOMENTS = {
   -- You sit down to eat (and we don't know what)
@@ -69,6 +87,26 @@ D.MOMENTS = {
   drinkItem = {
     { en = "You sip your {item} slowly. It does you good.", fr = "Vous sirotez votre {item} lentement. Ça fait du bien." },
     { en = "You sit down and drink slowly, letting your breath settle.", fr = "Vous vous asseyez et buvez lentement, le temps de reprendre votre souffle." },
+  },
+  -- by kind of drink (see D.DRINK_WORDS)
+  drinkWater = {
+    { en = "You drink your {item} in long gulps. Nothing fancy, just good, clear water.", fr = "Vous buvez votre {item} à longues gorgées. Rien d'extraordinaire, juste une bonne eau claire." },
+    { en = "Your {item} tastes of nothing at all, and that's exactly its charm.", fr = "Votre {item} n'a le goût de rien, et c'est justement ce qui fait tout son charme." },
+    { en = "Water, simply. You drink slowly, and your whole body seems to thank you.", fr = "De l'eau, tout simplement. Vous buvez lentement, et tout votre corps semble vous dire merci." },
+  },
+  drinkConjured = {
+    { en = "The conjured water tingles faintly on your tongue, as if to remind you it was made of magic.", fr = "L'eau invoquée picote légèrement sur la langue, comme pour vous rappeler qu'elle est faite de magie." },
+    { en = "Conjured water: perfectly clear, perfectly cold, and maybe a little too perfect.", fr = "De l'eau invoquée : parfaitement claire, parfaitement froide, et peut-être un peu trop parfaite." },
+  },
+  drinkMilk = {
+    { en = "The milk is rich and creamy. You end up with a little white mustache.", fr = "Le lait est riche et onctueux. Vous voilà avec une petite moustache blanche." },
+    { en = "You drink your {item} slowly. It tastes like a farmhouse breakfast.", fr = "Vous buvez votre {item} lentement. Ça a le goût d'un petit-déjeuner à la ferme." },
+  },
+  drinkJuice = {
+    { en = "Your {item} is sweet and fruity. A small treat.", fr = "Votre {item} a un goût sucré et fruité. Une petite douceur." },
+  },
+  drinkDew = {
+    { en = "Your {item} tastes faintly of flowers and early morning.", fr = "Votre {item} a un léger goût de fleurs et de petit matin." },
   },
 
   -- A long fight, or one that left you below half health
@@ -166,6 +204,28 @@ D.MOMENTS = {
   trainer = {
     { en = "Your trainer looks you over, as if measuring how far you've come.", fr = "Un regard attentif vous détaille, comme pour mesurer le chemin parcouru." },
     { en = "Your trainer greets you with a knowing nod.", fr = "Un signe de tête entendu vous accueille." },
+  },
+
+  -- Professions. {skill} = the profession's name, {item} = the recipe
+  learnProfession = {
+    { en = "{skill}: a whole new craft to learn. Your fingers are already itching to try.",
+      fr = "{skill} : tout un nouveau métier à apprendre. Les doigts vous démangent déjà d'essayer." },
+    { en = "A new path opens before you: {skill}. Every master started exactly here.",
+      fr = "Une nouvelle voie s'ouvre à vous : {skill}. Tous les maîtres ont commencé exactement ici." },
+    { en = "You leave with your head full of new words, new tools and new gestures. {skill} will take patience.",
+      fr = "Vous repartez la tête pleine de nouveaux mots, de nouveaux outils et de nouveaux gestes. {skill} demandera de la patience." },
+  },
+  -- a higher rank of a profession you already know (journeyman, expert...)
+  craftRankUp = {
+    { en = "You feel your hands grow surer. {skill} is becoming second nature.",
+      fr = "Vos mains se font plus sûres. {skill} devient peu à peu une seconde nature." },
+    { en = "A few more secrets of {skill}, entrusted to you. There's always more to learn.",
+      fr = "Quelques secrets de plus en {skill}, rien que pour vous. Il y a toujours plus à apprendre." },
+  },
+  learnRecipe = {
+    { en = "A new recipe: {item}. You can't wait to try it.", fr = "Nouvelle recette : {item}. Vous avez hâte d'essayer." },
+    { en = "You go over the steps of the recipe in your head, again and again: {item}.", fr = "Vous repassez les étapes de la recette dans votre tête, encore et encore : {item}." },
+    { en = "You carefully commit it to memory: {item}.", fr = "Vous la gravez soigneusement dans votre mémoire : {item}." },
   },
 
   -- Back to life

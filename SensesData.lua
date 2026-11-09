@@ -461,6 +461,17 @@ S.zones = {
 -- The most precise level of all.
 ---------------------------------------------------------------------------
 S.spots = {
+  { id = "sw_dwarven_forge", map = 1453, x = 63.7, y = 36.7, r = 2.5, when = { indoors = false },
+    names = { en = "the Dwarven District forge", fr = "la forge du Quartier des Nains" },
+    arrive = {
+      { long = true,
+        en = "You step close to the forge. The heat hits you like a wall, the air shimmers above the coals, and the smell of hot iron fills your lungs.",
+        fr = "Vous vous approchez de la forge. La chaleur vous frappe comme un mur, l'air tremble au-dessus des braises, et l'odeur du fer chaud vous emplit les poumons." },
+    },
+    ambient = {
+      { en = "The heat of the forge stings your cheeks.", fr = "La chaleur de la forge vous pique les joues." },
+      { en = "The coals glow red, and the air above them shimmers.", fr = "Les braises rougeoient, et l'air tremble au-dessus d'elles." },
+    } },
   { id = "wf_sentinel_inn", map = 1436, x = 52.5, y = 53.1, r = 1.5, when = { resting = true },
     names = { en = "Sentinel Hill inn", fr = "l'auberge de la Colline des sentinelles" },
     arrive = {
@@ -523,6 +534,23 @@ S.subzones = {
     },
     ambient = {
       { en = "The air tingles faintly with magic.", fr = "L'air picote légèrement de magie." },
+    } },
+  { id = "sw_dwarven", names = { "dwarven district", "quartier des nains" }, -- Stormwind's forges
+    arrive = {
+      { long = true,
+        en = "The air grows thick and warm as you enter the Dwarven District. Smoke drifts from the forges, carrying a smell of hot iron, coal and gunpowder.",
+        fr = "L'air devient lourd et chaud quand vous entrez dans le Quartier des Nains. La fumée des forges flotte dans les rues, chargée d'une odeur de fer chaud, de charbon et de poudre.",
+        when = OUT },
+    },
+    ambient = {
+      { long = true,
+        en = "Even before you see the forges, you can smell them: coal smoke, hot iron, a hint of gunpowder. In the Dwarven District, a fire is never far.",
+        fr = "Avant même de voir les forges, vous les sentez : fumée de charbon, fer chaud, une pointe de poudre. Dans le Quartier des Nains, le feu n'est jamais loin.",
+        when = OUT },
+      { en = "A smell of coal smoke and hot iron hangs over the district.", fr = "Une odeur de fumée de charbon et de fer chaud flotte sur le quartier.", when = OUT },
+      { en = "Thick smoke curls up from the forges.", fr = "Une épaisse fumée s'élève des forges.", when = OUT },
+      { en = "A whiff of gunpowder mixes with the forge smoke.", fr = "Une pointe de poudre se mêle à la fumée des forges.", when = OUT },
+      { en = "Soot drifts in the air and settles on your sleeves.", fr = "De la suie flotte dans l'air et se dépose sur vos manches.", when = OUT },
     } },
   { id = "sw_cathedral", names = { "cathedral square", "place de la cathédrale" },
     ambient = {

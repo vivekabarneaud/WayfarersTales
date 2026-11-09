@@ -165,21 +165,49 @@ local function FightEnded()
 end
 
 -- Eating and drinking
+
+-- What kind of drink is it? (water, milk, juice... from words in its name)
+local function DrinkKind(link)
+  local name = link and link:match("%[(.-)%]")
+  if not name then return nil end
+  name = name:lower()
+  for _, group in ipairs(D.DRINK_WORDS) do
+    for _, word in ipairs(group[2]) do
+      if name:find(word, 1, true) then return group[1] end
+    end
+  end
+end
+
+-- The item leaves the bags around the same moment as the buff shows up (Kindred
+-- watches the bags): look a little later, and once more if it isn't known yet.
+local function MealLine(drink, tries)
+  local _, link = KT.LastFood and KT.LastFood(6)
+  if not link and tries < 2 then
+    After(1.5, function() MealLine(drink, tries + 1) end, "meal")
+    return
+  end
+  if not drink then
+    if link then Play("eatItem", { item = link }) else Play("eat") end
+    return
+  end
+  local kind = DrinkKind(link)
+  if kind and D.MOMENTS["drink" .. kind] then
+    Play("drink" .. kind, { item = link })
+  elseif link then
+    Play("drinkItem", { item = link })
+  else
+    Play("drink")
+  end
+end
+
 local wasEating, wasDrinking
 local function CheckMeal()
   local eating = W.HasAura(D.SPELL_FOOD_AURA, true)
   local drinking = W.HasAura(D.SPELL_DRINK_AURA, true)
   if eating and not wasEating then
-    -- the item leaves the bags around the same moment: look a little later
-    After(1, function()
-      local _, link = KT.LastFood and KT.LastFood()
-      if link then Play("eatItem", { item = link }) else Play("eat") end
-    end, "eat")
+    After(1, function() MealLine(false, 1) end, "eat")
   elseif drinking and not wasDrinking and not eating then
-    After(1, function()
-      local _, link = KT.LastFood and KT.LastFood()
-      if link then Play("drinkItem", { item = link }) else Play("drink") end
-    end, "drink")
+    After(1, function() MealLine(true, 1) end, "drink")
   end
   wasEating, wasDrinking = eating, drinking
 end
@@ -208,6 +236,71 @@ local function OnSpell(spellID)
     hearthAt = GetTime() -- the line comes once you've arrived
   else
     After(1, function() Play(key) end, "gather")
+  end
+end
+
+-- Professions and recipes, from the game's own system messages ("You have learned
+-- a new spell: [Engineering]", "You have learned how to create a new item: ...").
+-- The game's message formats are turned into patterns, so it works in any language.
+local function ToPattern(fmt)
+  if type(fmt) ~= "string" then return nil end
+  local p = fmt:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+  p = p:gsub("%%%%s", "(.+)")
+  return "^" .. p .. "$"
+end
+
+-- Profession names in your language, from their spells (all ranks share the name)
+local PROFESSION_SPELLS = { 2259, 2018, 7411, 4036, 2366, 2108, 2575, 8613, 3908, 2550, 3273, 7620 }
+local professionNames -- lowercase name -> true
+local function IsProfession(name)
+  if not professionNames then
+    professionNames = { herbalism = true, herboristerie = true }
+    for _, id in ipairs(PROFESSION_SPELLS) do
+      local n = SpellName(id)
+      if n then professionNames[n:lower()] = true end
+    end
+  end
+  return name and professionNames[name:lower()] or false
+end
+
+-- Professions this character already had (so a new rank isn't taken for a new craft)
+local function KnownProfessions(state)
+  if state.professions then return state.professions end
+  local found = {}
+  local lines = GetNumSkillLines and GetSkillLineInfo and GetNumSkillLines() or 0
+  for i = 1, lines do
+    local ok, name = pcall(GetSkillLineInfo, i)
+    if ok and name and IsProfession(name) then found[name:lower()] = true end
+  end
+  if lines > 0 then state.professions = found end -- skills not loaded yet: try again later
+  return found
+end
+
+local professionAt = 0
+local function OnSystemMessage(msg)
+  if type(msg) ~= "string" then return end
+  local state = S.State()
+  if not state then return end
+
+  local spell = ToPattern(ERR_LEARN_SPELL_S) and msg:match(ToPattern(ERR_LEARN_SPELL_S))
+  if spell then
+    local name = spell:match("%[(.-)%]") or spell
+    if not IsProfession(name) then return end
+    local known = KnownProfessions(state)
+    local key = name:lower()
+    professionAt = GetTime() -- the recipes that come with it don't get their own line
+    if known[key] then
+      Play("craftRankUp", { skill = name })
+    else
+      known[key] = true
+      Play("learnProfession", { skill = name })
+    end
+    return
+  end
+
+  local recipe = ToPattern(ERR_LEARN_RECIPE_S) and msg:match(ToPattern(ERR_LEARN_RECIPE_S))
+  if recipe and GetTime() - professionAt > 10 then
+    Play("learnRecipe", { item = recipe })
   end
 end
 
@@ -282,7 +375,7 @@ end
 local ERRANDS = { BANKFRAME_OPENED = "bank", MAIL_SHOW = "mail", AUCTION_HOUSE_SHOW = "auction", TRAINER_SHOW = "trainer" }
 
 local f = CreateFrame("Frame")
-for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
+for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW" }) do
   pcall(f.RegisterEvent, f, ev)
 end
@@ -297,12 +390,17 @@ f:SetScript("OnEvent", function(_, event, ...)
   local ok, err = pcall(function(...)
     if event == "PLAYER_LOGIN" then
       C_Timer.NewTicker(5, Safe(Tick, "tick"))
+      -- remember the professions you already have (skills may load a bit later)
+      After(5, function() if S.State() then KnownProfessions(S.State()) end end, "professions")
       wasEating = W.HasAura(D.SPELL_FOOD_AURA, true)
       wasDrinking = W.HasAura(D.SPELL_DRINK_AURA, true)
     elseif event == "PLAYER_REGEN_DISABLED" then
       fightStart = GetTime()
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
+    elseif event == "CHAT_MSG_SYSTEM" then
+      local msg = ...
+      After(0.5, function() OnSystemMessage(msg) end, "learn") -- after the game's own message
     elseif ERRANDS[event] then
       local key = ERRANDS[event]
       After(0.3, function() Play(key) end, "errand")

@@ -849,7 +849,7 @@ M.body_parched = {
 }
 M.drinkRelief = {
   "Ah, ça va mieux.",
-  "Cette boisson a un goût merveilleux.",
+  "Ça fait du bien par où ça passe.",
 }
 M.body_hungry = {
   "Votre ventre gargouille.",
@@ -1000,7 +1000,7 @@ L.SN_GUIDE = table.concat({
   "|cffffd100Ambiance (Senses)|r",
   "De temps en temps, une courte ligne décrit le monde autour de vous : une odeur, un bruit, le vent, la météo. La première fois que vous arrivez dans un nouveau lieu, il vous accueille avec sa propre ligne.",
   "En entrant dans un lieu que vous connaissez déjà (un village, une ferme, un quartier), une ligne peut aussi l'évoquer, au plus une fois toutes les 10 minutes (15 avec le rythme Rare, 5 avec Souvent).",
-  "Les petits moments ont aussi leurs lignes, chacun avec son propre minuteur : un combat difficile, un repas, une cueillette ou une extraction de minerai, le dépeçage, votre pierre de foyer, l'atterrissage après un long vol, l'aube et le crépuscule, entrer ou sortir d'un bâtiment, la banque, la boîte aux lettres, l'hôtel des ventes, votre maître de métier ou de classe, le retour à la vie, ou simplement rester immobile un moment.",
+  "Les petits moments ont aussi leurs lignes, chacun avec son propre minuteur : un combat difficile, un repas, une cueillette ou une extraction de minerai, le dépeçage, votre pierre de foyer, l'atterrissage après un long vol, l'aube et le crépuscule, entrer ou sortir d'un bâtiment, la banque, la boîte aux lettres, l'hôtel des ventes, votre maître de métier ou de classe, apprendre un métier ou une recette, le retour à la vie, ou simplement rester immobile un moment.",
   "Les lignes dépendent du paysage, du lieu précis, du jour ou de la nuit, de l'intérieur ou de l'extérieur, de la météo et du monde autour de vous.",
   "L'onglet Ambiance montre ce que l'addon voit là où vous êtes, et toutes les lignes qui pourraient apparaître ici. Si une ligne vous semble fausse, signalez-la avec /wt nope.",
 }, "\n")
