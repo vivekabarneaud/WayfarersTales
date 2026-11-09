@@ -653,9 +653,12 @@ local function OnPetAppear()
   end
 
   -- Hello after logging in (unless something more important was just said)
+  -- (not after a /reload, and at most once an hour for the same pet)
   if not state.greeted then
     state.greeted = true
-    if not spoke and not wasSame and GetTime() - (state.loginAt or 0) < 600 then
+    if not spoke and not wasSame and not state.reloaded and GetTime() - (state.loginAt or 0) < 600
+      and time() - (pet.lastGreet or 0) > 3600 then
+      pet.lastGreet = time()
       Say(GreetingPool(), nil, nil, true)
       spoke = true
     end
@@ -1364,7 +1367,8 @@ local function Rebaseline()
   ScanAuras("player")
 end
 
-function H.PLAYER_ENTERING_WORLD()
+function H.PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUi)
+  if isReloadingUi then state.reloaded = true end -- a /reload isn't a new arrival
   if not KT.ModuleOn("kindred") then return end
   After(2, QueuePetAppear)
   After(3, Rebaseline)

@@ -79,6 +79,7 @@ D.BANDS = { 0, 40, 80 }
 D.EMOTES = {
   PET = "affection", HUG = "affection", LOVE = "affection", CUDDLE = "affection", KISS = "affection",
   SOOTHE = "affection", PAT = "affection", TICKLE = "affection", SNUGGLE = "affection",
+  COMFORT = "affection", PRAISE = "affection", NUZZLE = "affection",
   DANCE = "playful", CHEER = "playful", FLEX = "playful", SILLY = "playful", BOUNCE = "playful",
   CLAP = "playful", LAUGH = "playful", GIGGLE = "playful", JOKE = "playful", WHISTLE = "playful",
   APPLAUD = "playful", BRAVO = "playful", WOOT = "playful", CONGRATULATE = "playful", CONGRATS = "playful",
@@ -95,7 +96,8 @@ D.EMOTES = {
 -- Kinds the pet also notices when the emote isn't aimed at it.
 D.EMOTE_UNTARGETED = { playful = true, chicken = true, roar = true, rest = true, sad = true, hungry = true, sorry = true }
 -- Backup when the emote command can't be seen: words that mean "affection" (EN/FR).
-D.AFFECTION_WORDS = { "cajol", "câlin", "calin", "caress", "embrass", "aime", "pet ", "hug", "cuddle", "love", "kiss" }
+D.AFFECTION_WORDS = { "cajol", "câlin", "calin", "caress", "embrass", "aime", "consol", "réconfort",
+  "pet ", "hug", "cuddle", "love", "kiss", "comfort", "nuzzle" }
 D.LOSS = {
   death       = { amount = 1, cooldown = 600 },
   rude        = { amount = 1, cooldown = 300 },

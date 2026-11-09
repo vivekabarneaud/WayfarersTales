@@ -116,7 +116,7 @@ L.GUIDE = table.concat({
   "Les réactions de votre familier évoluent avec votre lien : timides au début, puis amicales (40+), puis dévouées (80+).",
   "",
   "|cffffd100Renforcer votre lien|r",
-  "|cffff8fb1Câlins|r  /pet /hug /love /cuddle /kiss /soothe /pat /tickle sur votre familier : +1 (une fois toutes les 15 min)",
+  "|cffff8fb1Câlins|r  /pet /hug /love /cuddle /kiss /soothe /comfort /praise /pat /tickle sur votre familier : +1 (une fois toutes les 15 min). Après un combat difficile, réconfortez-le juste après l'avoir ressuscité !",
   "|cffff8fb1Nourriture|r  +1 (une fois toutes les 10 min). Votre familier a une nourriture préférée secrète (+2) et une qu'il n'aime pas (rien). Essayez différentes choses pour les découvrir !",
   "|cffff8fb1Repas partagés|r  Parfois, quand vous vous asseyez pour manger, votre familier réclame une bouchée. Nourrissez-le dans les 2 minutes : +4 pour la même nourriture, +2 pour une autre.",
   "|cffff8fb1Demandes de câlins|r  De temps en temps, votre familier réclame de l'attention. /pet dans les 2 minutes : +2",

@@ -118,7 +118,7 @@ L.GUIDE = table.concat({
   "Your pet's reactions change with your bond: shy at first, then friendly (40+), then devoted (80+).",
   "",
   "|cffffd100Growing your bond|r",
-  "|cffff8fb1Cuddles|r  /pet /hug /love /cuddle /kiss /soothe /pat /tickle on your pet: +1 (once every 15 min)",
+  "|cffff8fb1Cuddles|r  /pet /hug /love /cuddle /kiss /soothe /comfort /praise /pat /tickle on your pet: +1 (once every 15 min). After a hard fight, comfort it soon after reviving it!",
   "|cffff8fb1Feeding|r  +1 (once every 10 min). Your pet has a secret favorite food (+2) and a food it doesn't like (nothing). Feed it different things to find out!",
   "|cffff8fb1Shared meals|r  Sometimes, when you sit down to eat, your pet asks for a bite. Feed it within 2 minutes: +4 for the same food, +2 for another.",
   "|cffff8fb1Petting requests|r  Now and then your pet asks for attention. /pet within 2 minutes: +2",
