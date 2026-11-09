@@ -231,89 +231,90 @@ D.MOMENTS = {
   },
   -- Each profession's own lines: learn_<key> (learning it) and rank_<key> (a new
   -- rank). Keys come from the profession spells (see PROFESSION_KEYS in Moments.lua).
+  -- About how YOU feel (curiosity, pride, calm...), not about the work itself.
   learn_alchemy = {
-    { en = "Alchemy: vials, herbs and strange vapors. You'll have to get used to the smell.", fr = "L'alchimie : des fioles, des herbes et d'étranges vapeurs. Il va falloir vous habituer à l'odeur." },
-    { en = "Your first lesson in alchemy: measure twice, pour once. And never sniff an unknown vial.", fr = "Première leçon d'alchimie : mesurer deux fois, verser une seule. Et ne jamais renifler une fiole inconnue." },
+    { en = "A thrill of curiosity runs through you: so many vials, so many secrets just waiting for you.", fr = "Un frisson de curiosité vous parcourt : tant de fioles, tant de secrets qui n'attendent que vous." },
+    { en = "A mix of nerves and excitement. Alchemy feels like holding a secret in your hands.", fr = "Un mélange de nervosité et d'excitation. L'alchimie, c'est comme tenir un secret entre vos mains." },
   },
   rank_alchemy = {
-    { en = "Your potions are getting clearer, your measures more precise. Alchemy is starting to make sense.", fr = "Vos potions gagnent en pureté, vos dosages en précision. L'alchimie commence à prendre tout son sens." },
+    { en = "A quiet pride settles in: the mixtures that once puzzled you are finally starting to make sense.", fr = "Une fierté tranquille vous gagne : les mélanges qui vous déroutaient autrefois prennent enfin tout leur sens." },
   },
   learn_blacksmithing = {
-    { en = "Blacksmithing: fire, iron and a heavy hammer. Your arms are going to remember this.", fr = "La forge : du feu, du fer et un lourd marteau. Vos bras vont s'en souvenir." },
-    { en = "You learn to read the color of hot metal: red, orange, then that pale yellow that means it's time to strike.", fr = "Vous apprenez à lire la couleur du métal chaud : rouge, orange, puis ce jaune pâle qui annonce qu'il est temps de frapper." },
+    { en = "A spark of pride lights up in you. One day, you'll wear armor forged with your own hands.", fr = "Une étincelle de fierté s'allume en vous. Un jour, vous porterez une armure forgée de vos propres mains." },
+    { en = "You can almost feel the weight of the hammer in your hand already, and you can't wait.", fr = "Vous sentez déjà presque le poids du marteau dans votre main, et vous avez hâte." },
   },
   rank_blacksmithing = {
-    { en = "Your hammer blows grow steadier, your metal truer. The anvil is starting to know you.", fr = "Vos coups de marteau se font plus sûrs, votre métal plus droit. L'enclume commence à vous connaître." },
+    { en = "You feel your confidence growing. The forge doesn't intimidate you anymore.", fr = "Vous sentez votre assurance grandir. La forge ne vous intimide plus." },
   },
   learn_enchanting = {
-    { en = "Enchanting: drawing the magic out of objects and weaving it into others. Your fingertips tingle just thinking about it.", fr = "L'enchantement : tirer la magie des objets pour la tisser dans d'autres. Rien que d'y penser, le bout de vos doigts picote." },
-    { en = "You learn to feel the faint hum of magic sleeping inside things. Enchanting has begun.", fr = "Vous apprenez à sentir le léger bourdonnement de la magie endormie dans les choses. L'enchantement commence." },
+    { en = "Something stirs in you, somewhere between wonder and respect. Magic, at your fingertips.", fr = "Quelque chose s'éveille en vous, entre émerveillement et respect. La magie, au bout de vos doigts." },
+    { en = "The excitement almost makes you dizzy. Suddenly, the world seems full of hidden magic.", fr = "L'excitation vous donne presque le vertige. Le monde vous semble soudain plein de magie cachée." },
   },
   rank_enchanting = {
-    { en = "The arcane currents feel clearer now, easier to bend. Your enchantments hold better.", fr = "Les courants arcaniques vous semblent plus clairs, plus faciles à plier. Vos enchantements tiennent mieux." },
+    { en = "A deep satisfaction settles in you: the magic answers you a little more readily now.", fr = "Une profonde satisfaction vous gagne : la magie vous répond un peu plus volontiers." },
   },
   learn_engineering = {
-    { en = "Engineering: gears, blasting powder and a healthy dose of luck. What could possibly go wrong?", fr = "L'ingénierie : des engrenages, de la poudre explosive et une bonne dose de chance. Qu'est-ce qui pourrait mal tourner ?" },
-    { en = "You leave with a head full of schematics and a strong urge to blow something up. Carefully. Probably.", fr = "Vous repartez la tête pleine de schémas et une furieuse envie de faire exploser quelque chose. Prudemment. Sans doute." },
+    { en = "Your head is buzzing with ideas, and you're grinning like a child. What could possibly go wrong?", fr = "Votre tête bourdonne d'idées, et vous souriez comme un enfant. Qu'est-ce qui pourrait mal tourner ?" },
+    { en = "A giddy excitement takes hold of you. Somewhere, something is about to go boom, and it will be your fault.", fr = "Une excitation fébrile s'empare de vous. Quelque part, quelque chose va bientôt faire boum, et ce sera votre faute." },
   },
   rank_engineering = {
-    { en = "Fewer singed eyebrows, more working gadgets. Your engineering is coming along nicely.", fr = "Moins de sourcils roussis, plus de gadgets qui marchent. Votre ingénierie fait de beaux progrès." },
+    { en = "A small surge of pride: fewer explosions by accident, more on purpose.", fr = "Une petite bouffée de fierté : moins d'explosions par accident, plus d'explosions voulues." },
   },
   learn_herbalism = {
-    { en = "Herbalism: from now on, every flower along the road is worth a second look.", fr = "L'herboristerie : désormais, chaque fleur au bord du chemin mérite un second regard." },
-    { en = "You learn to tell a precious herb from a common weed, and to pick it gently so it grows back.", fr = "Vous apprenez à distinguer une herbe précieuse d'une mauvaise herbe, et à la cueillir en douceur pour qu'elle repousse." },
+    { en = "A quiet joy fills you. From now on, every flower along the road feels like a small gift.", fr = "Une joie tranquille vous envahit. Désormais, chaque fleur au bord du chemin ressemble à un petit cadeau." },
+    { en = "You feel a little closer to the land, as if it had just let you in on a secret.", fr = "Vous vous sentez un peu plus proche de la terre, comme si elle venait de vous confier un secret." },
   },
   rank_herbalism = {
-    { en = "You spot herbs faster now, even half hidden in the grass.", fr = "Vous repérez les herbes plus vite désormais, même à moitié cachées dans la végétation." },
+    { en = "You feel at ease among the plants now, almost at home.", fr = "Vous vous sentez à l'aise parmi les plantes désormais, presque chez vous." },
   },
   learn_leatherworking = {
-    { en = "Leatherworking: hides, needles and thread. And patience, mostly.", fr = "Le travail du cuir : des peaux, des aiguilles et du fil. Et surtout de la patience." },
-    { en = "You run your fingers over a piece of leather and start to see what it could become.", fr = "Vous passez les doigts sur un morceau de cuir et commencez à entrevoir ce qu'il pourrait devenir." },
+    { en = "You feel the satisfaction of a craft you can hold in your hands. Patient work, honest work.", fr = "Vous ressentez la satisfaction d'un métier qu'on tient entre ses mains. Un travail patient, un travail honnête." },
+    { en = "A calm pleasure comes over you at the thought of the first piece you'll make.", fr = "Un plaisir paisible vous gagne à l'idée de la première pièce que vous fabriquerez." },
   },
   rank_leatherworking = {
-    { en = "Your stitches are tighter, your leather more supple. The craft is in your hands now.", fr = "Vos coutures sont plus serrées, votre cuir plus souple. Le métier est entre vos mains." },
+    { en = "A quiet pride: your hands have learned patience.", fr = "Une fierté discrète : vos mains ont appris la patience." },
   },
   learn_mining = {
-    { en = "Mining: from now on, every vein of ore in the rock is calling your name.", fr = "Le minage : désormais, chaque filon dans la roche vous appelle." },
-    { en = "You learn where to strike so the rock gives way: along the vein, never against it.", fr = "Vous apprenez où frapper pour que la roche cède : le long du filon, jamais contre." },
+    { en = "A treasure hunter's thrill runs through you. Every mountain might be hiding something.", fr = "Un frisson de chercheur de trésors vous parcourt. Chaque montagne cache peut-être quelque chose." },
+    { en = "Impatience takes hold of you. The rock is calling, and you want to answer.", fr = "L'impatience vous gagne. La roche vous appelle, et vous avez envie de répondre." },
   },
   rank_mining = {
-    { en = "Your pick finds the weak spot in the rock faster now.", fr = "Votre pioche trouve plus vite le point faible de la roche." },
+    { en = "You feel more sure of yourself with every vein you find.", fr = "Vous gagnez en assurance à chaque filon trouvé." },
   },
   learn_skinning = {
-    { en = "Skinning: not the most glamorous craft, but nothing goes to waste.", fr = "Le dépeçage : pas le métier le plus glamour, mais rien ne se perd." },
-    { en = "You learn to work the knife slowly and cleanly along the hide. Your stomach will get used to it.", fr = "Vous apprenez à manier le couteau lentement et proprement, le long de la peau. Votre estomac s'y fera." },
+    { en = "Not the most glamorous craft, but you feel a quiet respect: nothing will go to waste.", fr = "Pas le métier le plus glamour, mais vous ressentez un respect tranquille : rien ne sera gaspillé." },
+    { en = "Your stomach turns a little at first, then settles. You'll get used to it, and you know it.", fr = "Votre estomac se serre un peu au début, puis se calme. Vous vous y ferez, et vous le savez." },
   },
   rank_skinning = {
-    { en = "Your knife moves surer now, and the hides come off whole.", fr = "Votre couteau se fait plus sûr, et les peaux viennent entières." },
+    { en = "The knife doesn't trouble you anymore: what once felt strange now feels natural.", fr = "Le couteau ne vous trouble plus : ce qui vous semblait étrange vous paraît désormais naturel." },
   },
   learn_tailoring = {
-    { en = "Tailoring: needle, thread and a lot of cloth. Every scrap of fabric you find just became interesting.", fr = "La couture : du fil, une aiguille et beaucoup de tissu. Chaque bout d'étoffe que vous trouverez devient intéressant." },
-    { en = "You learn to measure, cut and stitch. Somewhere, a very fine robe is waiting to be made.", fr = "Vous apprenez à mesurer, couper et coudre. Quelque part, une très belle robe attend d'être faite." },
+    { en = "A little creative thrill runs through you. You're already imagining what you'll make.", fr = "Un petit frisson créatif vous parcourt. Vous imaginez déjà ce que vous allez confectionner." },
+    { en = "A gentle excitement comes over you: every scrap of cloth could become something beautiful.", fr = "Une douce excitation vous gagne : chaque bout d'étoffe pourrait devenir quelque chose de beau." },
   },
   rank_tailoring = {
-    { en = "Your stitches are finer, your seams straighter. Tailoring suits you.", fr = "Vos points sont plus fins, vos coutures plus droites. La couture vous va bien." },
+    { en = "You look at your own stitches with a quiet pride. They're getting really good.", fr = "Vous regardez vos propres points avec une fierté discrète. Ils deviennent vraiment beaux." },
   },
   learn_cooking = {
-    { en = "Cooking: a warm meal after a long day is worth more than gold.", fr = "La cuisine : un bon repas chaud après une longue journée vaut plus que de l'or." },
-    { en = "You learn the basics: a good fire, the right moment, and a pinch of salt. Your companions will thank you.", fr = "Vous apprenez les bases : un bon feu, le bon moment, et une pincée de sel. Vos compagnons vous remercieront." },
+    { en = "A warm glow fills you at the thought of sharing a good meal by the fire.", fr = "Une douce chaleur vous gagne à l'idée de partager un bon repas au coin du feu." },
+    { en = "Your mouth is already watering, and a funny kind of happiness settles in. Cooking is a kind of comfort.", fr = "Vous en salivez déjà, et un drôle de bonheur vous gagne. Cuisiner, c'est une forme de réconfort." },
   },
   rank_cooking = {
-    { en = "Less burnt, more delicious. Your cooking is getting better.", fr = "Moins de brûlé, plus de délicieux. Votre cuisine s'améliore." },
+    { en = "You feel a little pride in your dishes, and a little hunger too.", fr = "Vous éprouvez une petite fierté devant vos plats, et aussi un petit creux." },
   },
   learn_firstaid = {
-    { en = "First aid: clean bandages and steady hands. One day, this will save a life. Maybe yours.", fr = "Le secourisme : des bandages propres et des mains sûres. Un jour, ça sauvera une vie. Peut-être la vôtre." },
-    { en = "You learn to wrap a wound tight, but not too tight. It's harder than it looks.", fr = "Vous apprenez à bander une plaie bien serré, mais pas trop. C'est plus difficile qu'il n'y paraît." },
+    { en = "A feeling of safety comes over you: knowing how to tend a wound makes the road ahead a little less frightening.", fr = "Un sentiment de sécurité vous gagne : savoir soigner une plaie rend la route un peu moins effrayante." },
+    { en = "A sense of responsibility settles on your shoulders. One day, this might save someone.", fr = "Un sentiment de responsabilité se pose sur vos épaules. Un jour, ça sauvera peut-être quelqu'un." },
   },
   rank_firstaid = {
-    { en = "Your bandages are tighter, cleaner, faster. You could patch up a whole army.", fr = "Vos bandages sont plus serrés, plus propres, plus rapides. Vous pourriez soigner toute une armée." },
+    { en = "Wounds don't shake you as much anymore. Your hands have stopped trembling.", fr = "Les blessures vous troublent moins désormais. Vos mains ne tremblent plus." },
   },
   learn_fishing = {
-    { en = "Fishing: a line, a hook, and all the patience in the world.", fr = "La pêche : une ligne, un hameçon, et toute la patience du monde." },
-    { en = "From now on, every pond and every river looks a little different. What might be hiding down there?", fr = "Désormais, chaque mare et chaque rivière vous semble un peu différente. Qu'est-ce qui peut bien se cacher là-dessous ?" },
+    { en = "A deep calm comes over you at the thought of long, quiet hours by the water.", fr = "Un grand calme vous envahit à l'idée de longues heures tranquilles au bord de l'eau." },
+    { en = "You feel like a child again, eager to see what bites first.", fr = "Vous retrouvez une âme d'enfant, impatiente de voir ce qui mordra en premier." },
   },
   rank_fishing = {
-    { en = "You read the water better now: the ripples, the shadows, the right moment to pull.", fr = "Vous lisez mieux l'eau désormais : les rides, les ombres, le bon moment pour ferrer." },
+    { en = "You feel more patient, more at peace. The water has taught you something.", fr = "Vous gagnez en patience et en sérénité. L'eau vous a appris quelque chose." },
   },
 
   learnRecipe = {

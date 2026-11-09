@@ -438,7 +438,7 @@ S.zones = {
         when = { indoors = false, night = false, weather = "clear" } },
     },
     ambient = {
-      { en = "A guard's armor clinks as a patrol passes.", fr = "Une armure cliquette au passage d'une patrouille.", when = OUT },
+      { en = "Behind Stormwind's high walls, you feel safe, for a while.", fr = "Derrière les hautes murailles de Hurlevent, vous vous sentez en sécurité, pour un temps.", when = OUT },
     },
     hearth = { -- any Stormwind inn, depending on how busy it is
       { en = "Back in the heart of Stormwind. The inn is packed, as always: voices everywhere, people coming and going, and barely room to squeeze through.",
