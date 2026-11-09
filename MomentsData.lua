@@ -23,6 +23,13 @@ D.MOMENT_RULES = {
   drinkMilk       = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
   drinkJuice      = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
   drinkDew        = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
+  -- your own food diary (see D.MEAL_FAMILIAR, D.MEAL_MILESTONES)
+  firstTaste      = { cd = 0,    chance = 1,   gap = 10, shares = "eat" },
+  firstSip        = { cd = 0,    chance = 1,   gap = 10, shares = "drink" },
+  familiarFood    = { cd = 900,  chance = 1,   gap = 20, shares = "eat" },
+  familiarDrink   = { cd = 900,  chance = 1,   gap = 20, shares = "drink" },
+  foodMilestone   = { cd = 0,    chance = 1,   gap = 10, shares = "eat" },
+  drinkMilestone  = { cd = 0,    chance = 1,   gap = 10, shares = "drink" },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -52,6 +59,20 @@ for _, k in ipairs({ "alchemy", "blacksmithing", "enchanting", "engineering", "h
   D.MOMENT_RULES["learn_" .. k] = { cd = 0,   chance = 1, gap = 0, shares = "learnProfession" }
   D.MOMENT_RULES["rank_" .. k]  = { cd = 600, chance = 1, gap = 0, shares = "craftRankUp" }
 end
+
+-- First taste of each kind of food / drink uses the same timer as the general one
+for _, k in ipairs({ "meat", "fish", "cheese", "bread", "fungus", "fruit" }) do
+  D.MOMENT_RULES["firstTaste_" .. k] = D.MOMENT_RULES.firstTaste
+end
+for _, k in ipairs({ "Water", "Conjured", "Milk", "Juice", "Dew" }) do
+  D.MOMENT_RULES["firstSip_" .. k] = D.MOMENT_RULES.firstSip
+end
+
+-- Your food diary: after this many times, a food or drink is an old favourite
+-- (and now and then gets its own line); these counts get a little celebration.
+D.MEAL_FAMILIAR = 10
+D.MEAL_FAMILIAR_CHANCE = 0.4
+D.MEAL_MILESTONES = { [25] = true, [50] = true, [100] = true }
 
 -- How long you stand still (not AFK, not fighting) before a quiet moment
 D.QUIET_AFTER = 150
@@ -87,6 +108,88 @@ D.MOMENTS = {
     { en = "You dig into your {item}. Simple, and so satisfying.", fr = "Vous attaquez votre {item}. Simple, et tellement bon." },
     { en = "You take your time with your {item}. No hurry, just for a moment.", fr = "Vous prenez le temps de savourer votre {item}. Rien ne presse, juste un instant." },
   },
+  -- The first time you eat a food: taste, texture and how it makes you feel
+  firstTaste = {
+    { en = "You taste your {item} for the first time. A careful bite, then another, with curiosity: every flavor is a small discovery.",
+      fr = "Vous goûtez votre {item} pour la première fois. Une bouchée prudente, puis une autre, avec curiosité : chaque saveur est une petite découverte." },
+    { en = "Something new: your {item}. You close your eyes for a moment to really savor it. Funny how a new flavor can make a day feel different.",
+      fr = "Du nouveau : votre {item}. Vous fermez les yeux un instant pour mieux savourer. C'est fou comme une saveur inconnue peut changer une journée." },
+  },
+  firstTaste_meat = {
+    { en = "You taste your {item} for the first time. The meat is rich and savory, and each bite warms you from the inside. The kind of meal that keeps you going for miles.",
+      fr = "Vous goûtez votre {item} pour la première fois. La viande est riche et savoureuse, et chaque bouchée vous réchauffe de l'intérieur. De quoi tenir des lieues." },
+  },
+  firstTaste_fish = {
+    { en = "You taste your {item} for the first time. Delicate, with a clean, light taste of clear water. You eat slowly, savoring something new.",
+      fr = "Vous goûtez votre {item} pour la première fois. C'est délicat, avec un goût franc et léger d'eau claire. Vous mangez lentement, en savourant cette nouveauté." },
+  },
+  firstTaste_cheese = {
+    { en = "You taste your {item} for the first time: a rich flavor, a melting texture, and a little sharp bite at the end. You catch yourself smiling.",
+      fr = "Vous goûtez votre {item} pour la première fois : une saveur riche, une texture fondante, et une petite pointe piquante à la fin. Vous vous surprenez à sourire." },
+  },
+  firstTaste_bread = {
+    { en = "You taste your {item} for the first time. A golden crust, a soft inside, and that comforting smell of the oven. It feels a little like home.",
+      fr = "Vous goûtez votre {item} pour la première fois. Une croûte dorée, un cœur moelleux, et cette odeur réconfortante de four. Un peu comme à la maison." },
+  },
+  firstTaste_fungus = {
+    { en = "You taste your {item} for the first time. Earthy, almost woody, with a texture you're not quite sure about. Strange... but not bad.",
+      fr = "Vous goûtez votre {item} pour la première fois. Un goût de terre, presque de sous-bois, et une texture déroutante. Étrange... mais pas mauvais." },
+  },
+  firstTaste_fruit = {
+    { en = "You taste your {item} for the first time. Fresh and sweet, it melts in your mouth. A little burst of sunshine on the road.",
+      fr = "Vous goûtez votre {item} pour la première fois. Une fraîcheur sucrée qui fond dans la bouche. Un petit rayon de soleil sur la route." },
+  },
+  -- Something you've eaten many times (D.MEAL_FAMILIAR)
+  familiarFood = {
+    { en = "Your {item}, again. An old friend by now, and honestly? Nothing beats a good old classic.",
+      fr = "Encore votre {item}. Une vieille connaissance, et franchement ? Rien ne vaut un bon vieux classique." },
+    { en = "Your {item}, like so many times before. A familiar, comforting taste, just the way you like it.",
+      fr = "Votre {item}, comme tant de fois déjà. Un goût familier, réconfortant, exactement comme vous l'aimez." },
+    { en = "You don't even need to look anymore: your hands know your {item} by heart.",
+      fr = "Vous n'avez même plus besoin de regarder : vos mains connaissent votre {item} par cœur." },
+  },
+  -- The 25th, 50th, 100th time ({count})
+  foodMilestone = {
+    { en = "Your {item}, for the {count}th time. At this point, it's practically a tradition.",
+      fr = "Votre {item}, pour la {count}e fois. À ce stade, c'est presque une tradition." },
+  },
+
+  -- The first time you drink something
+  firstSip = {
+    { en = "A first sip of your {item}. You let it roll on your tongue, curious, before swallowing. One more taste to remember.",
+      fr = "Une première gorgée de votre {item}. Vous la laissez rouler sur la langue, avec curiosité, avant d'avaler. Une saveur de plus à retenir." },
+  },
+  firstSip_Water = {
+    { en = "You drink your {item} for the first time. Clear, cool water that washes the dust of the road from your throat. Simple, and perfect.",
+      fr = "Vous buvez votre {item} pour la première fois. Une eau claire et fraîche, qui chasse de votre gorge la poussière de la route. Simple, et parfait." },
+  },
+  firstSip_Conjured = {
+    { en = "Your first taste of conjured water. It tingles faintly, perfectly clear, perfectly cold... and tastes of absolutely nothing. Magic is strange.",
+      fr = "Pour la première fois, vous goûtez à l'eau invoquée. Elle picote légèrement, parfaitement claire, parfaitement froide... et n'a absolument aucun goût. Étrange chose que la magie." },
+  },
+  firstSip_Milk = {
+    { en = "You drink your {item} for the first time. Rich and creamy, it brings back the memory of a farm kitchen at dawn.",
+      fr = "Vous buvez votre {item} pour la première fois. Un lait riche et onctueux, qui vous rappelle une cuisine de ferme au petit matin." },
+  },
+  firstSip_Juice = {
+    { en = "You drink your {item} for the first time. Sweet, fruity, a little tangy. A small joy, sip after sip.",
+      fr = "Vous buvez votre {item} pour la première fois. Une saveur sucrée, fruitée, un peu acidulée. Un petit bonheur, gorgée après gorgée." },
+  },
+  firstSip_Dew = {
+    { en = "You drink your {item} for the first time. Light, with a scent of flowers and morning. It feels almost too delicate to drink.",
+      fr = "Vous buvez votre {item} pour la première fois. Une saveur légère, au parfum de fleurs et de matin. Presque trop délicate pour être bue." },
+  },
+  familiarDrink = {
+    { en = "Your {item}, again. Some things never change, and that's just fine.",
+      fr = "Encore votre {item}. Certaines choses ne changent jamais, et c'est très bien comme ça." },
+    { en = "Your {item}, as always. A familiar taste, like an old friend on the road.",
+      fr = "Votre {item}, comme toujours. Un goût familier, comme un vieil ami sur la route." },
+  },
+  drinkMilestone = {
+    { en = "Your {item}, for the {count}th time. At this point, it's practically a tradition.",
+      fr = "Votre {item}, pour la {count}e fois. À ce stade, c'est presque une tradition." },
+  },
+
   drink = {
     { en = "You drink in long, slow sips.", fr = "Vous buvez à longues gorgées, sans vous presser." },
     { en = "You sit down and drink slowly, letting your breath settle.", fr = "Vous vous asseyez et buvez lentement, le temps de reprendre votre souffle." },

@@ -180,12 +180,45 @@ end
 
 -- The item leaves the bags around the same moment as the buff shows up (Kindred
 -- watches the bags): look a little later, and once more if it isn't known yet.
+-- Your food diary: how many times this character has eaten / drunk each item.
+-- Returns the new count.
+local function CountMeal(itemID)
+  local state = S.State()
+  if not state or not itemID then return nil end
+  state.diary = state.diary or {}
+  local n = (state.diary[itemID] or 0) + 1
+  state.diary[itemID] = n
+  return n
+end
+
+-- A diary line if this food/drink is new, an old favourite or a milestone.
+-- Returns true if a line was shown.
+local function DiaryLine(drink, itemID, link, n)
+  if not n then return false end
+  local vars = { item = link, count = n }
+  if n == 1 then
+    local kind
+    if drink then kind = DrinkKind(link) else kind = KT.FoodKind and KT.FoodKind(itemID, link) end
+    local base = drink and "firstSip" or "firstTaste"
+    local key = kind and D.MOMENTS[base .. "_" .. kind] and (base .. "_" .. kind) or base
+    return Play(key, vars)
+  end
+  if D.MEAL_MILESTONES[n] then
+    return Play(drink and "drinkMilestone" or "foodMilestone", vars)
+  end
+  if n >= D.MEAL_FAMILIAR and math.random() < D.MEAL_FAMILIAR_CHANCE then
+    return Play(drink and "familiarDrink" or "familiarFood", vars)
+  end
+  return false
+end
+
 local function MealLine(drink, tries)
-  local _, link = KT.LastFood and KT.LastFood(6)
+  local itemID, link = KT.LastFood and KT.LastFood(6)
   if not link and tries < 2 then
     After(1.5, function() MealLine(drink, tries + 1) end, "meal")
     return
   end
+  if link and DiaryLine(drink, itemID, link, CountMeal(itemID)) then return end
   if not drink then
     if link then Play("eatItem", { item = link }) else Play("eat") end
     return

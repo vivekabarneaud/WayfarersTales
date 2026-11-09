@@ -437,6 +437,8 @@ local function FoodKind(itemID, link)
   return found or nil
 end
 
+KT.FoodKind = FoodKind -- also used by Moments (first taste of a food)
+
 local function PetCanEat(itemID, link)
   if not itemID then return false end
   if pet.foods[itemID] then return true end
