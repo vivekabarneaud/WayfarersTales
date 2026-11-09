@@ -1267,6 +1267,8 @@ function H.ADDON_LOADED(name)
   end
   -- settings and data from older versions, no longer used
   s.drops, s.showBody, s.bodyPos, s.bodyPos2, s.bodyPos3 = nil, nil, nil, nil, nil
+  -- 0.32: the heart is now off by default; turn it off once for older saves too
+  if not s.heartOffOnce then s.showHeart, s.heartOffOnce = false, true end
   db.probes = nil
   KT.ApplyLanguage()
   if not db.welcomed then

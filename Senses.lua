@@ -9,6 +9,7 @@ KT.Senses = S
 local state                 -- this character's saved data: visited places, recent lines
 local lastWeatherName
 local chatter = {}          -- times other people spoke / emoted near you
+local sawPlayerPlates       -- we've seen other players' name plates this session (so they're on)
 
 -- Rhythm: chance per minute to show an ambient line, and minimum gap between two.
 -- entry = minimum gap between two "you walk into a sub-zone" lines (its own timer).
@@ -40,15 +41,24 @@ function S.Crowd()
   for i = #chatter, 1, -1 do
     if now - chatter[i] > 180 then table.remove(chatter, i) end
   end
+  -- Other players' name plates. The game may hide friendly name plates from addons
+  -- (C_NamePlate.GetNamePlates returns nothing for them), so we ask about the name
+  -- plate units directly: nameplate1, nameplate2...
   local players = 0
-  local platesOn = GetCVar and GetCVar("nameplateShowFriends") == "1"
-  if C_NamePlate and C_NamePlate.GetNamePlates then
-    local ok, plates = pcall(C_NamePlate.GetNamePlates)
-    if ok and plates then
-      for _, plate in ipairs(plates) do
-        local unit = plate.namePlateUnitToken
-        if unit and UnitIsPlayer(unit) then players = players + 1 end
-      end
+  for i = 1, 80 do
+    local unit = "nameplate" .. i
+    local ok, isPlayer = pcall(function()
+      if UnitExists(unit) and UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") then return true end
+      return false
+    end)
+    if ok and isPlayer then players = players + 1 end
+  end
+  if players > 0 then sawPlayerPlates = true end
+  local platesOn = sawPlayerPlates
+  if not platesOn and GetCVar then
+    for _, cvar in ipairs({ "nameplateShowFriends", "nameplateShowFriendlyPlayers" }) do
+      local ok, v = pcall(GetCVar, cvar)
+      if ok and v == "1" then platesOn = true end
     end
   end
   local talk = #chatter
