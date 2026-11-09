@@ -440,6 +440,17 @@ S.zones = {
     ambient = {
       { en = "A guard's armor clinks as a patrol passes.", fr = "Une armure cliquette au passage d'une patrouille.", when = OUT },
     },
+    hearth = { -- any Stormwind inn, depending on how busy it is
+      { en = "Back in the heart of Stormwind. The inn is packed, as always: voices everywhere, people coming and going, and barely room to squeeze through.",
+        fr = "De retour au cœur de Hurlevent. L'auberge est bondée, comme toujours : des voix de partout, des allées et venues, et à peine de quoi se faufiler.",
+        when = { indoors = true, crowd = "crowded" } },
+      { en = "So much for peace and quiet: the inn is full of voices and comings and goings. Stormwind never really sleeps.",
+        fr = "Pour le calme, c'est raté : l'auberge déborde de voix et d'allées et venues. Hurlevent ne dort jamais vraiment.",
+        when = { indoors = true, crowd = { "lively", "crowded" } } },
+      { en = "For once, Stormwind's inn is almost quiet. You savor the calm while it lasts.",
+        fr = "Pour une fois, l'auberge de Hurlevent est presque calme. Vous savourez la tranquillité tant qu'elle dure.",
+        when = { indoors = true, crowd = "quiet" } },
+    },
   },
 }
 
@@ -475,14 +486,9 @@ S.spots = {
 -- Sub-zones (matched by name, English and French)
 ---------------------------------------------------------------------------
 S.subzones = {
-  { id = "sw_trade", names = { "trade district", "quartier commerçant", "the gilded rose", "la rose dorée" },
+  { id = "sw_trade", names = { "trade district", "quartier commerçant" },
     ambient = {
       { en = "Merchants' signs creak in the breeze.", fr = "Les enseignes des marchands grincent dans la brise.", when = OUT },
-    },
-    hearth = { -- Stormwind's inn, the Gilded Rose
-      { en = "Back at the Gilded Rose. After the road, the calm of a fine city inn feels almost luxurious.",
-        fr = "De retour dans la belle auberge de Hurlevent. Après la route, le calme d'une auberge de ville semble presque luxueux.",
-        when = { indoors = true } },
     } },
   { id = "sw_canals", names = { "the canals", "les canaux" },
     arrive = {
@@ -538,8 +544,11 @@ S.subzones = {
     } },
   { id = "darkshire", names = { "darkshire", "sombre-comté", "scarlet raven tavern" }, -- Duskwood
     hearth = {
-      { en = "Darkshire's inn is dim and hushed, and outside, the night never ends. Still, four walls and a roof are something.",
-        fr = "L'auberge de Sombre-Comté est sombre et feutrée, et dehors, la nuit ne finit jamais. Mais quatre murs et un toit, c'est déjà ça.",
+      { en = "Darkshire's inn is dim and hushed, and outside, the night never ends. You're in no real hurry to step back out there.",
+        fr = "L'auberge de Sombre-Comté est sombre et feutrée, et dehors, la nuit ne finit jamais. Vous n'avez pas vraiment hâte de ressortir.",
+        when = { indoors = true } },
+      { en = "The dim inn of Darkshire, at last. Out there, the endless night is waiting... You'd gladly linger here a little longer.",
+        fr = "La pénombre de l'auberge de Sombre-Comté, enfin. Dehors, la nuit sans fin vous attend... Vous aimeriez bien pouvoir vous éterniser un peu.",
         when = { indoors = true } },
     } },
   { id = "if_forge", names = { "the great forge", "la grande forge" },
