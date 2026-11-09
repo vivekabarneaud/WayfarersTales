@@ -576,8 +576,8 @@ f:SetScript("OnEvent", function(_, event, ...)
       OnWeatherChanged()
     else
       -- someone else talking or emoting near you: the place is lively
-      local sender = select(2, ...)
-      if sender and not KT.IsMe(sender) then
+      local sender, guid = select(2, ...), select(12, ...)
+      if sender and not KT.IsMe(sender, guid) then
         chatter[#chatter + 1] = GetTime()
       end
     end

@@ -44,12 +44,14 @@ end
 
 local function After(sec, fn) C_Timer.After(sec, fn) end
 
--- Is this chat sender you? (exact name: "Ann" must not match "Annabelle";
--- the realm part "-Realm" is ignored)
-function KT.IsMe(sender)
+-- Is this chat sender you? Best: the sender's unique ID (chat events give it),
+-- which works whatever the name looks like (Forever has surnames: "Kitty Sweetpea").
+-- Fallback: the first word of the name ("Ann" must not match "Annabelle").
+function KT.IsMe(sender, guid)
+  if guid and guid ~= "" then return guid == UnitGUID("player") end
   if not sender then return false end
-  local name = tostring(sender):match("^([^%-]+)")
-  return name ~= nil and name == UnitName("player")
+  local first = tostring(sender):match("^([^%-%s]+)")
+  return first ~= nil and first == UnitName("player")
 end
 local function Today() return date("%Y-%m-%d") end
 local function InCombat() return UnitAffectingCombat("player") end
@@ -1413,8 +1415,9 @@ function H.BAG_UPDATE()
   After(0.3, DiffBags)
 end
 
-function H.CHAT_MSG_TEXT_EMOTE(text, sender)
-  if not PetAlive() or not text or not KT.IsMe(sender) then return end
+function H.CHAT_MSG_TEXT_EMOTE(text, sender, ...)
+  local guid = select(10, ...) -- 12th argument of chat events: the sender's ID
+  if not PetAlive() or not text or not KT.IsMe(sender, guid) then return end
   local targeted = text:find(pet.name, 1, true) ~= nil
   local token = (GetTime() - lastEmote.t < 3) and lastEmote.token or nil
   lastEmote.token = nil
