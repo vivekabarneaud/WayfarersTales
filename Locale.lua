@@ -118,6 +118,7 @@ L.GUIDE = table.concat({
   "Your pet's reactions change with your bond: shy at first, then friendly (40+), then devoted (80+).",
   "",
   "|cffffd100Growing your bond|r",
+  "Your pet never spells it out: watch its reactions in the chat, they tell you when a moment is waiting for you.",
   "|cffff8fb1Cuddles|r  /pet /hug /love /cuddle /kiss /soothe /comfort /praise /pat /tickle on your pet: +1 (once every 15 min). After a hard fight, comfort it soon after reviving it!",
   "|cffff8fb1Feeding|r  +1 (once every 10 min). Your pet has a secret favorite food (+2) and a food it doesn't like (nothing). Feed it different things to find out!",
   "|cffff8fb1Shared meals|r  Sometimes, when you sit down to eat, your pet asks for a bite. Feed it within 2 minutes: +4 for the same food, +2 for another.",
@@ -387,9 +388,10 @@ M.playerLevel = {
   { "Level {level}! {pet} bounces around you in celebration." },
   { "Level {level}! {pet} is bursting with pride. You did it together!" },
 }
-M.petLevel = {
-  "{pet} has grown stronger: level {level}!",
-  "{pet} reached level {level} and looks very proud.",
+M.petLevel = { -- must invite a cheer by itself (no hint in chat)
+  "{pet} has grown stronger: level {level}! And keeps glancing at you, clearly waiting for some applause.",
+  "{pet} reached level {level} and stands tall, looking at you as if waiting for your cheers.",
+  "Level {level} for {pet}! A very expectant look your way: surely this deserves a little celebration?",
 }
 M.feedFavoriteFirst = {
   "{pet} goes absolutely wild for the {item}! Looks like {food} is a favorite!",
@@ -413,16 +415,20 @@ M.lootFavorite = {
   "{pet} spots your {item} and can barely contain the excitement!",
   "{pet} has eyes only for your {item} now.",
 }
-M.treatHint = {
-  "(Feed the {item} to {pet} within 2 minutes for a treat!)",
+-- treat requests: must ask for the food by themselves (no hint in chat)
+M.treatAsk = {
+  "{pet} looks at your {item}, then at you, then at your {item} again. The message is clear.",
+  "{pet} has noticed your {item} and won't stop staring at you. Surely that one's for sharing?",
+  "{pet} won't leave your side, eyes fixed on your {item}. A treat, perhaps?",
+}
+M.treatAskFavorite = {
+  "{pet} spots your {item} and can barely contain the excitement. Please, please share?",
+  "{pet} has eyes only for your {item}... and for you, who could share it.",
 }
 M.treatGiven = {
   "{pet} gobbles down the {item} you just found. Best. Treat. Ever.",
   "{pet} was hoping you'd share the {item}, and you did!",
   "{pet} can hardly believe it: the {item}, shared right away!",
-}
-M.celebrateHint = {
-  "(Cheer for {pet} with /cheer, /clap, /applaud, /bravo or /woot!)",
 }
 M.celebrated = {
   "{pet} puffs up with pride at your cheers!",
@@ -481,9 +487,6 @@ M.attentionRequest = {
     "{pet} flops over right in front of you, demanding cuddles.",
   },
 }
-M.attentionHint = {
-  "(Use /pet on {pet} within 2 minutes!)",
-}
 M.attentionAnswered = {
   {
     "{pet} accepts the touch, and seems to relax for the first time.",
@@ -529,9 +532,6 @@ M.mealRequest = {
   "{pet} sits beside you and stares at your {item}. Maybe a bite to share?",
   "{pet} gently paws at your arm, eyes fixed on your {item}.",
   "{pet} sniffs hopefully as you eat your {item}...",
-}
-M.mealHint = {
-  "(Feed {pet} within 2 minutes to share your meal!)",
 }
 M.mealShared = {
   "You share your {item} with {pet}. A meal is better together!",
@@ -650,6 +650,7 @@ M.mealRequest_bird = {
   "{pet} watches your {item} with a sideways look. Sharing is caring?",
 }
 M.lootFood_bird = { "{pet} eyes your {item} and gives a hopeful chirp." }
+M.treatAsk_bird = { "{pet} eyes your {item} and gives a hopeful chirp. Is that one for sharing?" }
 M.fishing_bird = { "{pet} stares at the {item} with the focus of a born hunter." }
 M.hungry_bird = { "{pet} chirps hungrily in agreement." }
 M.rude_bird = {
@@ -686,6 +687,7 @@ M.attentionRequest_scaly = { "{pet} nudges your leg with a cool snout, asking fo
 M.attentionAnswered_scaly = { "{pet} rumbles contentedly." }
 M.mealRequest_scaly = { "{pet} stares at your {item} without blinking. At all." }
 M.lootFood_scaly = { "{pet}'s tongue flicks at the scent of your {item}." }
+M.treatAsk_scaly = { "{pet}'s tongue flicks at the scent of your {item}, eyes fixed on you. A treat, perhaps?" }
 M.fishing_scaly = { "{pet} watches the {item} very, very closely." }
 M.hungry_scaly = { "{pet}'s tongue flicks hungrily." }
 M.rude_scaly = {
@@ -720,6 +722,7 @@ M.attentionRequest_chitin = { "{pet} taps your boot several times. Attention req
 M.attentionAnswered_chitin = { "{pet} clicks with delight." }
 M.mealRequest_chitin = { "{pet} clicks hungrily at the sight of your {item}." }
 M.lootFood_chitin = { "{pet} clicks excitedly at your {item}." }
+M.treatAsk_chitin = { "{pet} clicks excitedly at your {item}, then turns to you. Sharing?" }
 M.fishing_chitin = { "{pet} snaps at the air near the {item}. Hungry?" }
 M.hungry_chitin = { "{pet} clicks hungrily in agreement." }
 M.rude_chitin = {

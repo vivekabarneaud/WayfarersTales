@@ -218,6 +218,8 @@ D.POOL_SOUND = {
   tierUp = "ui:big", loyaltyUp = "ui:big", anniversary = "ui:big", daysTogether = "ui:big",
   feedFavoriteFirst = "ui:discover", favoriteRevealed = "ui:discover",
   treatGiven = "happy", celebrated = "excited",
+  treatAsk = "happy", treatAskFavorite = "excited", petLevel = "excited", -- requests: the sound is the cue
+
   petDangerHigh = "excited", petDangerNear = "excited",
 }
 

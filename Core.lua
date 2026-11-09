@@ -172,7 +172,6 @@ end
 
 -- Pet lines look like game emotes: emote color (from your chat settings),
 -- no label, shown in every chat tab that displays emotes.
-local HINT_POOLS = { mealHint = true, attentionHint = true, treatHint = true, celebrateHint = true }
 
 local function EmoteColor()
   local info = ChatTypeInfo and ChatTypeInfo["EMOTE"]
@@ -259,12 +258,9 @@ local function Say(poolKey, vars, delta, important)
   if type(pool[1]) == "table" then pool = pool[Band()] or pool[1] end -- banded pool
   vars = vars or {}
   vars.pet = vars.pet or (pet and pet.name) or "?"
-  local color
-  if HINT_POOLS[poolKey] then color = "|cffb0b0b0"
-  elseif db.settings.label then color = MSG_COLOR
-  else color = EmoteColor() end
+  local color = db.settings.label and MSG_COLOR or EmoteColor()
   local text = Fill(PickLine(poolKey, pool), vars)
-  if not HINT_POOLS[poolKey] then AddJournal("kindred", poolKey, text, delta) end
+  AddJournal("kindred", poolKey, text, delta)
   -- item links and highlights end with |r: switch back to our color after them
   text = text:gsub("|r", "|r" .. color)
   local line = color .. text .. "|r" .. GainText(delta)
@@ -813,7 +809,6 @@ local function MaybeAskAttention()
   local a = { expires = GetTime() + D.ATTENTION_WINDOW }
   state.attention = a
   Say("attentionRequest")
-  Say("attentionHint")
   After(D.ATTENTION_WINDOW + 1, function()
     if state.attention == a then
       state.attention = nil
@@ -923,7 +918,6 @@ local function OnPlayerEat(itemID, link)
   Mark("mealRequest")
   state.meal = { itemID = itemID, link = link, expires = GetTime() + D.MEAL_WINDOW }
   Say("mealRequest", { item = link })
-  Say("mealHint")
   local thisMeal = state.meal
   After(D.MEAL_WINDOW + 1, function()
     if state.meal == thisMeal then
@@ -976,23 +970,26 @@ local function OnLoot(msg)
   local kind = FoodKind(id, link)
   if kind and kind == tastes.dislike then return end -- not interested at all
 
-  local reacted = false
+  local pool, base
   if kind and kind == tastes.favorite and tastes.favoriteKnown then
-    -- a known favorite gets noticed much more often
-    reacted = Flavor("lootFavorite", 0.7 * mult, { item = link })
+    pool, base = "lootFavorite", 0.7 -- a known favorite gets noticed much more often
   elseif fishing and (isFood or isIngredient) and (not diet or diet.count >= 6 or diet.fish) then
-    reacted = Flavor("fishing", 0.45 * mult, { item = link })
+    pool, base = "fishing", 0.45
   elseif (isFood or (isIngredient and kind)) and PetCanEat(id, link) then
-    reacted = Flavor("lootFood", 0.35 * mult, { item = link })
+    pool, base = "lootFood", 0.35
   end
-  if not reacted then return end
+  if not pool then return end
+
+  -- edible right away (not a raw ingredient)? then the pet asks for it as a treat,
+  -- and the line itself says so (no hint in chat, the guide explains it)
+  local treat = isFood and not state.treat and not state.meal and not state.attention
+  if treat then pool = (pool == "lootFavorite") and "treatAskFavorite" or "treatAsk" end
+  if not Flavor(pool, base * mult, { item = link }) then return end
   Mark("lootReact")
 
-  -- edible right away (not a raw ingredient)? then it's a treat request
-  if isFood and not state.treat and not state.meal and not state.attention then
+  if treat then
     local t = { itemID = id, link = link, expires = GetTime() + D.TREAT_WINDOW }
     state.treat = t
-    Say("treatHint", { item = link })
     After(D.TREAT_WINDOW + 1, function()
       if state.treat == t then state.treat = nil end
     end)
@@ -1489,12 +1486,11 @@ function H.UNIT_LEVEL(unit)
   if unit ~= "pet" or not pet or not UnitExists("pet") then return end
   local lvl = UnitLevel("pet")
   if lvl and pet.level and lvl > pet.level then
+    -- the level-up line itself invites the player to cheer
     Say("petLevel", { level = lvl }, nil, true)
     if lvl % 10 == 0 then AddMemory("petLevel", { level = lvl }) end
-    -- invite the player to cheer
     local c = { expires = GetTime() + D.CELEBRATE_WINDOW }
     state.celebrate = c
-    Say("celebrateHint", nil, nil, true)
     After(D.CELEBRATE_WINDOW + 1, function()
       if state.celebrate == c then state.celebrate = nil end
     end)
