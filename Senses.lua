@@ -11,14 +11,15 @@ local lastWeatherName
 local chatter = {}          -- times other people spoke / emoted near you
 local sawPlayerPlates       -- we've seen other players' name plates this session (so they're on)
 
--- Rhythm: chance per minute to show an ambient line, and minimum gap between two.
--- entry = minimum gap between two "you walk into a sub-zone" lines (its own timer).
+-- Rhythm. Ambient lines fill the silence: one plays at a random moment between
+-- min and max seconds after the last line of any kind (never a fixed tick, never a
+-- long drought). entry = at most one "you walk into a known place" line every N seconds.
 local RHYTHM = {
-  [1] = { chance = 0.06, gap = 900, entry = 900 },  -- rare
-  [2] = { chance = 0.12, gap = 480, entry = 600 },  -- normal
-  [3] = { chance = 0.25, gap = 240, entry = 300 },  -- chatty
+  [1] = { min = 480, max = 720, entry = 600 },  -- rare: 8 to 12 min
+  [2] = { min = 240, max = 420, entry = 360 },  -- normal: 4 to 7 min
+  [3] = { min = 120, max = 240, entry = 180 },  -- often: 2 to 4 min
 }
-local ENTRY_AFTER_LINE = 90 -- never right after another line
+local ENTRY_AFTER_LINE = 60 -- never right after another line
 local RECENT_MAX = 15
 
 ---------------------------------------------------------------------------
@@ -536,14 +537,27 @@ local function CanSpeak()
 end
 
 -- Now and then, an ambient line
+local loginAt = time()
+local ambientDue, ambientDueFor -- when the next ambient line is due, and for which "last line"
+
 local function AmbientTick()
   if not CanSpeak() then return end
   local r = RHYTHM[Rhythm()]
-  if not r or time() - (state.lastLine or 0) < r.gap then return end
-  if math.random() >= r.chance then return end
+  if not r then return end
+  -- a new silence started (a line was shown, or we just logged in): pick when to break it
+  local base = math.max(state.lastLine or 0, loginAt)
+  if ambientDueFor ~= base or not ambientDue then
+    ambientDueFor = base
+    ambientDue = base + math.random(r.min, r.max)
+  end
+  if time() < ambientDue then return end
   local ctx = S.Context()
-  if ctx.eating or ctx.drinking then return end -- you're busy with your meal (it has its own line)
-  S.Show(S.Pick(ctx, "ambient"))
+  if ctx.eating or ctx.drinking then -- you're busy with your meal (it has its own line)
+    ambientDue = time() + 30
+    return
+  end
+  local c = S.Pick(ctx, "ambient")
+  if c then S.Show(c) else ambientDue = time() + 60 end -- nothing fits here: try again a bit later
 end
 
 -- for Moments.lua (little moments: after a fight, eating, dawn...)
@@ -754,7 +768,7 @@ f:SetScript("OnEvent", function(_, event, ...)
       end
       local w = S.Weather()
       lastWeatherName = w and w.confirmed and w.name or nil
-      C_Timer.NewTicker(60, Safe(AmbientTick, "ambient"))
+      C_Timer.NewTicker(15, Safe(AmbientTick, "ambient"))
       -- walking into a spot doesn't change the zone name: check every few seconds
       C_Timer.NewTicker(5, Safe(CheckArrival, "arrival"))
       C_Timer.After(8, Safe(CheckArrival, "arrival"))

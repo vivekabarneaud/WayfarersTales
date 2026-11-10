@@ -9,7 +9,7 @@ local S = KT.Senses
 local Mo = {}
 KT.Moments = Mo
 
-local RHYTHM_MULT = { [1] = 0.5, [2] = 1, [3] = 1.4 }
+
 
 local function SpellName(id)
   if not (C_Spell and C_Spell.GetSpellName) then return nil end
@@ -31,6 +31,11 @@ local function After(sec, fn, name) C_Timer.After(sec, Safe(fn, name or "timer")
 -- Playing a moment
 ---------------------------------------------------------------------------
 
+-- Rhythm: Rare makes every moment's cooldown longer, Often shorter. Moments tied to
+-- something you just did play every time their cooldown allows; only very frequent
+-- ones (gathering, recipes...) keep a chance below 1, so they don't fire every time.
+local RHYTHM_CD = { [1] = 1.5, [2] = 1, [3] = 0.6 }
+
 -- Can moment `key` play now? (its own timer, the gap since the last line, its chance)
 local function Ready(key)
   local state = S.State()
@@ -39,10 +44,10 @@ local function Ready(key)
   if not rule then return nil end
   state.moments = state.moments or {}
   local now = time()
-  if now - (state.moments[rule.shares or key] or 0) < (rule.cd or 0) then return nil end
+  local cd = (rule.cd or 0) * (RHYTHM_CD[S.Rhythm()] or 1)
+  if now - (state.moments[rule.shares or key] or 0) < cd then return nil end
   if now - (state.lastLine or 0) < (rule.gap or 60) then return nil end
-  local chance = math.min(1, (rule.chance or 1) * (RHYTHM_MULT[S.Rhythm()] or 1))
-  if math.random() >= chance then return nil end
+  if (rule.chance or 1) < 1 and math.random() >= rule.chance then return nil end
   return rule, state
 end
 

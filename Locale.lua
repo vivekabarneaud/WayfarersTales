@@ -1032,7 +1032,7 @@ L.SN_BIOMES = {
 L.SN_GUIDE = table.concat({
   "|cffffd100Ambiance (Senses)|r",
   "Now and then, a short line describes the world around you: a smell, a sound, the wind, the weather. The first time you reach a new place, it greets you with a line of its own.",
-  "Walking into a place you already know (a village, a farm, a district) can bring a line about it too, at most once every 10 minutes (15 with the Rare rhythm, 5 with Often).",
+  "Walking into a place you already know (a village, a farm, a district) can bring a line about it too, at most once every 6 minutes (10 with the Rare rhythm, 3 with Often).",
   "Little moments get a line too, each on its own timer: a hard fight, a meal, gathering herbs or ore, skinning, your hearthstone, landing after a long flight, dawn and dusk, stepping indoors or out, the bank, the mailbox, the auction house, your trainer, learning a profession or a recipe, finding a rare or epic item, crafting something special or for the first time, coming back to life, or simply standing still for a while.",
   "Your character also remembers everything they eat and drink: a new food gets its own line about its taste, and an old favourite or a 25th, 50th, 100th time too.",
   "Lines depend on the landscape, the exact place, day or night, indoors or out, the weather and how many people are around.",

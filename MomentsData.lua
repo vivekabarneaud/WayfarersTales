@@ -10,19 +10,20 @@ local D = KT.Data
 
 -- Each moment has its own timer:
 --   cd     = seconds before this moment can play again
---   chance = how often it plays when it can (x0.5 with the Rare rhythm, x1.4 with Often)
+--   chance = for very frequent actions only: how often it plays when it can (1 = always)
+--   (the Rare rhythm makes every cd x1.5, Often x0.6)
 --   gap    = it never plays less than this many seconds after another Senses line
 --   shares = uses the timer of another moment (e.g. stepping in and stepping out)
 D.MOMENT_RULES = {
-  eat             = { cd = 900,  chance = 0.6, gap = 20 },
-  eatItem         = { cd = 900,  chance = 0.6, gap = 20, shares = "eat" },
-  drink           = { cd = 900,  chance = 0.5, gap = 20 },
-  drinkItem       = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
-  drinkWater      = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
-  drinkConjured   = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
-  drinkMilk       = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
-  drinkJuice      = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
-  drinkDew        = { cd = 900,  chance = 0.5, gap = 20, shares = "drink" },
+  eat             = { cd = 900,  chance = 1, gap = 20 },
+  eatItem         = { cd = 900,  chance = 1, gap = 20, shares = "eat" },
+  drink           = { cd = 900,  chance = 1, gap = 20 },
+  drinkItem       = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
+  drinkWater      = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
+  drinkConjured   = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
+  drinkMilk       = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
+  drinkJuice      = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
+  drinkDew        = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
   -- your own food diary (see D.MEAL_FAMILIAR, D.MEAL_MILESTONES)
   firstTaste      = { cd = 0,    chance = 1,   gap = 10, shares = "eat" },
   firstSip        = { cd = 0,    chance = 1,   gap = 10, shares = "drink" },
@@ -35,7 +36,7 @@ D.MOMENT_RULES = {
   lootLegendary   = { cd = 0,    chance = 1,   gap = 0 },
   craftRare       = { cd = 300,  chance = 1,   gap = 0 },
   craftEpic       = { cd = 0,    chance = 1,   gap = 0 },
-  craftFirst      = { cd = 600,  chance = 0.6, gap = 20 },
+  craftFirst      = { cd = 600,  chance = 1, gap = 20 },
   discoveryMilestone = { cd = 0, chance = 1,   gap = 30 },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
@@ -52,15 +53,15 @@ D.MOMENT_RULES = {
   mine            = { cd = 1200, chance = 0.5, gap = 60 },
   skin            = { cd = 1200, chance = 0.5, gap = 60 },
   hearth          = { cd = 600,  chance = 1,   gap = 30 },
-  landing         = { cd = 600,  chance = 0.8, gap = 30 },
+  landing         = { cd = 600,  chance = 1, gap = 30 },
   dawn            = { cd = 3600, chance = 1,   gap = 30 },
   dusk            = { cd = 3600, chance = 1,   gap = 30 },
-  goIn            = { cd = 900,  chance = 0.5, gap = 60, shares = "door" },
-  goOut           = { cd = 900,  chance = 0.5, gap = 60, shares = "door" },
-  bank            = { cd = 1800, chance = 0.6, gap = 20 },
-  mail            = { cd = 1800, chance = 0.6, gap = 20 },
-  auction         = { cd = 1800, chance = 0.6, gap = 20 },
-  trainer         = { cd = 1800, chance = 0.6, gap = 20 },
+  goIn            = { cd = 900,  chance = 1, gap = 60, shares = "door" },
+  goOut           = { cd = 900,  chance = 1, gap = 60, shares = "door" },
+  bank            = { cd = 1800, chance = 1, gap = 20 },
+  mail            = { cd = 1800, chance = 1, gap = 20 },
+  auction         = { cd = 1800, chance = 1, gap = 20 },
+  trainer         = { cd = 1800, chance = 1, gap = 20 },
   learnProfession = { cd = 0,    chance = 1,   gap = 0 },
   craftRankUp     = { cd = 600,  chance = 1,   gap = 0 },
   learnRecipe     = { cd = 1800, chance = 0.35, gap = 30 },
