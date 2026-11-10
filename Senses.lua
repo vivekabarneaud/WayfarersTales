@@ -10,6 +10,7 @@ local state                 -- this character's saved data: visited places, rece
 local lastWeatherName
 local chatter = {}          -- times other people spoke / emoted near you
 local sawPlayerPlates       -- we've seen other players' name plates this session (so they're on)
+local sawCreaturePlates     -- same for creatures and NPCs (enemy name plates)
 
 -- Rhythm. Ambient lines fill the silence: one plays at a random moment between
 -- min and max seconds after the last line of any kind (never a fixed tick, never a
@@ -45,16 +46,29 @@ function S.Crowd()
   -- Other players' name plates. The game may hide friendly name plates from addons
   -- (C_NamePlate.GetNamePlates returns nothing for them), so we ask about the name
   -- plate units directly: nameplate1, nameplate2...
-  local players = 0
+  -- Creatures and NPCs with a name plate (a boar, a guard...) are counted too, for
+  -- lines like "there's no one in sight".
+  local players, creatures = 0, 0
   for i = 1, 80 do
     local unit = "nameplate" .. i
-    local ok, isPlayer = pcall(function()
-      if UnitExists(unit) and UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") then return true end
-      return false
+    local ok, kind = pcall(function()
+      if not UnitExists(unit) or UnitIsUnit(unit, "player") then return nil end
+      if UnitIsPlayer(unit) then return "player" end
+      if UnitIsDead(unit) then return nil end
+      return "creature"
     end)
-    if ok and isPlayer then players = players + 1 end
+    if ok and kind == "player" then players = players + 1 end
+    if ok and kind == "creature" then creatures = creatures + 1 end
   end
   if players > 0 then sawPlayerPlates = true end
+  if creatures > 0 then sawCreaturePlates = true end
+  -- can we see creatures? (enemy name plates on, or we've seen some this session)
+  local creaturePlatesOn = sawCreaturePlates
+  if not creaturePlatesOn and GetCVar then
+    local ok, v = pcall(GetCVar, "nameplateShowEnemies")
+    if ok and v == "1" then creaturePlatesOn = true end
+  end
+  S.lastCreatures, S.creaturePlatesOn = creatures, creaturePlatesOn
   local platesOn = sawPlayerPlates
   if not platesOn and GetCVar then
     for _, cvar in ipairs({ "nameplateShowFriends", "nameplateShowFriendlyPlayers" }) do
@@ -82,6 +96,9 @@ function S.Context()
   local ctx = KT.World.Snapshot()
   ctx.weather = S.Weather()
   ctx.crowd, ctx.players, ctx.chatter = S.Crowd()
+  ctx.creatures = S.lastCreatures
+  -- alone: nobody in sight, neither players nor creatures (only if we can tell)
+  ctx.alone = ctx.crowd == "quiet" and S.creaturePlatesOn and ctx.creatures == 0 or false
   ctx.subLower = (ctx.sub or ""):lower()
   ctx.moving = S.Moving()
   ctx.roofed = S.Roofed(ctx)
@@ -205,6 +222,7 @@ local function Check(when, ctx)
     if not ctx.weather or ctx.weather.name ~= when.weather then return false, "weather" end
   end
   if when.calm and (ctx.crowd == "lively" or ctx.crowd == "crowded") then return false, "calm" end
+  if when.alone and not ctx.alone then return false, "alone" end
   if when.crowd then
     if not ctx.crowd then return false, "crowdUnknown" end
     local ok = false
@@ -452,6 +470,7 @@ function S.Tags(c, ctx)
     if w.race then add(string.format(T.race, type(w.race) == "table" and table.concat(w.race, "/") or w.race), InList(w.race, ctx.race)) end
     if w.notRace then add(string.format(T.notRace, type(w.notRace) == "table" and table.concat(w.notRace, "/") or w.notRace), not InList(w.notRace, ctx.race)) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
+    if w.alone then add(T.alone, ctx.alone) end
     if w.subMatch then
       local found = false
       for _, s in ipairs(w.subMatch) do

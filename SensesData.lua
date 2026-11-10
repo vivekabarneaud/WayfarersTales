@@ -185,7 +185,7 @@ S.biomes = {
       { en = "A twig snaps somewhere nearby.", fr = "Une brindille craque quelque part non loin.", when = OUT,
         rewrite = { en = "A twig snaps nearby. And yet, there's no one in sight.",
                     fr = "Une brindille craque non loin. Il n'y a personne en vue, pourtant.",
-                    when = { indoors = false, crowd = "quiet" } } },
+                    when = { indoors = false, alone = true } } },
       { en = "An owl hoots in the dark.", fr = "Une chouette hulule dans l'obscurité.", when = { indoors = false, night = true } },
       { en = "Light filters through the leaves.", fr = "La lumière filtre à travers les feuilles.", when = { indoors = false, night = false, weather = "clear" } },
       { en = "A squirrel darts up a tree trunk.", fr = "Un écureuil file le long d'un tronc.", when = { indoors = false, night = false } },
