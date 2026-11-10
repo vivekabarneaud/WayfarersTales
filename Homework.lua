@@ -222,6 +222,21 @@ local function QuestTitle(id)
   return nil
 end
 
+-- Notes and flagged lines already handled (D.PROCESSED, Processed.lua): removed from
+-- the notes, unflagged in the journal, so the report only shows what's still waiting.
+function H.Prune()
+  local P = D.PROCESSED
+  if not P then return end
+  local db = KT.GetDB()
+  local notes = db.fieldNotes or {}
+  for i = #notes, 1, -1 do
+    if notes[i].t and P.notes[notes[i].t] then table.remove(notes, i) end
+  end
+  for _, e in ipairs(db.journal or {}) do
+    if e.flagged and e.t and P.flags[e.t] then e.flagged, e.flagNote = nil, nil end
+  end
+end
+
 local rewardTitle -- the title shown in the quest reward window (the quest may leave the log before it's turned in)
 
 local ev = CreateFrame("Frame")
@@ -231,6 +246,7 @@ pcall(ev.RegisterEvent, ev, "QUEST_TURNED_IN")
 ev:SetScript("OnEvent", function(_, event, questID)
   local ok, err = pcall(function()
     if event == "PLAYER_LOGIN" then
+      H.Prune()
       if KT.GetDB().settings.homework then H.Toggle(true) end
     elseif event == "QUEST_COMPLETE" then
       rewardTitle = GetTitleText and GetTitleText() or nil

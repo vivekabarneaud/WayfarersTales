@@ -467,12 +467,14 @@ function KT.ShowReport()
   end
   local npcs = {}
   for id, e in pairs(api.GetDB().npcs or {}) do
+    if not D.NPCS[tonumber(id)] then -- NPCs already identified (D.NPCS) are not listed again
     local kinds = {}
     for k in pairs(e.kinds or {}) do kinds[#kinds + 1] = k end
     table.sort(kinds)
     npcs[#npcs + 1] = string.format("[%s] %s (%s / %s) %s, %s, race: %s, x%d: %s", tostring(id), tostring(e.name),
       tostring(e.zone), tostring(e.sub), e.sex == 3 and "female" or (e.sex == 2 and "male" or "?"),
       tostring(e.ctype or "?"), tostring(e.race or "?"), e.n or 1, table.concat(kinds, ", "))
+    end
   end
   table.sort(npcs)
   local notes = {}
