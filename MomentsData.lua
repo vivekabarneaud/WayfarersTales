@@ -550,3 +550,111 @@ D.MOMENTS = {
     { en = "Your limbs feel like lead, and every movement is an effort.", fr = "Vos membres pèsent comme du plomb, et chaque geste vous coûte." },
   },
 }
+
+---------------------------------------------------------------------------
+-- Body (Elements) lines that depend on your gear or your shape.
+-- when: cloak / boots / gloves = true (wearing one) or false (not), armor = "plate"...
+--       (chest piece), form = "furry" (bear, cat, travel form, ghost wolf), still = true.
+-- {cloak}, {boots}, {gloves} = links to the items you're wearing.
+-- Used instead of the usual lines (Locale.lua) when they fit: some of the time in
+-- your normal shape (D.BODY_GEAR_CHANCE), always in an animal form.
+---------------------------------------------------------------------------
+D.BODY_GEAR_CHANCE = 0.6
+
+-- Usual Body pools whose lines describe a human body (hands, clothes...): skipped in an
+-- animal form when no fur line fits.
+D.BODY_PERSON_POOLS = {
+  coldEnter = true, freezingEnter = true, coldRemind = true, freezingRemind = true, warmBack = true,
+  hotEnter = true, hotRemind = true, soaked = true, dry = true, fireWarm = true,
+}
+
+local CLOAK_COLD = { draft = true,
+  en = "You pull your {cloak} tighter around your neck. The icy wind still finds a way in.",
+  fr = "Vous resserrez votre {cloak} autour de votre cou. Le vent glacé parvient quand même à s'y faufiler.",
+  when = { cloak = true, indoors = false } }
+local NOCLOAK_COLD = { draft = true,
+  en = "You fold your arms across your chest to keep in a little warmth. A cloak would be welcome.",
+  fr = "Vous croisez les bras sur votre poitrine pour garder un peu de chaleur. Une cape ne serait pas de refus.",
+  when = { cloak = false, indoors = false } }
+local HANDS_STILL = { draft = true,
+  en = "You blow into your hands and rub them together, trying to warm them. Your fingers tingle.",
+  fr = "Vous soufflez dans vos mains et les frottez l'une contre l'autre pour tenter de les réchauffer. Vos doigts picotent.",
+  when = { still = true, gloves = false } }
+local GLOVES_STILL = { draft = true,
+  en = "You clap your hands together, muffled by your {gloves}, and stamp your feet to get the blood flowing.",
+  fr = "Vous frappez vos mains l'une contre l'autre, étouffées par vos {gloves}, et tapez des pieds pour faire circuler le sang.",
+  when = { still = true, gloves = true } }
+local PLATE_COLD = { draft = true,
+  en = "The cold seeps through your plate armor, and the icy metal bites your skin.",
+  fr = "Le froid traverse votre armure de plaques, et le métal glacé vous mord la peau.",
+  when = { armor = "plate" } }
+local MAIL_COLD = { draft = true,
+  en = "The rings of your mail are icy and bite your skin with every move.",
+  fr = "Les mailles de votre armure sont glacées et vous mordent la peau à chaque mouvement.",
+  when = { armor = "mail" } }
+local FUR_COLD = { draft = true,
+  en = "Your thick fur keeps out the worst of it, but the cold still nips at your ears.",
+  fr = "Votre épaisse fourrure vous protège du pire, mais le froid finit quand même par vous mordre les oreilles.",
+  when = { form = "furry" } }
+local FUR_FREEZING = { draft = true,
+  en = "Even through your fur, the cold pierces you. You hunch up to keep in a little warmth.",
+  fr = "Même sous votre fourrure, le froid vous transperce. Vous vous ramassez sur vous-même pour garder un peu de chaleur.",
+  when = { form = "furry" } }
+local PLATE_HOT = { draft = true,
+  en = "Under your plate, you're suffocating, and sweat runs down your back.",
+  fr = "Sous vos plaques, vous étouffez, et la sueur vous coule dans le dos.",
+  when = { armor = "plate" } }
+local FUR_HOT = { draft = true,
+  en = "Your fur is far too warm for this weather. You pant, tongue hanging out.",
+  fr = "Votre fourrure est bien trop chaude pour ce temps. Vous haletez, la langue pendante.",
+  when = { form = "furry" } }
+local CLOAK_HOT = { draft = true,
+  en = "Your {cloak} is far too warm. You dream of taking it off.",
+  fr = "Votre {cloak} vous tient bien trop chaud. Vous rêvez de l'enlever.",
+  when = { cloak = true } }
+local FAN_STILL = { draft = true,
+  en = "You fan yourself with your hand, to little effect. The scorching air doesn't stir.",
+  fr = "Vous vous éventez de la main, sans grand effet. L'air brûlant ne bouge pas d'un souffle.",
+  when = { still = true, shifted = false } }
+local BOOTS_WET = { draft = true,
+  en = "Your {boots} are soaked through, and every step makes a little squelch.",
+  fr = "Vos {boots} ont pris l'eau, et chaque pas fait un petit bruit mouillé.",
+  when = { boots = true } }
+local NOBOOTS_WET = { draft = true,
+  en = "With nothing on your feet, you feel cold water and mud at every step.",
+  fr = "Sans rien aux pieds, vous sentez l'eau froide et la boue à chaque pas.",
+  when = { boots = false } }
+local CLOAK_WET = { draft = true,
+  en = "Water has soaked into your {cloak}, which weighs on your shoulders and drips down your back.",
+  fr = "L'eau a imbibé votre {cloak}, qui vous pèse sur les épaules et goutte dans votre dos.",
+  when = { cloak = true } }
+local FUR_WET = { draft = true,
+  en = "Your soaked fur clings to your skin. You shake yourself hard, sending water flying everywhere.",
+  fr = "Votre fourrure trempée vous colle à la peau. Vous vous ébrouez vigoureusement, en projetant de l'eau partout.",
+  when = { form = "furry" } }
+local FUR_DRY = { draft = true,
+  en = "Your fur has finally dried, soft and fluffy again.",
+  fr = "Votre fourrure a enfin séché, douce et gonflée à nouveau.",
+  when = { form = "furry" } }
+local CLOAK_FIRE = { draft = true,
+  en = "You open the folds of your {cloak} to let the fire's warmth in.",
+  fr = "Vous écartez les pans de votre {cloak} pour laisser entrer la chaleur du feu.",
+  when = { cloak = true } }
+local FUR_FIRE = { draft = true,
+  en = "You draw close to the fire, and its warmth slowly seeps into your fur.",
+  fr = "Vous vous approchez du feu, et sa chaleur pénètre doucement votre fourrure.",
+  when = { form = "furry" } }
+
+D.BODY_LINES = {
+  coldEnter      = { CLOAK_COLD, NOCLOAK_COLD, PLATE_COLD, MAIL_COLD, FUR_COLD },
+  coldRemind     = { CLOAK_COLD, NOCLOAK_COLD, HANDS_STILL, GLOVES_STILL, PLATE_COLD, MAIL_COLD, FUR_COLD },
+  freezingEnter  = { PLATE_COLD, FUR_FREEZING },
+  freezingRemind = { CLOAK_COLD, HANDS_STILL, GLOVES_STILL, PLATE_COLD, FUR_FREEZING },
+  hotEnter       = { PLATE_HOT, FUR_HOT },
+  hotRemind      = { PLATE_HOT, FUR_HOT, CLOAK_HOT, FAN_STILL },
+  overheatEnter  = { PLATE_HOT, FUR_HOT },
+  overheatRemind = { PLATE_HOT, FUR_HOT, CLOAK_HOT, FAN_STILL },
+  soaked         = { BOOTS_WET, NOBOOTS_WET, CLOAK_WET, FUR_WET },
+  dry            = { FUR_DRY },
+  fireWarm       = { CLOAK_FIRE, FUR_FIRE },
+}

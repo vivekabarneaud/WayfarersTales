@@ -84,6 +84,35 @@ function S.Context()
   ctx.subLower = (ctx.sub or ""):lower()
   ctx.moving = S.Moving()
   ctx.roofed = S.Roofed(ctx)
+  S.Gear(ctx)
+  return ctx
+end
+
+-- What you're wearing (item links, for {cloak}, {boots}, {gloves}), your chest
+-- armor type, and your shapeshift form (druid forms, ghost wolf): in an animal
+-- form you're not "wearing" your cloak or boots, and you have fur, not hands.
+local ARMOR_TYPES = { [1] = "cloth", [2] = "leather", [3] = "mail", [4] = "plate" }
+local FORMS = { [1] = "cat", [5] = "bear", [8] = "bear", [3] = "travel", [4] = "aquatic", [31] = "moonkin", [16] = "wolf" }
+S.FURRY = { cat = true, bear = true, travel = true, wolf = true }
+
+function S.Gear(ctx)
+  local function link(slot)
+    local ok, l = pcall(GetInventoryItemLink, "player", slot)
+    return ok and l or nil
+  end
+  ctx.cloak, ctx.boots, ctx.gloves = link(15), link(8), link(10)
+  ctx.armor = nil
+  local ok, chestID = pcall(GetInventoryItemID, "player", 5)
+  if ok and chestID then
+    local fn = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
+    local ok2, _, _, _, _, _, classID, subID = pcall(fn, chestID)
+    if ok2 and classID == 4 then ctx.armor = ARMOR_TYPES[subID] end
+  end
+  ctx.form = nil
+  if GetShapeshiftFormID then
+    local ok3, id = pcall(GetShapeshiftFormID)
+    if ok3 and id then ctx.form = FORMS[id] end
+  end
   return ctx
 end
 
@@ -130,6 +159,21 @@ local function Check(when, ctx)
   if when.swimming and not ctx.swimming then return false, "swimming" end
   if when.moving and not ctx.moving then return false, "moving" end
   if when.sky and (ctx.indoors or ctx.roofed) then return false, "sky" end
+  if when.still and ctx.moving then return false, "still" end
+  -- shapeshift forms: "furry" = bear, cat, travel form, ghost wolf
+  if when.shifted ~= nil and when.shifted ~= (ctx.form ~= nil) then return false, "form" end
+  if when.form then
+    local ok = (when.form == "furry" and S.FURRY[ctx.form]) or when.form == ctx.form
+    if not ok then return false, "form" end
+  end
+  -- gear: only in your normal shape (true = wearing one, false = not)
+  for _, slot in ipairs({ "cloak", "boots", "gloves" }) do
+    if when[slot] ~= nil then
+      if ctx.form then return false, "form" end
+      if when[slot] ~= (ctx[slot] ~= nil) then return false, slot end
+    end
+  end
+  if when.armor and (ctx.form or ctx.armor ~= when.armor) then return false, "armor" end
   if when.airBelow and not ((ctx.air or 15) < when.airBelow) then return false, "airBelow" end
   if when.airAbove and not ((ctx.air or 15) > when.airAbove) then return false, "airAbove" end
   if when.notBiomes and when.notBiomes[ctx.biome] then return false, "biome" end
@@ -367,6 +411,13 @@ function S.Tags(c, ctx)
     if w.swimming then add(T.swimming, ctx.swimming) end
     if w.moving then add(T.moving, ctx.moving) end
     if w.sky then add(T.sky, not ctx.indoors and not ctx.roofed) end
+    if w.still then add(T.still, not ctx.moving) end
+    if w.form then add(string.format(T.form, w.form), (w.form == "furry" and S.FURRY[ctx.form]) or w.form == ctx.form) end
+    if w.shifted ~= nil then add(w.shifted and T.shifted or T.unshifted, w.shifted == (ctx.form ~= nil)) end
+    for _, slot in ipairs({ "cloak", "boots", "gloves" }) do
+      if w[slot] ~= nil then add(w[slot] and T[slot] or T["no_" .. slot], not ctx.form and w[slot] == (ctx[slot] ~= nil)) end
+    end
+    if w.armor then add(string.format(T.armor, w.armor), not ctx.form and ctx.armor == w.armor) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
     if w.subMatch then
       local found = false

@@ -934,7 +934,8 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", sky = "ciel ouvert", draft = "brouillon",
+  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", sky = "ciel ouvert", draft = "brouillon", still = "immobile", form = "forme : %s", shifted = "forme animale", unshifted = "forme normale",
+  cloak = "avec une cape", no_cloak = "sans cape", boots = "avec des bottes", no_boots = "sans bottes", gloves = "avec des gants", no_gloves = "sans gants", armor = "armure : %s",
 }
 L.SN_POS = "Position : %s   Endroit : %s"
 L.SN_LANDSCAPE = "Paysage : %s   Niveaux de la zone : %s"
@@ -1008,7 +1009,8 @@ L.SN_REASONS = {
   biome = "pas dans ce paysage", sub = "seulement dans un lieu précis",
   weatherWait = "en attente des données météo", weather = "pas avec cette météo",
   crowdUnknown = "a besoin de savoir qui est là", crowd = "pas avec ce monde-là",
-  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule", sky = "seulement à ciel ouvert", draft = "brouillon, en attente de validation",
+  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule", sky = "seulement à ciel ouvert", draft = "brouillon, en attente de validation", still = "seulement sans bouger",
+  form = "pas sous cette forme", cloak = "dépend de votre cape", boots = "dépend de vos bottes", gloves = "dépend de vos gants", armor = "dépend de votre armure",
 }
 L.SN_BIOMES = {
   forest = "forêt", plains = "plaines", farmland = "terres agricoles sèches", hills = "collines", mountain = "montagnes", snow = "neige",

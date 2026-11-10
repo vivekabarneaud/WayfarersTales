@@ -26,7 +26,28 @@ local function Clamp(x) return math.max(0, math.min(100, x)) end
 local function Round(x) return math.floor(x + 0.5) end
 
 -- same argument order as KT.Narrate: (what, vars, important)
+-- Lines about your gear or your shape (D.BODY_LINES) are used when they fit:
+-- often in your normal shape, always in an animal form. In an animal form, the
+-- usual lines about hands, fingers or clothes (D.BODY_PERSON_POOLS) are skipped.
 local function Say(poolKey, vars, important)
+  local S = KT.Senses
+  local list = D.BODY_LINES and D.BODY_LINES[poolKey]
+  local ok, ctx = false, nil
+  if S and S.Context and (list or D.BODY_PERSON_POOLS[poolKey]) then ok, ctx = pcall(S.Context) end
+  if ok and ctx then
+    local fits = {}
+    for _, line in ipairs(list or {}) do
+      if not line.draft and S.Check(line.when, ctx) then fits[#fits + 1] = line end
+    end
+    if #fits > 0 and (ctx.form or math.random() < D.BODY_GEAR_CHANCE) then
+      local line = fits[math.random(#fits)]
+      vars = vars or {}
+      vars.cloak, vars.boots, vars.gloves = ctx.cloak, ctx.boots, ctx.gloves
+      KT.NarrateText("elements", poolKey, S.LineText(line), vars, important)
+      return
+    end
+    if ctx.form and D.BODY_PERSON_POOLS[poolKey] then return end -- a bear has no fingers to warm
+  end
   KT.Narrate("elements", poolKey, vars, important)
 end
 

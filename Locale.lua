@@ -943,7 +943,8 @@ L.SN_TAGS = {
   day = "daytime", night = "night", indoors = "indoors", outdoors = "outdoors", resting = "city or inn",
   swimming = "swimming", weather = "weather: %s", crowd = "crowd: %s",
   airBelow = "air below %s", airAbove = "air above %s", notBiomes = "not in: %s", place = "place: %s",
-  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone", calm = "no crowd", sky = "open sky", draft = "draft",
+  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone", calm = "no crowd", sky = "open sky", draft = "draft", still = "standing still", form = "form: %s", shifted = "animal form", unshifted = "normal shape",
+  cloak = "wearing a cloak", no_cloak = "no cloak", boots = "wearing boots", no_boots = "no boots", gloves = "wearing gloves", no_gloves = "no gloves", armor = "chest armor: %s",
 }
 L.SN_POS = "Position: %s   Spot: %s"
 L.SN_LANDSCAPE = "Landscape: %s   Zone levels: %s"
@@ -1016,7 +1017,8 @@ L.SN_REASONS = {
   airAbove = "only when warmer", biome = "not in this landscape", sub = "only in a particular place",
   weatherWait = "waiting for weather data", weather = "not in this weather",
   crowdUnknown = "needs to know who's around", crowd = "not with this crowd",
-  cooldown = "already played, back in %s", moving = "only while walking", calm = "not with a crowd around", sky = "only under the open sky", draft = "draft, waiting for approval",
+  cooldown = "already played, back in %s", moving = "only while walking", calm = "not with a crowd around", sky = "only under the open sky", draft = "draft, waiting for approval", still = "only when standing still",
+  form = "not in this shape", cloak = "depends on your cloak", boots = "depends on your boots", gloves = "depends on your gloves", armor = "depends on your armor",
 }
 L.SN_BIOMES = {
   forest = "forest", plains = "plains", farmland = "dry farmland", hills = "hills", mountain = "mountains", snow = "snow",
