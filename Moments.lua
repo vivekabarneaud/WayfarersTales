@@ -518,9 +518,39 @@ end
 
 local ERRANDS = { BANKFRAME_OPENED = "bank", MAIL_SHOW = "mail", AUCTION_HOUSE_SHOW = "auction", TRAINER_SHOW = "trainer" }
 
+-- NPC log: every NPC you deal with is noted (id, name, sex, zone, and the race if the
+-- game gives it), so we can later write lines for specific NPCs or their people.
+-- Saved in db.npcs, listed in the report.
+local NPC_EVENTS = { BANKFRAME_OPENED = "bank", MERCHANT_SHOW = "vendor", TRAINER_SHOW = "trainer",
+  GOSSIP_SHOW = "talk", AUCTION_HOUSE_SHOW = "auction", TAXIMAP_OPENED = "flight" }
+
+local function LogNPC(kind)
+  local db = KT.GetDB()
+  if not db then return end
+  local ok, guid = pcall(UnitGUID, "npc")
+  if not ok or type(guid) ~= "string" then return end
+  local unitType, _, _, _, _, npcID = strsplit("-", guid)
+  if unitType ~= "Creature" or not npcID then return end
+  db.npcs = db.npcs or {}
+  local e = db.npcs[npcID] or { first = time() }
+  local okN, name = pcall(UnitName, "npc")
+  if okN and type(name) == "string" then e.name = name end
+  local okS, sex = pcall(UnitSex, "npc")
+  if okS and type(sex) == "number" then e.sex = sex end -- 2 = male, 3 = female
+  local okR, race = pcall(UnitRace, "npc")
+  if okR and type(race) == "string" then e.race = race end
+  local okT, ctype = pcall(UnitCreatureType, "npc")
+  if okT and type(ctype) == "string" then e.ctype = ctype end
+  e.zone, e.sub = GetRealZoneText(), GetSubZoneText()
+  e.kinds = e.kinds or {}
+  e.kinds[kind] = true
+  e.n, e.last = (e.n or 0) + 1, time()
+  db.npcs[npcID] = e
+end
+
 local f = CreateFrame("Frame")
 for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
-  "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW" }) do
+  "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED" }) do
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
@@ -532,6 +562,7 @@ end
 
 f:SetScript("OnEvent", function(_, event, ...)
   local ok, err = pcall(function(...)
+    if NPC_EVENTS[event] then pcall(LogNPC, NPC_EVENTS[event]) end
     if event == "PLAYER_LOGIN" then
       C_Timer.NewTicker(5, Safe(Tick, "tick"))
       After(3, CheckBirth, "birth") -- a brand new character?
@@ -557,6 +588,8 @@ f:SetScript("OnEvent", function(_, event, ...)
     elseif ERRANDS[event] then
       local key = ERRANDS[event]
       After(0.3, function() Play(key) end, "errand")
+    elseif NPC_EVENTS[event] then
+      return -- only logged (above)
     else
       local unit = ...
       if unit ~= "player" then return end

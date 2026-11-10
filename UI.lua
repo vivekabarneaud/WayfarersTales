@@ -464,10 +464,21 @@ function KT.ShowReport()
     roofs[#roofs + 1] = string.format("%s / %s (map %s at %s,%s)", tostring(r.zone), tostring(r.sub),
       tostring(r.map), tostring(r.x), tostring(r.y))
   end
+  local npcs = {}
+  for id, e in pairs(api.GetDB().npcs or {}) do
+    local kinds = {}
+    for k in pairs(e.kinds or {}) do kinds[#kinds + 1] = k end
+    table.sort(kinds)
+    npcs[#npcs + 1] = string.format("[%s] %s (%s / %s) %s, %s, race: %s, x%d: %s", tostring(id), tostring(e.name),
+      tostring(e.zone), tostring(e.sub), e.sex == 3 and "female" or (e.sex == 2 and "male" or "?"),
+      tostring(e.ctype or "?"), tostring(e.race or "?"), e.n or 1, table.concat(kinds, ", "))
+  end
+  table.sort(npcs)
   local text = "Wayfarer's Tales report (" .. date("%Y-%m-%d") .. ", " .. tostring(GetLocale()) .. ")\n"
     .. (#lines > 0 and table.concat(lines, "\n") or L.UI_JOURNAL_NOFLAGS)
     .. (#proposals > 0 and ("\n\n" .. L.UI_REPORT_PROPOSALS .. "\n" .. table.concat(proposals, "\n")) or "")
     .. (#roofs > 0 and ("\n\n" .. L.UI_REPORT_ROOFS .. "\n" .. table.concat(roofs, "\n")) or "")
+    .. (#npcs > 0 and ("\n\n" .. L.UI_REPORT_NPCS .. "\n" .. table.concat(npcs, "\n")) or "")
     .. (function()
       local errs = {}
       for _, e in ipairs(api.GetDB().errors or {}) do

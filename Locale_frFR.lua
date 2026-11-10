@@ -1002,6 +1002,7 @@ L.SN_PROPOSE      = "Proposer"
 L.SN_PROPOSED     = "Merci ! Votre ligne est enregistrée avec ce lieu. Elle sera dans la fenêtre « Rapport & idées »."
 L.UI_REPORT_PROPOSALS = "--- Lignes proposées ---"
 L.UI_REPORT_ROOFS = "--- Endroits avec un toit (/wt toit) ---"
+L.UI_REPORT_NPCS = "--- PNJ rencontrés ---"
 L.SN_PLAY_TT      = "Afficher cette ligne dans le chat maintenant, pour voir comment elle rend. (Un aperçu : la ligne n'est pas consommée.)"
 L.SN_REASONS = {
   night = "seulement la nuit", day = "seulement le jour", indoors = "seulement à l'intérieur",

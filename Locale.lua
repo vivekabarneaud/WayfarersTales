@@ -1011,6 +1011,7 @@ L.SN_PROPOSE      = "Propose"
 L.SN_PROPOSED     = "Thanks! Your line was saved with this place. It will be in the \"Report & ideas\" box."
 L.UI_REPORT_PROPOSALS = "--- Proposed lines ---"
 L.UI_REPORT_ROOFS = "--- Roofed spots (/wt roof) ---"
+L.UI_REPORT_NPCS = "--- NPCs you dealt with ---"
 L.SN_PLAY_TT      = "Show this line in the chat now, to see how it reads. (A preview: it doesn't use the line up.)"
 L.SN_REASONS = {
   night = "only at night", day = "only by day", indoors = "only indoors", outdoors = "only outdoors",
