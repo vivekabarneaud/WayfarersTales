@@ -84,6 +84,7 @@ L.UI_CHATTY_DESC = {
 }
 L.UI_OPT_MINIMAP  = "Afficher le bouton de la minicarte"
 L.UI_OPT_HEART    = "Afficher le cœur à côté de l'icône de bonheur"
+L.UI_OPT_TESTDRAFTS = "Essayer les nouvelles lignes (brouillons et réécritures en cours de relecture)"
 L.UI_OPT_DEBUG    = "Mode débogage (messages techniques dans le chat)"
 L.UI_OPT_LABEL    = "Afficher « Wayfarer's Tales » devant les messages du familier"
 L.UI_TAB_JOURNAL  = "Journal"
@@ -934,7 +935,7 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", sky = "ciel ouvert", draft = "brouillon", still = "immobile", form = "forme : %s", shifted = "forme animale", unshifted = "forme normale",
+  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", sky = "ciel ouvert", draft = "brouillon", rewrite = "réécriture (test)", still = "immobile", form = "forme : %s", shifted = "forme animale", unshifted = "forme normale",
   cloak = "avec une cape", no_cloak = "sans cape", boots = "avec des bottes", no_boots = "sans bottes", gloves = "avec des gants", no_gloves = "sans gants", armor = "armure : %s",
 }
 L.SN_POS = "Position : %s   Endroit : %s"

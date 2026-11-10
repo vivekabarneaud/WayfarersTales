@@ -87,6 +87,7 @@ L.UI_CHATTY_DESC = {
 }
 L.UI_OPT_MINIMAP = "Show the minimap button"
 L.UI_OPT_HEART   = "Show the heart next to the happiness icon"
+L.UI_OPT_TESTDRAFTS = "Try new lines (drafts and rewrites being reviewed)"
 L.UI_OPT_DEBUG   = "Debug mode (technical messages in chat)"
 L.UI_OPT_LABEL   = "Show \"Wayfarer's Tales\" before your pet's messages"
 L.UI_TAB_JOURNAL = "Journal"
@@ -943,7 +944,7 @@ L.SN_TAGS = {
   day = "daytime", night = "night", indoors = "indoors", outdoors = "outdoors", resting = "city or inn",
   swimming = "swimming", weather = "weather: %s", crowd = "crowd: %s",
   airBelow = "air below %s", airAbove = "air above %s", notBiomes = "not in: %s", place = "place: %s",
-  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone", calm = "no crowd", sky = "open sky", draft = "draft", still = "standing still", form = "form: %s", shifted = "animal form", unshifted = "normal shape",
+  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone", calm = "no crowd", sky = "open sky", draft = "draft", rewrite = "rewrite (testing)", still = "standing still", form = "form: %s", shifted = "animal form", unshifted = "normal shape",
   cloak = "wearing a cloak", no_cloak = "no cloak", boots = "wearing boots", no_boots = "no boots", gloves = "wearing gloves", no_gloves = "no gloves", armor = "chest armor: %s",
 }
 L.SN_POS = "Position: %s   Spot: %s"

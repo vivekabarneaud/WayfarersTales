@@ -37,7 +37,7 @@ local function Say(poolKey, vars, important)
   if ok and ctx then
     local fits = {}
     for _, line in ipairs(list or {}) do
-      if not line.draft and S.Check(line.when, ctx) then fits[#fits + 1] = line end
+      if (not line.draft or S.Testing()) and S.Check(line.when, ctx) then fits[#fits + 1] = line end
     end
     if #fits > 0 and (ctx.form or math.random() < D.BODY_GEAR_CHANCE) then
       local line = fits[math.random(#fits)]

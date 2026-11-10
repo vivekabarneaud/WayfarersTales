@@ -671,6 +671,7 @@ local function BuildOptions(parent)
   Check("showThermo", "UI_OPT_THERMO", function() if KT.Elements then KT.Elements.UpdateThermo() end end)
   Check("label", "UI_OPT_LABEL")
   Check("sound", "UI_OPT_SOUND")
+  Check("testDrafts", "UI_OPT_TESTDRAFTS")
   Check("debug", "UI_OPT_DEBUG")
 
   -- Language

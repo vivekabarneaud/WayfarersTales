@@ -242,6 +242,7 @@ D.DEFAULTS = {
   bodyStyle = "none",      -- body comfort by your portrait: none / icons / bars
   sensesRhythm = 2,        -- how often immersion lines appear (0-3)
   sensesStyle = "mixed",   -- line length: short / mixed / rich
+  testDrafts = true,       -- play new lines waiting for review (drafts, rewrite proposals)
 }
 D.SOUND_GAP = 3 -- minimum seconds between two animal sounds (chimes ignore it)
 

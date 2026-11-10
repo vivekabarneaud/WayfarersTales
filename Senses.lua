@@ -242,12 +242,26 @@ function S.SpotName(sp)
   return (KT.CurrentLanguage() == "fr" and n.fr) or n.en or sp.id
 end
 
+-- Testing new lines (Options, on by default while we review them): draft lines can
+-- play, and rewrite proposals replace the current text (line.rewrite in the data,
+-- or D.REWRITES[id] in Drafts.lua).
+function S.Testing()
+  return KT.GetDB().settings.testDrafts ~= false
+end
+
+function S.Effective(line, id)
+  if not line or not S.Testing() then return line end
+  local rw = line.rewrite or (D.REWRITES and D.REWRITES[id])
+  if not rw then return line end
+  return { en = rw.en, fr = rw.fr, when = rw.when or line.when, long = line.long, rewriteOf = line }
+end
+
 function S.Candidates(ctx, kind)
   local list = {}
   local function add(src, lines, weight, prefix)
     if not lines then return end
     for i, line in ipairs(lines) do
-      list[#list + 1] = { line = line, weight = weight, id = prefix .. ":" .. i, src = src, kind = kind, biome = ctx.biome }
+      list[#list + 1] = { line = S.Effective(line, prefix .. ":" .. i), weight = weight, id = prefix .. ":" .. i, src = src, kind = kind, biome = ctx.biome }
     end
   end
   for _, sp in ipairs(S.SpotsHere(ctx)) do
@@ -276,11 +290,11 @@ local function SubzoneArrivals(ctx)
   local sz = FindSubzone(ctx)
   if sz and sz.arrive then
     for i, line in ipairs(sz.arrive) do
-      list[#list + 1] = { line = line, weight = 3, id = "sub:" .. sz.id .. ":arrive:" .. i, src = "subzone", kind = "arrive" }
+      list[#list + 1] = { line = S.Effective(line, "sub:" .. sz.id .. ":arrive:" .. i), weight = 3, id = "sub:" .. sz.id .. ":arrive:" .. i, src = "subzone", kind = "arrive" }
     end
   end
   for i, line in ipairs(D.SENSES.genericArrive or {}) do
-    list[#list + 1] = { line = line, weight = 1, id = "genericArrive:" .. i, src = "generic", kind = "arrive" }
+    list[#list + 1] = { line = S.Effective(line, "genericArrive:" .. i), weight = 1, id = "genericArrive:" .. i, src = "generic", kind = "arrive" }
   end
   return list
 end
@@ -329,7 +343,7 @@ function S.PickFrom(list, ctx)
   local pool, total, best = {}, 0, 99
   for _, c in ipairs(list) do
     local w = c.weight * StyleFactor(c)
-    if w > 0 and not c.line.draft and Check(c.line.when, ctx) and not IsRecent(c.id) and not Cooldown(c) then
+    if w > 0 and (not c.line.draft or S.Testing()) and Check(c.line.when, ctx) and not IsRecent(c.id) and not Cooldown(c) then
       local tier = TIER[c.src] or 5
       if tier < best then
         -- a more precise level has something: start over with only that level
@@ -401,7 +415,8 @@ function S.Tags(c, ctx)
   if c.kind == "arrive" then add((L.SN_ARRIVE_TAG:gsub("[()]", "")))
   elseif c.kind == "hearth" then add(T.hearth) end
   if c.line and c.line.long then add(T.long) end
-  if c.line and c.line.draft then add(T.draft, false) end
+  if c.line and c.line.draft then add(T.draft, S.Testing()) end
+  if c.line and c.line.rewriteOf then add(T.rewrite) end
 
   local w = c.line and c.line.when
   if w then
@@ -472,7 +487,7 @@ function S.LinesHere()
   for _, kind in ipairs({ "arrive", "ambient", "hearth" }) do
     for _, c in ipairs(S.Candidates(ctx, kind)) do
       local ok, reason = Check(c.line.when, ctx)
-      if ok and c.line.draft then ok, reason = false, "draft" end
+      if ok and c.line.draft and not S.Testing() then ok, reason = false, "draft" end
       if ok then
         local rest = Cooldown(c)
         if rest then ok, reason, c.remaining = false, "cooldown", rest end
@@ -549,7 +564,7 @@ local function FirstVisit(ctx)
       if sp.arrive then
         local list = {}
         for i, line in ipairs(sp.arrive) do
-          list[#list + 1] = { line = line, weight = 4, id = "spot:" .. sp.id .. ":arrive:" .. i, src = "spot", kind = "arrive" }
+          list[#list + 1] = { line = S.Effective(line, "spot:" .. sp.id .. ":arrive:" .. i), weight = 4, id = "spot:" .. sp.id .. ":arrive:" .. i, src = "spot", kind = "arrive" }
         end
         local c = S.PickFrom(list, ctx)
         if c then ShowArrival(c, ctx) return true end
@@ -679,7 +694,7 @@ local function OnWeatherChanged()
   local lines = D.SENSES.weatherChange[key]
   if lines and lines[1] then
     local i = math.random(#lines)
-    S.Show({ line = lines[i], id = "weatherChange:" .. key .. ":" .. i })
+    S.Show({ line = S.Effective(lines[i], "weatherChange:" .. key .. ":" .. i), id = "weatherChange:" .. key .. ":" .. i })
   end
 end
 
