@@ -56,7 +56,7 @@ local function PickLine(key, state, ctx)
   if not lines then return nil end
   local fits = {}
   for i, line in ipairs(lines) do
-    if S.Check(line.when, ctx) then fits[#fits + 1] = i end
+    if (not line.draft or S.Testing()) and S.Check(line.when, ctx) then fits[#fits + 1] = i end
   end
   state.momentLine = state.momentLine or {}
   local last = state.momentLine[key]
@@ -72,9 +72,13 @@ end
 function Mo.Play(key, vars)
   local rule, state = Ready(key)
   if not rule then return false end
-  local line, i = PickLine(key, state, S.Context())
+  local ctx = S.Context()
+  local line, i = PickLine(key, state, ctx)
   if not line then return false end
   Commit(key, rule, state)
+  -- your gear, for lines that mention it ({cloak}, {boots}, {gloves})
+  vars = vars or {}
+  vars.cloak, vars.boots, vars.gloves = vars.cloak or ctx.cloak, vars.boots or ctx.boots, vars.gloves or ctx.gloves
   S.Show({ line = line, id = "moment:" .. key .. ":" .. i, src = "moment", kind = "moment" }, false, nil, vars)
   return true
 end
@@ -249,6 +253,7 @@ end
 local SPELL_MOMENTS = { [2366] = "herb", [2575] = "mine", [8613] = "skin", [8690] = "hearth" }
 local spellByName = {}
 local hearthAt
+local herbAt -- when you last gathered an herb (waiting for its loot message)
 local function OnSpell(spellID)
   local key = SPELL_MOMENTS[spellID]
   if not key then
@@ -267,6 +272,14 @@ local function OnSpell(spellID)
   if not key then return end
   if key == "hearth" then
     hearthAt = GetTime() -- the line comes once you've arrived
+  elseif key == "herb" then
+    -- wait for the loot message to know which herb it was (see OnLootMessage);
+    -- if none comes, a general herb line
+    local t = GetTime()
+    herbAt = t
+    After(D.HERB_LOOT_WAIT, function()
+      if herbAt == t then herbAt = nil; Play("herb") end
+    end, "gather")
   else
     After(1, function() Play(key) end, "gather")
   end
@@ -392,6 +405,16 @@ local function OnLootMessage(msg)
   end
   local looted = MatchAny(msg, LOOT_FORMATS)
   if not looted then return end
+  -- the herb you just gathered: its own lines if it has some
+  if herbAt and GetTime() - herbAt < D.HERB_LOOT_WAIT then
+    local herb = D.HERBS[tonumber(looted:match("item:(%d+)"))]
+    if herb then
+      herbAt = nil
+      local key = D.MOMENTS["herb_" .. herb] and ("herb_" .. herb) or "herb"
+      Play(key, { item = looted })
+      return
+    end
+  end
   local q = Quality(looted)
   if not q or q < 3 then return end
   Play((q >= 5 and "lootLegendary") or (q == 4 and "lootEpic") or "lootRare", { item = looted })

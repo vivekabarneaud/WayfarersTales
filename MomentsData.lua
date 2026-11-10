@@ -41,6 +41,14 @@ D.MOMENT_RULES = {
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
   herb            = { cd = 1200, chance = 0.5, gap = 60 },
+  -- each herb's own lines (D.HERBS) share the herb timer, a little shorter
+  herb_peacebloom = { cd = 600, chance = 0.5, gap = 30, shares = "herb" },
+  herb_silverleaf = { cd = 600, chance = 0.5, gap = 30, shares = "herb" },
+  herb_earthroot  = { cd = 600, chance = 0.5, gap = 30, shares = "herb" },
+  herb_mageroyal  = { cd = 600, chance = 0.5, gap = 30, shares = "herb" },
+  herb_briarthorn = { cd = 600, chance = 0.5, gap = 30, shares = "herb" },
+  herb_bruiseweed = { cd = 600, chance = 0.5, gap = 30, shares = "herb" },
+  herb_stranglekelp = { cd = 600, chance = 0.5, gap = 30, shares = "herb" },
   mine            = { cd = 1200, chance = 0.5, gap = 60 },
   skin            = { cd = 1200, chance = 0.5, gap = 60 },
   hearth          = { cd = 600,  chance = 1,   gap = 30 },
@@ -657,4 +665,77 @@ D.BODY_LINES = {
   soaked         = { BOOTS_WET, NOBOOTS_WET, CLOAK_WET, FUR_WET },
   dry            = { FUR_DRY },
   fireWarm       = { CLOAK_FIRE, FUR_FIRE },
+}
+
+---------------------------------------------------------------------------
+-- Herbs: after gathering, the loot message tells us which herb it was, so the
+-- line can be about that very plant. {item} = the herb (link), {gloves} = your gloves.
+-- Item ID -> key of its lines (D.MOMENTS.herb_<key>); other herbs get the general line.
+---------------------------------------------------------------------------
+D.HERB_LOOT_WAIT = 6 -- seconds to wait for the loot message after gathering
+D.HERBS = {
+  [2447] = "peacebloom", [765] = "silverleaf", [2449] = "earthroot", [785] = "mageroyal",
+  [2450] = "briarthorn", [2453] = "bruiseweed", [3820] = "stranglekelp",
+}
+
+D.MOMENTS.herb_peacebloom = {
+  { draft = true,
+    en = "You gently pick the flower. Its scent is soft, almost sweet, and a little pollen clings to your fingers.",
+    fr = "Vous cueillez délicatement la fleur. Son parfum est doux, presque sucré, et un peu de pollen reste sur vos doigts." },
+  { draft = true,
+    en = "A simple, slender flower that grows almost everywhere. Just breathing it in makes you feel calmer. You can see why they call it that: {item}.",
+    fr = "Une fleur simple et fine, qui pousse un peu partout. Rien qu'à la respirer, vous vous sentez plus calme. Vous comprenez pourquoi on l'appelle ainsi : {item}." },
+  { draft = true,
+    en = "A thin stem, light petals, that soft and discreet scent: no doubt about it, {item}.",
+    fr = "Une tige fine, des pétales légers, ce parfum doux et discret : pas de doute, c'est bien {item}." },
+}
+D.MOMENTS.herb_silverleaf = {
+  { draft = true,
+    en = "The top of the leaf is downy, the underside smooth and silvery. No doubt about it: {item}.",
+    fr = "Le dessus de la feuille est duveteux, le dessous lisse et argenté. Pas de doute : {item}." },
+  { draft = true,
+    en = "You crush a leaf between your fingers: a fresh, slightly bitter smell escapes, like wild mint.",
+    fr = "Vous froissez une feuille entre vos doigts : une odeur fraîche et un peu amère s'en échappe, comme de la menthe sauvage." },
+  { draft = true,
+    en = "The silvery leaves catch the light for a moment as you pick them. They smell of sage and fresh earth.",
+    fr = "Les feuilles argentées accrochent un instant la lumière quand vous les cueillez. Elles sentent la sauge et la terre fraîche." },
+}
+D.MOMENTS.herb_earthroot = {
+  { draft = true,
+    en = "You pull gently on the root until it gives. It smells of damp earth and wood, and leaves a brown trace on your hands.",
+    fr = "Vous tirez doucement sur la racine jusqu'à ce qu'elle cède. Elle sent la terre humide et le bois, et laisse une trace brune sur vos mains." },
+  { draft = true,
+    en = "The root is hard and knotted, covered in tiny filaments. You shake off the soil clinging to it before putting it away.",
+    fr = "La racine est dure, noueuse, couverte de petits filaments. Vous secouez la terre qui s'y accroche avant de la ranger." },
+}
+D.MOMENTS.herb_mageroyal = {
+  { draft = true,
+    en = "A peppery smell rises from the leaves as you pick them. A faint tingle stays at your fingertips, like a trace of magic.",
+    fr = "Une odeur poivrée monte des feuilles quand vous les cueillez. Un léger picotement vous reste au bout des doigts, comme une trace de magie." },
+  { draft = true,
+    en = "You can see why mages love it: even picked, the plant seems to quiver softly between your fingers.",
+    fr = "Vous comprenez pourquoi les mages en raffolent : même cueillie, la plante semble frémir doucement entre vos doigts." },
+}
+D.MOMENTS.herb_briarthorn = {
+  { draft = true,
+    en = "Ouch! A thorn pricks your thumb. You pull it out with a wince: this one fights back.",
+    fr = "Aïe ! Une épine vous pique le pouce. Vous la retirez en grimaçant : cette plante-là se défend.",
+    when = { gloves = false } },
+  { draft = true,
+    en = "Good thing you're wearing your {gloves}: the thorns catch on them without reaching your skin.",
+    fr = "Heureusement que vous portez vos {gloves} : les épines s'y accrochent sans atteindre votre peau.",
+    when = { gloves = true } },
+  { draft = true,
+    en = "You carefully part the thorny stems. Despite the thorns, the flowers smell lovely, a sweet scent of wild rose.",
+    fr = "Vous écartez les tiges épineuses avec précaution. Malgré les épines, les fleurs sentent bon, un parfum sucré de rose sauvage." },
+}
+D.MOMENTS.herb_bruiseweed = {
+  { draft = true,
+    en = "Its sap has a sharp smell that stings your nose. They say it soothes bruises, hence the name.",
+    fr = "Sa sève a une odeur âcre qui vous pique le nez. On dit qu'elle soulage les douleurs, d'où son nom." },
+}
+D.MOMENTS.herb_stranglekelp = {
+  { draft = true,
+    en = "The kelp slides between your fingers, slimy and cold, and coils around your wrist as if it didn't want to let go.",
+    fr = "L'algue glisse entre vos doigts, visqueuse et froide, et s'enroule autour de votre poignet comme si elle ne voulait pas vous lâcher." },
 }
