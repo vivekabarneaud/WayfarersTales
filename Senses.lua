@@ -193,6 +193,15 @@ local function Check(when, ctx)
   -- race: a lore line can be told differently to a native of the place
   if when.race and not InList(when.race, ctx.race) then return false, "race" end
   if when.notRace and InList(when.notRace, ctx.race) then return false, "race" end
+  -- the NPC you are dealing with (D.NPCS: race and role noted by hand, sex from the game)
+  if when.npcRace and not InList(when.npcRace, ctx.npcRace) then return false, "npc" end
+  if when.npcRole and not InList(when.npcRole, ctx.npcRole) then return false, "npc" end
+  if when.npcSex and when.npcSex ~= ctx.npcSex then return false, "npc" end
+  -- body needs (filled in by the Elements module): below a value from 0 to 100
+  for _, need in ipairs({ "hunger", "thirst", "energy" }) do
+    local below = when[need .. "Below"]
+    if below and not (ctx[need] and ctx[need] < below) then return false, "need" end
+  end
   -- shapeshift forms: "furry" = bear, cat, travel form, ghost wolf
   if when.shifted ~= nil and when.shifted ~= (ctx.form ~= nil) then return false, "form" end
   if when.form then

@@ -35,11 +35,17 @@ local function Say(poolKey, vars, important)
   local ok, ctx = false, nil
   if S and S.Context and (list or D.BODY_PERSON_POOLS[poolKey]) then ok, ctx = pcall(S.Context) end
   if ok and ctx then
-    local fits = {}
+    ctx.hunger, ctx.thirst, ctx.energy = state.hunger, state.thirst, state.energy
+    local fits, always = {}, {}
     for _, line in ipairs(list or {}) do
-      if (not line.draft or S.Testing()) and S.Check(line.when, ctx) then fits[#fits + 1] = line end
+      if (not line.draft or S.Testing()) and S.Check(line.when, ctx) then
+        fits[#fits + 1] = line
+        if line.always then always[#always + 1] = line end
+      end
     end
-    if #fits > 0 and (ctx.form or math.random() < D.BODY_GEAR_CHANCE) then
+    -- "always" lines win when they fit (e.g. hunger getting pressing)
+    if #always > 0 then fits = always end
+    if #fits > 0 and (#always > 0 or ctx.form or math.random() < D.BODY_GEAR_CHANCE) then
       local line = fits[math.random(#fits)]
       vars = vars or {}
       vars.cloak, vars.boots, vars.gloves = ctx.cloak, ctx.boots, ctx.gloves

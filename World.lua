@@ -18,7 +18,7 @@ D.CLIMATE = {
   [1418] = { temp = 2,  biome = "badlands" },  -- Badlands
   [1419] = { temp = 1,  biome = "wasteland" }, -- Blasted Lands
   [1420] = { temp = 0,  biome = "gloom" },     -- Tirisfal Glades
-  [1421] = { temp = 0,  biome = "forest" },    -- Silverpine Forest
+  [1421] = { temp = 0,  biome = "gloom" },     -- Silverpine Forest: dark pines, grey skies, worgen
   [1422] = { temp = 0,  biome = "plague" },    -- Western Plaguelands
   [1423] = { temp = 0,  biome = "plague" },    -- Eastern Plaguelands
   [1424] = { temp = 0,  biome = "plains" },    -- Hillsbrad Foothills

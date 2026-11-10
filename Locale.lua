@@ -1021,7 +1021,7 @@ L.SN_REASONS = {
   weatherWait = "waiting for weather data", weather = "not in this weather",
   crowdUnknown = "needs to know who's around", crowd = "not with this crowd",
   cooldown = "already played, back in %s", moving = "only while walking", calm = "not with a crowd around", alone = "only when nobody (player or creature) is in sight", sky = "only under the open sky", draft = "draft, waiting for approval", still = "only when standing still",
-  form = "not in this shape", cloak = "depends on your cloak", boots = "depends on your boots", gloves = "depends on your gloves", armor = "depends on your armor", race = "told differently for your race",
+  form = "not in this shape", cloak = "depends on your cloak", boots = "depends on your boots", gloves = "depends on your gloves", armor = "depends on your armor", race = "told differently for your race", npc = "depends on the NPC", need = "depends on how hungry, thirsty or tired you are",
 }
 L.SN_BIOMES = {
   forest = "forest", plains = "plains", farmland = "dry farmland", hills = "hills", mountain = "mountains", snow = "snow",

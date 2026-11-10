@@ -38,6 +38,12 @@ D.MOMENT_RULES = {
   craftEpic       = { cd = 0,    chance = 1,   gap = 0 },
   craftFirst      = { cd = 600,  chance = 1, gap = 20 },
   discoveryMilestone = { cd = 0, chance = 1,   gap = 30 },
+  fall            = { cd = 300,  chance = 1,   gap = 10 },
+  fallHard        = { cd = 300,  chance = 1,   gap = 0, shares = "fall" },
+  campSit         = { cd = 900,  chance = 1,   gap = 10 },
+  campRested      = { cd = 900,  chance = 1,   gap = 10 },
+  npc             = { cd = 120,  chance = 1,   gap = 20 },
+  questAccept_2159 = { cd = 0,   chance = 1,   gap = 0 },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -654,6 +660,20 @@ local FUR_FIRE = { draft = true,
   fr = "Vous vous approchez du feu, et sa chaleur pénètre doucement votre fourrure.",
   when = { form = "furry" } }
 
+-- When a need gets pressing (below 25%), these lines take over ("always").
+local HUNGRY_MORE = { draft = true, always = true,
+  en = "Your stomach growls loudly. It's really time to eat something.",
+  fr = "Votre estomac gargouille bruyamment. Il serait vraiment temps de manger quelque chose.",
+  when = { hungerBelow = 25 } }
+local THIRSTY_MORE = { draft = true, always = true,
+  en = "Your throat is dry and your lips are starting to crack. You need a drink, and soon.",
+  fr = "Votre gorge est sèche et vos lèvres commencent à craqueler. Il vous faut boire, et vite.",
+  when = { thirstBelow = 25 } }
+local TIRED_MORE = { draft = true, always = true,
+  en = "Your eyelids keep closing on their own, and your steps grow heavy. A real rest would do you a world of good.",
+  fr = "Vos paupières se ferment toutes seules et vos pas se font lourds. Un vrai repos vous ferait le plus grand bien.",
+  when = { energyBelow = 25 } }
+
 D.BODY_LINES = {
   coldEnter      = { CLOAK_COLD, NOCLOAK_COLD, PLATE_COLD, MAIL_COLD, FUR_COLD },
   coldRemind     = { CLOAK_COLD, NOCLOAK_COLD, HANDS_STILL, GLOVES_STILL, PLATE_COLD, MAIL_COLD, FUR_COLD },
@@ -666,6 +686,9 @@ D.BODY_LINES = {
   soaked         = { BOOTS_WET, NOBOOTS_WET, CLOAK_WET, FUR_WET },
   dry            = { FUR_DRY },
   fireWarm       = { CLOAK_FIRE, FUR_FIRE },
+  body_hungry    = { HUNGRY_MORE },
+  body_thirsty   = { THIRSTY_MORE },
+  body_tired     = { TIRED_MORE },
 }
 
 ---------------------------------------------------------------------------
@@ -694,7 +717,7 @@ D.MOMENTS.herb_silverleaf = {
   { draft = true,
     en = "The top of the leaf is downy, the underside smooth and silvery. No doubt about it: {item}.",
     fr = "Le dessus de la feuille est duveteux, le dessous lisse et argenté. Pas de doute : {item}." },
-  { draft = true,
+  {
     en = "You crush a leaf between your fingers: a fresh, slightly bitter smell escapes, like wild mint.",
     fr = "Vous froissez une feuille entre vos doigts : une odeur fraîche et un peu amère s'en échappe, comme de la menthe sauvage." },
   { draft = true,
@@ -739,4 +762,111 @@ D.MOMENTS.herb_stranglekelp = {
   { draft = true,
     en = "The kelp slides between your fingers, slimy and cold, and coils around your wrist as if it didn't want to let go.",
     fr = "L'algue glisse entre vos doigts, visqueuse et froide, et s'enroule autour de votre poignet comme si elle ne voulait pas vous lâcher." },
+}
+
+---------------------------------------------------------------------------
+-- Falls: health lost on landing (only read out of combat).
+---------------------------------------------------------------------------
+D.FALL_MIN = 0.05  -- lose at least 5% of your health: a small line
+D.FALL_HARD = 0.30 -- 30% or more: a hard fall
+
+D.MOMENTS.fall = {
+  { draft = true,
+    en = "Ouch. Your knees will remember that jump for a long time.",
+    fr = "Aïe. Vos genoux se souviendront longtemps de ce saut.",
+    when = { shifted = false } },
+  { draft = true,
+    en = "You land heavily, and a dull pain climbs up your legs.",
+    fr = "Vous atterrissez lourdement, et une douleur sourde vous remonte le long des jambes.",
+    when = { shifted = false } },
+  { draft = true,
+    en = "You land heavily on your paws. Your pads sting for a moment.",
+    fr = "Vous retombez lourdement sur vos pattes. Vos coussinets vous lancent un moment.",
+    when = { form = "furry" } },
+}
+D.MOMENTS.fallHard = {
+  { draft = true,
+    en = "The fall knocks the wind out of you. For a moment the world spins, and you stay there, gathering your wits.",
+    fr = "La chute vous coupe le souffle. Pendant un instant, le monde tourne autour de vous, et vous restez là, à reprendre vos esprits." },
+}
+
+---------------------------------------------------------------------------
+-- Campfires, for everyone (hunters' pets have their own lines in Kindred)
+---------------------------------------------------------------------------
+D.MOMENTS.campSit = {
+  { draft = true,
+    en = "You sit down by the fire. The flames crackle, and a gentle warmth spreads through your hands.",
+    fr = "Vous vous asseyez près du feu. Les flammes crépitent, et une douce chaleur vous gagne les mains.",
+    when = { shifted = false } },
+  { draft = true,
+    en = "You hold your hands out to the flames. The smell of burning wood and the warmth on your face: a real comfort.",
+    fr = "Vous tendez les mains vers les flammes. L'odeur du bois qui brûle et la chaleur sur votre visage : un vrai réconfort.",
+    when = { shifted = false } },
+  { draft = true,
+    en = "You lie down by the fire, and its warmth slowly seeps into your fur.",
+    fr = "Vous vous couchez près du feu, et sa chaleur pénètre doucement votre fourrure.",
+    when = { form = "furry" } },
+}
+D.MOMENTS.campRested = {
+  { draft = true,
+    en = "You get up, limbs warmed and mind lighter. You're ready to set off again.",
+    fr = "Vous vous relevez, les membres réchauffés et l'esprit plus léger. Vous voilà d'attaque pour repartir." },
+  { draft = true,
+    en = "The fire did you good: your muscles have loosened, and the road ahead seems shorter.",
+    fr = "Le feu vous a fait du bien : vos muscles se sont dénoués, et la route vous semble moins longue." },
+}
+
+---------------------------------------------------------------------------
+-- Quests: lines for specific quests, by quest ID (questAccept_<id>, questDone_<id>).
+-- Each one also needs a rule in D.MOMENT_RULES.
+---------------------------------------------------------------------------
+D.MOMENTS.questAccept_2159 = { -- Livraison à Dolanaar (Teldrassil): leaving Shadowglen for the first time
+  { draft = true,
+    en = "For the first time, you're about to leave Shadowglen. The path to Dolanaar winds down through the forest, and your heart beats a little faster.",
+    fr = "Pour la première fois, vous allez quitter Sombrevallon. Le chemin vers Dolanaar descend à travers la forêt, et votre cœur bat un peu plus vite." },
+}
+
+---------------------------------------------------------------------------
+-- NPCs. The game doesn't tell addons an NPC's race, so we note them by hand
+-- (NPC id -> race and role), from what players report. The sex comes from the game.
+-- {npc} = the NPC's name.
+---------------------------------------------------------------------------
+D.NPC_LINE_CD = 1200 -- the same NPC gets a line at most every 20 minutes
+D.NPCS = {
+  [3589] = { race = "NightElf", role = "bowyer" },          -- Keina, Aldrassil: bows and arrows
+  [6091] = { race = "NightElf", role = "food" },            -- Dellylah, Aldrassil: food and drink
+  [3597] = { race = "NightElf", role = "trainer_druid" },   -- Mardant Strongoak, Aldrassil
+  [3596] = { race = "NightElf", role = "trainer_hunter" },  -- Ayanna Everstride, Aldrassil
+  [6736] = { race = "NightElf", role = "innkeeper" },       -- Keldamyr, Dolanaar
+}
+
+D.MOMENTS.npc = {
+  { draft = true,
+    en = "{npc} hands you your arrows with a calm smile. A smell of wax and freshly cut wood hangs around the stall.",
+    fr = "{npc} vous tend vos flèches avec un sourire tranquille. Une odeur de cire et de bois fraîchement taillé flotte autour de l'étal.",
+    when = { npcRace = "NightElf", npcRole = "bowyer" } },
+  { draft = true,
+    en = "Bows of pale wood are lined up behind {npc}, carefully polished. You can't help admiring one.",
+    fr = "Des arcs de bois clair sont alignés derrière {npc}, polis avec soin. Vous ne pouvez pas vous empêcher d'en admirer un.",
+    when = { npcRace = "NightElf", npcRole = "bowyer" } },
+  { draft = true,
+    en = "{npc} serves you with a gentle smile. A smell of bread and ripe fruit floats all around.",
+    fr = "{npc} vous sert avec un sourire doux. Une odeur de pain et de fruits mûrs flotte tout autour.",
+    when = { npcRace = "NightElf", npcRole = "food" } },
+  { draft = true,
+    en = "{npc} watches you with silvery eyes, calm as a forest without wind. You feel that nothing escapes that gaze.",
+    fr = "{npc} vous observe de ses yeux argentés, calme comme une forêt sans vent. Vous avez l'impression que rien ne lui échappe.",
+    when = { npcRace = "NightElf", npcRole = "trainer_druid" } },
+  { draft = true,
+    en = "{npc} sizes you up with a piercing look, the way one judges prey. Then, a faint smile.",
+    fr = "{npc} vous jauge d'un regard perçant, comme on estime une proie. Puis, un léger sourire.",
+    when = { npcRace = "NightElf", npcRole = "trainer_hunter" } },
+  { draft = true,
+    en = "{npc} greets you with a warm nod. Behind the counter, it smells of warm bread and polished wood.",
+    fr = "{npc} vous accueille d'un signe de tête chaleureux. Derrière le comptoir, ça sent le pain chaud et le bois ciré.",
+    when = { npcRace = "NightElf", npcRole = "innkeeper" } },
+  { draft = true, -- any night elf NPC
+    en = "{npc}'s eyes glow softly with a silvery light, like those of every night elf.",
+    fr = "Les yeux de {npc} luisent doucement d'un éclat argenté, comme ceux de tous les elfes de la nuit.",
+    when = { npcRace = "NightElf" } },
 }

@@ -1013,7 +1013,7 @@ L.SN_REASONS = {
   weatherWait = "en attente des données météo", weather = "pas avec cette météo",
   crowdUnknown = "a besoin de savoir qui est là", crowd = "pas avec ce monde-là",
   cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule", alone = "seulement quand personne n'est en vue (joueur ou créature)", sky = "seulement à ciel ouvert", draft = "brouillon, en attente de validation", still = "seulement sans bouger",
-  form = "pas sous cette forme", cloak = "dépend de votre cape", boots = "dépend de vos bottes", gloves = "dépend de vos gants", armor = "dépend de votre armure", race = "raconté autrement pour votre race",
+  form = "pas sous cette forme", cloak = "dépend de votre cape", boots = "dépend de vos bottes", gloves = "dépend de vos gants", armor = "dépend de votre armure", race = "raconté autrement pour votre race", npc = "dépend du PNJ", need = "dépend de votre faim, soif ou fatigue",
 }
 L.SN_BIOMES = {
   forest = "forêt", plains = "plaines", farmland = "terres agricoles sèches", hills = "collines", mountain = "montagnes", snow = "neige",

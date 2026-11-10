@@ -126,11 +126,9 @@ S.genericArrive = {
 -- which inn it is: zones, sub-zones and spots can have their own "hearth" lines,
 -- and these generic ones are used when there's nothing more precise.
 S.genericHearth = {
-  { en = "The familiar smell of the inn wraps around you: stew, spilled ale and woodsmoke. It feels good to be back.",
-    fr = "L'odeur familière de l'auberge vous enveloppe : ragoût, bière renversée et feu de bois. Ça fait du bien d'être de retour.",
-    when = { indoors = true, subMatch = { "inn", "auberge", "tavern", "taverne" } },
-    rewrite = { en = "The inn welcomes you with its familiar smells: warm bread, candle wax and polished wood. Your shoulders relax on their own.",
-                fr = "L'auberge vous accueille avec ses odeurs familières : pain chaud, cire de bougie et bois ciré. Vos épaules se détendent toutes seules." } },
+  { en = "The inn welcomes you with its familiar smells: warm bread, candle wax and polished wood. Your shoulders relax on their own.",
+    fr = "L'auberge vous accueille avec ses odeurs familières : pain chaud, cire de bougie et bois ciré. Vos épaules se détendent toutes seules.",
+    when = { indoors = true, subMatch = { "inn", "auberge", "tavern", "taverne" } } },
   { en = "Familiar walls around you again. It feels a little like coming home.",
     fr = "Des murs familiers vous entourent à nouveau. Un peu comme rentrer chez soi.",
     when = { indoors = true, resting = true } },
@@ -500,28 +498,29 @@ S.zones = {
       { draft = true, long = true,
         en = "You are walking on the World Tree itself. Beneath your feet lie not hills but colossal roots and branches, and the thought makes you a little dizzy.",
         fr = "Vous marchez sur l'Arbre-Monde lui-même. Sous vos pieds, ce ne sont pas des collines mais des racines et des branches géantes, et cette idée vous donne un léger vertige.",
-        when = OUT },
+        when = { indoors = false, notRace = "NightElf" } }, -- night elves are born here
     },
     ambient = {
       { draft = true,
-        en = "Violet light filters through the immense canopy. Everything is bathed in a soft, slightly unreal twilight, and time seems to slow down.",
-        fr = "Une lumière violette filtre à travers l'immense feuillage. Tout baigne dans un crépuscule doux et un peu irréel, et le temps semble ralentir.",
+        en = "Violet light filters through the immense canopy. Everything is bathed in a soft, slightly unreal half-light, and time seems to slow down.",
+        fr = "Une lumière violette filtre à travers l'immense feuillage. Tout baigne dans une pénombre douce et un peu irréelle, et le temps semble ralentir.",
         when = OUT },
-      { draft = true,
-        en = "The air smells of moss, damp bark and a hint of wildflowers. Here, even the silence feels alive.",
+      { en = "The air smells of moss, damp bark and a hint of wildflowers. Here, even the silence feels alive.",
         fr = "L'air sent la mousse, l'écorce humide et une pointe de fleurs sauvages. Ici, même le silence semble vivant.",
         when = { indoors = false, calm = true } },
-      { draft = true,
-        en = "It is whispered that the Tree never received the blessing of the great dragons. Listening to the wind in its branches, you understand why the elves speak of it with such worry.",
+      { en = "It is whispered that the Tree never received the blessing of the great dragons. Listening to the wind in its branches, you understand why the elves speak of it with such worry.",
         fr = "On murmure que l'Arbre n'a jamais reçu la bénédiction des grands dragons. En écoutant le vent dans ses branches, vous comprenez pourquoi les elfes en parlent avec tant d'inquiétude.",
         when = { indoors = false, notRace = "NightElf" } },
-      { draft = true,
-        en = "Night falls over Teldrassil without really changing its violet light. The leaves murmur softly, and you feel tiny, but safe.",
+      { en = "Night falls over Teldrassil without really changing its violet light. The leaves murmur softly, and you feel tiny, but safe.",
         fr = "La nuit tombe sur Teldrassil sans vraiment changer sa lumière violette. Le feuillage murmure doucement, et vous vous sentez minuscule, mais en sécurité.",
         when = { indoors = false, night = true } },
-      { draft = true, -- for night elves: this is home
+      { -- for night elves: this is home
         en = "You know the Tree never received the blessing of the great dragons. Listening to the wind in its branches, your heart tightens: this is your home, and the thought that it could one day be corrupted is unbearable.",
         fr = "Vous savez que l'Arbre n'a jamais reçu la bénédiction des grands dragons. En écoutant le vent dans ses branches, votre cœur se serre : c'est votre foyer, et l'idée qu'il puisse un jour se corrompre vous est insupportable.",
+        when = { indoors = false, race = "NightElf" } },
+      { draft = true, -- for night elves: the corruption is already creeping in
+        en = "A strange breeze passes through the branches. It smells sour, almost... corrupted. You clench your fists: nothing will stop you from protecting your home.",
+        fr = "Une brise étrange traverse les branches. Elle sent quelque chose d'aigre, presque… corrompu. Vous serrez les poings : rien ne vous empêchera de protéger votre foyer.",
         when = { indoors = false, race = "NightElf" } },
     },
   },
@@ -830,6 +829,18 @@ S.spots = {
   { id = "mw_shadowglen_water", map = 1438, x = 59.9, y = 33.0, r = 0.25, when = { indoors = false },
     names = { en = "in the Shadowglen moonwell", fr = "dans le puits de lune de Sombrevallon" },
     ambient = MOONWELL_WATER },
+  { id = "td_dolanaar_inn", map = 1438, x = 55.7, y = 59.7, r = 0.6, when = { resting = true },
+    names = { en = "Dolanaar's inn", fr = "l'auberge de Dolanaar" },
+    ambient = {
+      { draft = true,
+        en = "A smell of freshly baked bread drifts through the inn, and the beds look so soft that you catch yourself yawning. Staying a while wouldn't be a bad idea.",
+        fr = "Une odeur de pain sorti du four flotte dans l'auberge, et les lits ont l'air si moelleux que vous vous surprenez à bâiller. Rester un peu ne serait pas de refus." },
+    },
+    hearth = {
+      { draft = true,
+        en = "Back at Dolanaar's inn: the smell of warm bread, the soft beds... Here, you feel at home.",
+        fr = "De retour à l'auberge de Dolanaar : l'odeur du pain chaud, les lits moelleux… Ici, vous vous sentez chez vous." },
+    } },
   { id = "sw_dwarven_forge", map = 1453, x = 63.7, y = 36.7, r = 2.5, when = { indoors = false },
     names = { en = "the Dwarven District forge", fr = "la forge du Quartier des Nains" },
     arrive = {
@@ -961,6 +972,13 @@ S.subzones = {
       { en = "The dim inn of Darkshire, at last. Out there, the endless night is waiting... You'd gladly linger here a little longer.",
         fr = "La pénombre de l'auberge de Sombre-Comté, enfin. Dehors, la nuit sans fin vous attend... Vous aimeriez bien pouvoir vous éterniser un peu.",
         when = { indoors = true } },
+    } },
+  { id = "td_dolanaar", zone = 1438, names = { "dolanaar" }, -- Teldrassil: the first night elf village after Shadowglen
+    arrive = {
+      { draft = true, long = true,
+        en = "Dolanaar opens before you, humble and peaceful: a few houses of pale wood, a moonwell, and an inn where you could finally set down your pack, rest a little, and tie your hearthstone.",
+        fr = "Dolanaar s'ouvre devant vous, humble et paisible : quelques maisons de bois clair, un puits de lune, et une auberge où l'on pourrait enfin poser son sac, souffler un peu et lier sa pierre de foyer.",
+        when = OUT },
     } },
   { id = "td_shadowglen", zone = 1438, names = { "shadowglen", "sombrevallon" }, -- Teldrassil, night elf start
     arrive = {

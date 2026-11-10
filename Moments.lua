@@ -74,10 +74,12 @@ local function PickLine(key, state, ctx)
   return lines[i], i
 end
 
-function Mo.Play(key, vars)
+-- extra = more facts for the conditions (e.g. the NPC you're dealing with)
+function Mo.Play(key, vars, extra)
   local rule, state = Ready(key)
   if not rule then return false end
   local ctx = S.Context()
+  for k, v in pairs(extra or {}) do ctx[k] = v end
   local line, i = PickLine(key, state, ctx)
   if not line then return false end
   Commit(key, rule, state)
@@ -173,6 +175,37 @@ local function FightEnded()
   end, "fight")
 end
 
+-- Falls: when you start falling, note your health; when you land, compare.
+-- (Health is hidden from addons in combat: then nothing happens.)
+local fallStart, fallHealth
+local fallWatch = CreateFrame("Frame")
+local fallAcc = 0
+fallWatch:SetScript("OnUpdate", function(_, elapsed)
+  fallAcc = fallAcc + elapsed
+  if fallAcc < 0.1 then return end
+  fallAcc = 0
+  local ok, err = pcall(function()
+    local falling = IsFalling and IsFalling() and true or false
+    if falling and not fallStart then
+      fallStart, fallHealth = GetTime(), HealthPct()
+    elseif not falling and fallStart then
+      local duration, before = GetTime() - fallStart, fallHealth
+      fallStart, fallHealth = nil, nil
+      if before and duration > 0.4 then
+        After(0.4, function()
+          if UnitIsDeadOrGhost("player") then return end
+          local now = HealthPct()
+          if not now then return end
+          local lost = before - now
+          if lost >= D.FALL_HARD then Play("fallHard")
+          elseif lost >= D.FALL_MIN then Play("fall") end
+        end, "fall")
+      end
+    end
+  end)
+  if not ok then fallStart, fallHealth = nil, nil end
+end)
+
 -- Eating and drinking
 
 -- What kind of drink is it? (water, milk, juice... from words in its name)
@@ -242,7 +275,7 @@ local function MealLine(drink, tries)
   end
 end
 
-local wasEating, wasDrinking
+local wasEating, wasDrinking, wasCampSit, wasCampBuff, campSitAt
 local function CheckMeal()
   local eating = W.HasAura(D.SPELL_FOOD_AURA, true)
   local drinking = W.HasAura(D.SPELL_DRINK_AURA, true)
@@ -252,6 +285,18 @@ local function CheckMeal()
     After(1, function() MealLine(true, 1) end, "drink")
   end
   wasEating, wasDrinking = eating, drinking
+
+  -- campfires: sitting down by one (the 60 s "stay seated" buff), then its rested buff
+  local campSit = W.HasAura(D.AURA_CAMP_WELCOME)
+  if campSit and not wasCampSit then
+    campSitAt = GetTime()
+    After(1, function() Play("campSit") end, "camp")
+  end
+  local campBuff = W.HasAura(D.AURA_CAMP_BENEFITS)
+  if campBuff and not wasCampBuff and campSitAt and GetTime() - campSitAt < 180 then
+    After(1, function() Play("campRested") end, "camp")
+  end
+  wasCampSit, wasCampBuff = campSit, campBuff
 end
 
 -- Spells you cast: gathering and the hearthstone (found by name, for all ranks)
@@ -551,11 +596,28 @@ local function LogNPC(kind)
   e.kinds[kind] = true
   e.n, e.last = (e.n or 0) + 1, time()
   db.npcs[npcID] = e
+  return { id = tonumber(npcID), name = e.name, sex = e.sex }
+end
+
+-- A line about the NPC you're dealing with, if we know their race and role (D.NPCS).
+-- Returns true if a line was shown.
+local function NPCLine(info)
+  local known = info and info.id and D.NPCS[info.id]
+  local state = S.State()
+  if not known or not state then return false end
+  state.npcLine = state.npcLine or {}
+  if time() - (state.npcLine[info.id] or 0) < D.NPC_LINE_CD then return false end
+  if Play("npc", { npc = info.name }, { npcRace = known.race, npcRole = known.role, npcSex = info.sex }) then
+    state.npcLine[info.id] = time()
+    return true
+  end
+  return false
 end
 
 local f = CreateFrame("Frame")
 for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
-  "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED" }) do
+  "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED",
+  "QUEST_ACCEPTED" }) do
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
@@ -567,7 +629,11 @@ end
 
 f:SetScript("OnEvent", function(_, event, ...)
   local ok, err = pcall(function(...)
-    if NPC_EVENTS[event] then pcall(LogNPC, NPC_EVENTS[event]) end
+    local npcInfo
+    if NPC_EVENTS[event] then
+      local okL, info = pcall(LogNPC, NPC_EVENTS[event])
+      if okL then npcInfo = info end
+    end
     if event == "PLAYER_LOGIN" then
       C_Timer.NewTicker(5, Safe(Tick, "tick"))
       After(3, CheckBirth, "birth") -- a brand new character?
@@ -591,10 +657,17 @@ f:SetScript("OnEvent", function(_, event, ...)
       local msg = ...
       After(0.5, function() OnSystemMessage(msg) end, "learn") -- after the game's own message
     elseif ERRANDS[event] then
+      -- the NPC's own line if we know them, else the errand's line (bank, mail...)
       local key = ERRANDS[event]
-      After(0.3, function() Play(key) end, "errand")
+      After(0.3, function() if not NPCLine(npcInfo) then Play(key) end end, "errand")
     elseif NPC_EVENTS[event] then
-      return -- only logged (above)
+      After(0.3, function() NPCLine(npcInfo) end, "npc")
+    elseif event == "QUEST_ACCEPTED" then
+      -- (questLogIndex, questID) in some clients, (questID) in others
+      local a, b = ...
+      local id = b or a
+      local key = id and ("questAccept_" .. tostring(id))
+      if key and D.MOMENTS[key] then After(1, function() Play(key) end, "quest") end
     else
       local unit = ...
       if unit ~= "player" then return end
