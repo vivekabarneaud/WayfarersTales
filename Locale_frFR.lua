@@ -172,6 +172,7 @@ L.CMD_HELP = {
   "/wt sound - écouter les sons de votre familier",
   "/wt guide, /wt journal, /wt options - ouvrir un onglet de la fenêtre",
   "/wt resetvisits - oublier les lieux visités et le repos des lignes (pour les tests)",
+  "/wt devoirs - une petite fenêtre avec ce qu'il faut noter en jouant (pour les testeurs)",
   "/wt toit - cet endroit a un toit au-dessus de votre tête même si le jeu dit « dehors » : plus de lignes sur le ciel ici (à nouveau pour annuler)",
 }
 L.CMD_ROOF = {
@@ -1030,3 +1031,24 @@ L.SN_GUIDE = table.concat({
   "Les lignes dépendent du paysage, du lieu précis, du jour ou de la nuit, de l'intérieur ou de l'extérieur, de la météo et du monde autour de vous.",
   "L'onglet Ambiance montre ce que l'addon voit là où vous êtes, et toutes les lignes qui pourraient apparaître ici. Si une ligne vous semble fausse, signalez-la avec /wt nope.",
 }, "\n")
+
+-- Fenêtre des devoirs (/wt devoirs) : quoi noter en jouant, pour les testeurs
+L.HW_TITLE = "Devoirs"
+L.HW_SUB = "À noter en jouant. Chaque note garde votre zone et votre position."
+L.HW_NPC = "PNJ : ciblez-le (dites qui c'est en dessous)"
+L.HW_QUEST = "Une quête rendue mérite une ligne"
+L.HW_MOON = "Un puits de lune est ici"
+L.HW_SKY = "Dehors, mais pas de ciel ici"
+L.HW_FREE = "Autre chose (écrivez en dessous)"
+L.HW_BTN_NOTE = "Noter"
+L.HW_BTN_LAST = "La dernière"
+L.HW_BTN_HERE = "Ici"
+L.HW_INPUT = "Commentaire (facultatif) : nain, gobelin, ça sent... ?"
+L.HW_REPORT = "Rapport"
+L.HW_COUNT = "%d notes pour l'instant. Ligne bizarre ? /wt nope"
+L.HW_SAVED = "c'est noté. Ce sera dans votre rapport."
+L.HW_NEED_TARGET = "ciblez d'abord un PNJ."
+L.HW_NO_QUEST = "aucune quête rendue pour l'instant."
+L.HW_NEED_TEXT = "écrivez d'abord votre note dans la case."
+L.UI_REPORT_NOTES = "--- Notes de devoirs ---"
+L.UI_REPORT_QUESTS = "--- Quêtes rendues (dernières) ---"

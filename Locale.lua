@@ -174,6 +174,7 @@ L.CMD_HELP = {
   "/wt sound - hear your pet's sounds",
   "/wt guide, /wt journal, /wt options - open a tab of the window",
   "/wt resetvisits - forget visited places and line cooldowns (for testing)",
+  "/wt homework - a small window listing what to note while you play (for testers)",
   "/wt roof - this spot has a roof over your head even if the game says outdoors: no open-sky lines here (again to undo)",
 }
 L.CMD_ROOF = {
@@ -1038,6 +1039,28 @@ L.SN_GUIDE = table.concat({
   "Lines depend on the landscape, the exact place, day or night, indoors or out, the weather and how many people are around.",
   "The Ambiance tab shows what the addon sees where you stand, and every line that could appear here. If a line ever feels wrong, flag it with /wt nope.",
 }, "\n")
+
+
+-- Homework window (/wt homework): what to note while playing, for testers
+L.HW_TITLE = "Homework"
+L.HW_SUB = "Things to note while you play. Each note keeps your zone and position."
+L.HW_NPC = "NPC: target one (say who it is below)"
+L.HW_QUEST = "A quest you turned in deserves a line"
+L.HW_MOON = "A moonwell is here"
+L.HW_SKY = "Outdoors, but no open sky here"
+L.HW_FREE = "Something else (write it below)"
+L.HW_BTN_NOTE = "Note"
+L.HW_BTN_LAST = "Last quest"
+L.HW_BTN_HERE = "Here"
+L.HW_INPUT = "Comment (optional): dwarf, goblin, smells of...?"
+L.HW_REPORT = "Report"
+L.HW_COUNT = "%d notes so far. Odd line? /wt nope"
+L.HW_SAVED = "noted. It will be in your report."
+L.HW_NEED_TARGET = "target an NPC first."
+L.HW_NO_QUEST = "no quest turned in yet this time."
+L.HW_NEED_TEXT = "write your note in the box first."
+L.UI_REPORT_NOTES = "--- Homework notes ---"
+L.UI_REPORT_QUESTS = "--- Quests turned in (latest) ---"
 
 -- Keep an untouched copy of the English texts, so the language can be switched
 -- back and forth (other languages are laid over these, see Locale_frFR.lua).

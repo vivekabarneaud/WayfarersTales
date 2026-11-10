@@ -51,6 +51,7 @@ end
 
 function KT.RelabelPanel()
   for _, w in ipairs(labelled) do w:SetText(L[w.labelKey] or w.labelKey) end
+  if KT.Homework then KT.Homework.Refresh() end
   local p = pages.options
   if p then
     for n, b in pairs(p.chattyButtons) do b:SetText(L.UI_CHATTY[n]) end
@@ -474,11 +475,27 @@ function KT.ShowReport()
       tostring(e.ctype or "?"), tostring(e.race or "?"), e.n or 1, table.concat(kinds, ", "))
   end
   table.sort(npcs)
+  local notes = {}
+  for _, n in ipairs(api.GetDB().fieldNotes or {}) do
+    local what = n.kind
+    if n.kind == "npc" then what = string.format("npc [%s] %s (%s)", tostring(n.npcID), tostring(n.npcName),
+      n.npcSex == 3 and "female" or (n.npcSex == 2 and "male" or "?")) end
+    if n.kind == "quest" then what = string.format("quest [%s] %s", tostring(n.questID), tostring(n.questTitle)) end
+    notes[#notes + 1] = string.format("[%s] %s: %s | %s / %s (map %s at %s,%s, %s)", date("%Y-%m-%d %H:%M", n.t),
+      what, n.text or "-", tostring(n.zone), tostring(n.sub), tostring(n.map), tostring(n.x), tostring(n.y),
+      n.indoors and "indoors" or "outdoors")
+  end
+  local quests = {}
+  for _, q in ipairs(api.GetDB().questsDone or {}) do
+    quests[#quests + 1] = string.format("[%s] [%s] %s (%s)", date("%Y-%m-%d %H:%M", q.t), tostring(q.id), tostring(q.title), tostring(q.zone))
+  end
   local text = "Wayfarer's Tales report (" .. date("%Y-%m-%d") .. ", " .. tostring(GetLocale()) .. ")\n"
     .. (#lines > 0 and table.concat(lines, "\n") or L.UI_JOURNAL_NOFLAGS)
     .. (#proposals > 0 and ("\n\n" .. L.UI_REPORT_PROPOSALS .. "\n" .. table.concat(proposals, "\n")) or "")
     .. (#roofs > 0 and ("\n\n" .. L.UI_REPORT_ROOFS .. "\n" .. table.concat(roofs, "\n")) or "")
+    .. (#notes > 0 and ("\n\n" .. L.UI_REPORT_NOTES .. "\n" .. table.concat(notes, "\n")) or "")
     .. (#npcs > 0 and ("\n\n" .. L.UI_REPORT_NPCS .. "\n" .. table.concat(npcs, "\n")) or "")
+    .. (#quests > 0 and ("\n\n" .. L.UI_REPORT_QUESTS .. "\n" .. table.concat(quests, "\n")) or "")
     .. (function()
       local errs = {}
       for _, e in ipairs(api.GetDB().errors or {}) do

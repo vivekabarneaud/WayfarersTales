@@ -1618,6 +1618,8 @@ SlashCmdList.WAYFARERSTALES = function(msg)
         Print(q[1] .. " (" .. q[2] .. "): " .. ((ok and willPlay) and "OK" or "|cffff4040not found|r"))
       end)
     end
+  elseif cmd == "devoirs" or cmd == "homework" then
+    if KT.Homework then KT.Homework.Toggle() end
   elseif cmd == "toit" or cmd == "roof" then
     -- this spot has a roof even though the game says "outdoors": no open-sky lines here
     local res = KT.Senses and KT.Senses.ToggleRoof() or "nopos"
