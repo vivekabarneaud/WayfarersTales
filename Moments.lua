@@ -397,6 +397,34 @@ local function OnLootMessage(msg)
   Play((q >= 5 and "lootLegendary") or (q == 4 and "lootEpic") or "lootRare", { item = looted })
 end
 
+-- A brand new character: where you open your eyes (race) and what you feel (class).
+-- Only once per character, only at level 1 with no experience yet. Characters
+-- that already existed are marked silently the first time.
+local function Birth()
+  local state = S.State()
+  if not state or state.born then return end
+  state.born = time()
+  if (UnitLevel("player") or 0) > 1 or (UnitXP("player") or 0) > 0 then return end
+  if not KT.ModuleOn("senses") then return end
+  local _, race = UnitRace("player")
+  local _, class = UnitClass("player")
+  local r = D.BIRTH_RACE[race] or D.BIRTH_RACE.default
+  local c = D.BIRTH_CLASS[class]
+  local text = S.LineText(r) .. (c and (" " .. S.LineText(c)) or "")
+  state.lastLine = time()
+  KT.NarrateText("senses", "birth", text, nil, true)
+end
+
+-- after the intro cinematic, if there is one
+local waitingBirth = false
+local function CheckBirth()
+  if InCinematic and InCinematic() then
+    waitingBirth = true
+  else
+    After(3, Birth, "birth")
+  end
+end
+
 ---------------------------------------------------------------------------
 -- Every few seconds: flights, dawn and dusk, stepping in and out, standing still
 ---------------------------------------------------------------------------
@@ -468,7 +496,7 @@ end
 local ERRANDS = { BANKFRAME_OPENED = "bank", MAIL_SHOW = "mail", AUCTION_HOUSE_SHOW = "auction", TRAINER_SHOW = "trainer" }
 
 local f = CreateFrame("Frame")
-for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT",
+for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW" }) do
   pcall(f.RegisterEvent, f, ev)
 end
@@ -483,6 +511,7 @@ f:SetScript("OnEvent", function(_, event, ...)
   local ok, err = pcall(function(...)
     if event == "PLAYER_LOGIN" then
       C_Timer.NewTicker(5, Safe(Tick, "tick"))
+      After(3, CheckBirth, "birth") -- a brand new character?
       -- remember the professions you already have (skills may load a bit later)
       After(5, function() if S.State() then KnownProfessions(S.State()) end end, "professions")
       wasEating = W.HasAura(D.SPELL_FOOD_AURA, true)
@@ -491,6 +520,11 @@ f:SetScript("OnEvent", function(_, event, ...)
       fightStart = GetTime()
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
+    elseif event == "CINEMATIC_STOP" then
+      if waitingBirth then
+        waitingBirth = false
+        After(2, Birth, "birth")
+      end
     elseif event == "CHAT_MSG_LOOT" then
       local msg = ...
       After(0.5, function() OnLootMessage(msg) end, "loot") -- after the game's own message

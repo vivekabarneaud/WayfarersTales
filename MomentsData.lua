@@ -81,6 +81,50 @@ D.MEAL_FAMILIAR = 10
 D.MEAL_FAMILIAR_CHANCE = 0.4
 D.MEAL_MILESTONES = { [25] = true, [50] = true, [100] = true }
 
+-- A brand new character's very first moments: where you open your eyes (by race,
+-- always the race's starting area), then what you feel inside (by class).
+-- Keys are the game's race / class file names (UnitRace / UnitClass).
+D.BIRTH_RACE = {
+  Human = { en = "You open your eyes on the green hills of Northshire. The abbey stands tall nearby, and beyond the valley, all of Elwynn is waiting for you.",
+            fr = "Vous ouvrez les yeux sur les collines verdoyantes de Comté-du-Nord. L'abbaye se dresse non loin, et au-delà de la vallée, toute la forêt d'Elwynn vous attend." },
+  Dwarf = { en = "Cold air bites your cheeks. Snow crunches under your feet in this icy valley, and the mountains of Dun Morogh rise all around you.",
+            fr = "L'air froid vous mord les joues. La neige crisse sous vos pieds dans cette vallée glacée, et les montagnes de Dun Morogh se dressent tout autour de vous." },
+  Gnome = { en = "Snow, cold, and mountains as far as the eye can see. Somewhere beyond them lies Gnomeregan, and the hope of taking it back one day.",
+            fr = "De la neige, du froid, et des montagnes à perte de vue. Quelque part au-delà se trouve Gnomeregan, et l'espoir de la reprendre un jour." },
+  NightElf = { en = "You awaken beneath the great boughs of Teldrassil. Soft light filters through the leaves, and the forest seems to whisper your name.",
+               fr = "Vous vous éveillez sous les immenses branches de Teldrassil. Une douce lumière filtre à travers les feuilles, et la forêt semble murmurer votre nom." },
+  Tauren = { en = "The wind runs free over the plains of Mulgore, carrying the scent of tall grass. The Earth Mother watches over your first steps.",
+             fr = "Le vent court librement sur les plaines de Mulgore, chargé de l'odeur des hautes herbes. La Terre-Mère veille sur vos premiers pas." },
+  Orc = { en = "The dry heat of Durotar hits you at once. Red dust, rocks, and a land that respects only strength.",
+          fr = "La chaleur sèche de Durotar vous saisit aussitôt. Poussière rouge, rochers, et une terre qui ne respecte que la force." },
+  Troll = { en = "Durotar's hot wind smells of dust and dry earth. Far from the islands, your people have found a new home, and you a new path.",
+            fr = "Le vent chaud de Durotar sent la poussière et la terre sèche. Loin des îles, votre peuple a trouvé un nouveau foyer, et vous un nouveau chemin." },
+  Scourge = { en = "You open your eyes in the grey mist of Tirisfal. No heartbeat, no warmth, only a strange, cold freedom.",
+              fr = "Vous ouvrez les yeux dans la brume grise de Tirisfal. Pas de battement de cœur, pas de chaleur, seulement une étrange et froide liberté." },
+  default = { en = "A new life begins here. The world is vast, and everything is still ahead of you.",
+              fr = "Une nouvelle vie commence ici. Le monde est vaste, et tout reste encore devant vous." },
+}
+D.BIRTH_CLASS = {
+  DRUID = { en = "Deep inside, you feel the slow heartbeat of nature, as if every living thing were whispering to you.",
+            fr = "Au fond de vous, vous sentez battre le cœur lent de la nature, comme si chaque être vivant vous murmurait quelque chose." },
+  WARRIOR = { en = "Your hand closes on your weapon's grip. It feels right, as if it had always belonged there.",
+              fr = "Votre main se referme sur la poignée de votre arme. Elle semble à sa place, comme si elle l'avait toujours été." },
+  PALADIN = { en = "A quiet warmth glows in your chest: the Light is with you, and you will carry it far.",
+              fr = "Une chaleur paisible rayonne dans votre poitrine : la Lumière est avec vous, et vous la porterez loin." },
+  HUNTER = { en = "Your eyes scan the horizon on their own. Somewhere out there, a faithful companion is waiting for you.",
+             fr = "Vos yeux balaient l'horizon d'eux-mêmes. Quelque part, un fidèle compagnon vous attend." },
+  ROGUE = { en = "You notice every shadow, every way out, every purse within reach. Old habits, already.",
+            fr = "Vous remarquez chaque ombre, chaque issue, chaque bourse à portée de main. Déjà de vieilles habitudes." },
+  PRIEST = { en = "A gentle calm settles over you. Others will need you one day, and you feel up to it.",
+             fr = "Un calme doux vous envahit. D'autres auront besoin de vous un jour, et vous vous sentez à la hauteur." },
+  SHAMAN = { en = "The elements stir around you: wind, earth, fire and water. They're listening.",
+             fr = "Les éléments s'éveillent autour de vous : le vent, la terre, le feu et l'eau. Ils vous écoutent." },
+  MAGE = { en = "Magic tingles at your fingertips, eager and a little dangerous. The world is full of things to learn.",
+           fr = "La magie picote au bout de vos doigts, impatiente et un peu dangereuse. Le monde regorge de choses à apprendre." },
+  WARLOCK = { en = "Something dark whispers at the edge of your mind. Power has a price, and you fully intend to pay it.",
+              fr = "Quelque chose de sombre murmure aux confins de votre esprit. Le pouvoir a un prix, et vous comptez bien le payer." },
+}
+
 -- Discovery score ("Carnet" tab): points for each new thing discovered.
 D.DISCOVERY_POINTS = {
   zones = 10, subzones = 2, spots = 5, dungeons = 15,   -- places
