@@ -171,13 +171,20 @@ L.CMD_HELP = {
   "/wt sound - écouter les sons de votre familier",
   "/wt guide, /wt journal, /wt options - ouvrir un onglet de la fenêtre",
   "/wt resetvisits - oublier les lieux visités et le repos des lignes (pour les tests)",
+  "/wt toit - cet endroit a un toit au-dessus de votre tête même si le jeu dit « dehors » : plus de lignes sur le ciel ici (à nouveau pour annuler)",
+}
+L.CMD_ROOF = {
+  added = "Toit noté ici : les lignes qui parlent du ciel ne joueront plus à quelques pas de cet endroit. Retapez /wt toit pour annuler.",
+  removed = "Toit retiré : les lignes sur le ciel peuvent de nouveau jouer ici.",
+  builtin = "Cet endroit est déjà connu pour avoir un toit.",
+  nopos = "Impossible de lire votre position ici, désolé.",
 }
 L.CMD_STATUS_HINT = "Tapez |cffffd100/wt help|r pour toutes les commandes."
 L.CMD_NO_PET    = "Aucun familier de chasseur n'est invoqué pour le moment."
 L.CMD_CHATTY    = "Fréquence des réactions réglée sur %d."
 L.CMD_DEBUG     = "Mode débogage : %s"
 L.CMD_NO_MEMORY = "Pas encore de souvenirs. Votre histoire ne fait que commencer !"
-L.LOADED_FIRST  = "est installé ! Invoquez votre familier et cherchez le cœur à côté de son icône de bonheur. Tapez /wt pour ouvrir la fenêtre."
+L.LOADED_FIRST  = "est installé ! Tapez /wt pour ouvrir la fenêtre (ou cliquez sur le bouton près de la minicarte)."
 L.ERROR         = "a rencontré un problème (merci de le signaler) : %s"
 
 ---------------------------------------------------------------------------
@@ -927,7 +934,7 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule",
+  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", sky = "ciel ouvert", draft = "brouillon",
 }
 L.SN_POS = "Position : %s   Endroit : %s"
 L.SN_LANDSCAPE = "Paysage : %s   Niveaux de la zone : %s"
@@ -992,6 +999,7 @@ L.SN_PROPOSE_LABEL = "Proposer une ligne pour ce lieu :"
 L.SN_PROPOSE      = "Proposer"
 L.SN_PROPOSED     = "Merci ! Votre ligne est enregistrée avec ce lieu. Elle sera dans la fenêtre « Rapport & idées »."
 L.UI_REPORT_PROPOSALS = "--- Lignes proposées ---"
+L.UI_REPORT_ROOFS = "--- Endroits avec un toit (/wt toit) ---"
 L.SN_PLAY_TT      = "Afficher cette ligne dans le chat maintenant, pour voir comment elle rend. (Un aperçu : la ligne n'est pas consommée.)"
 L.SN_REASONS = {
   night = "seulement la nuit", day = "seulement le jour", indoors = "seulement à l'intérieur",
@@ -1000,7 +1008,7 @@ L.SN_REASONS = {
   biome = "pas dans ce paysage", sub = "seulement dans un lieu précis",
   weatherWait = "en attente des données météo", weather = "pas avec cette météo",
   crowdUnknown = "a besoin de savoir qui est là", crowd = "pas avec ce monde-là",
-  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule",
+  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule", sky = "seulement à ciel ouvert", draft = "brouillon, en attente de validation",
 }
 L.SN_BIOMES = {
   forest = "forêt", plains = "plaines", farmland = "terres agricoles sèches", hills = "collines", mountain = "montagnes", snow = "neige",

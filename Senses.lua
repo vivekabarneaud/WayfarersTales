@@ -83,7 +83,39 @@ function S.Context()
   ctx.crowd, ctx.players, ctx.chatter = S.Crowd()
   ctx.subLower = (ctx.sub or ""):lower()
   ctx.moving = S.Moving()
+  ctx.roofed = S.Roofed(ctx)
   return ctx
+end
+
+-- Some places count as "outdoors" for the game but have a roof over your head
+-- (Aldrassil's platforms...). Lines about the open sky skip them. Known ones are
+-- in D.ROOFED; players add their own with /wt toit (saved in db.roofs).
+local function InSpot(sp, ctx)
+  if sp.map ~= ctx.rawMapID or not ctx.x then return false end
+  local dx, dy = ctx.x - sp.x, ctx.y - sp.y
+  return dx * dx + dy * dy <= (sp.r or 1.5) * (sp.r or 1.5)
+end
+
+function S.Roofed(ctx)
+  for _, sp in ipairs(D.ROOFED or {}) do if InSpot(sp, ctx) then return true end end
+  for _, sp in ipairs(KT.GetDB().roofs or {}) do if InSpot(sp, ctx) then return true end end
+  return false
+end
+
+-- /wt toit: mark (or unmark) the spot you're standing on as roofed.
+-- Returns "added", "removed", "builtin" or "nopos".
+function S.ToggleRoof()
+  local ctx = S.Context()
+  if not ctx.x or not ctx.rawMapID then return "nopos" end
+  local db = KT.GetDB()
+  db.roofs = db.roofs or {}
+  for i, sp in ipairs(db.roofs) do
+    if InSpot(sp, ctx) then table.remove(db.roofs, i) return "removed" end
+  end
+  for _, sp in ipairs(D.ROOFED or {}) do if InSpot(sp, ctx) then return "builtin" end end
+  db.roofs[#db.roofs + 1] = { map = ctx.rawMapID, x = math.floor(ctx.x * 10 + 0.5) / 10,
+    y = math.floor(ctx.y * 10 + 0.5) / 10, r = 1.5, zone = ctx.zone, sub = ctx.sub, t = time() }
+  return "added"
 end
 
 ---------------------------------------------------------------------------
@@ -97,6 +129,7 @@ local function Check(when, ctx)
   if when.resting and not ctx.resting then return false, "resting" end
   if when.swimming and not ctx.swimming then return false, "swimming" end
   if when.moving and not ctx.moving then return false, "moving" end
+  if when.sky and (ctx.indoors or ctx.roofed) then return false, "sky" end
   if when.airBelow and not ((ctx.air or 15) < when.airBelow) then return false, "airBelow" end
   if when.airAbove and not ((ctx.air or 15) > when.airAbove) then return false, "airAbove" end
   if when.notBiomes and when.notBiomes[ctx.biome] then return false, "biome" end
@@ -129,15 +162,22 @@ end
 -- Which lines exist for this place (most precise first)
 ---------------------------------------------------------------------------
 
-local subIndex -- lowercase sub-zone name -> entry
-local function FindSubzone(nameLower)
+-- Sub-zones are matched by name; an entry with a zone (map ID) only counts in
+-- that zone, so two places with the same name in different zones don't mix.
+local subIndex -- lowercase sub-zone name -> list of entries
+local function FindSubzone(ctx)
   if not subIndex then
     subIndex = {}
     for _, e in ipairs(D.SENSES.subzones or {}) do
-      for _, n in ipairs(e.names) do subIndex[n] = e end
+      for _, n in ipairs(e.names) do
+        subIndex[n] = subIndex[n] or {}
+        table.insert(subIndex[n], e)
+      end
     end
   end
-  return subIndex[nameLower]
+  for _, e in ipairs(subIndex[ctx.subLower] or {}) do
+    if not e.zone or e.zone == ctx.mapID then return e end
+  end
 end
 
 -- Spots you're standing in right now (map coordinates + the spot's own conditions)
@@ -169,7 +209,7 @@ function S.Candidates(ctx, kind)
   for _, sp in ipairs(S.SpotsHere(ctx)) do
     add("spot", sp[kind], 4, "spot:" .. sp.id .. ":" .. kind)
   end
-  local sz = FindSubzone(ctx.subLower)
+  local sz = FindSubzone(ctx)
   if sz then add("subzone", sz[kind], 3, "sub:" .. sz.id .. ":" .. kind) end
   local z = ctx.mapID and D.SENSES.zones[ctx.mapID]
   if z then add("zone", z[kind], 2, "zone:" .. ctx.mapID .. ":" .. kind) end
@@ -189,7 +229,7 @@ end
 -- Arrival lines for a new sub-zone only: that sub-zone's own + generic ones (inns...)
 local function SubzoneArrivals(ctx)
   local list = {}
-  local sz = FindSubzone(ctx.subLower)
+  local sz = FindSubzone(ctx)
   if sz and sz.arrive then
     for i, line in ipairs(sz.arrive) do
       list[#list + 1] = { line = line, weight = 3, id = "sub:" .. sz.id .. ":arrive:" .. i, src = "subzone", kind = "arrive" }
@@ -245,7 +285,7 @@ function S.PickFrom(list, ctx)
   local pool, total, best = {}, 0, 99
   for _, c in ipairs(list) do
     local w = c.weight * StyleFactor(c)
-    if w > 0 and Check(c.line.when, ctx) and not IsRecent(c.id) and not Cooldown(c) then
+    if w > 0 and not c.line.draft and Check(c.line.when, ctx) and not IsRecent(c.id) and not Cooldown(c) then
       local tier = TIER[c.src] or 5
       if tier < best then
         -- a more precise level has something: start over with only that level
@@ -317,6 +357,7 @@ function S.Tags(c, ctx)
   if c.kind == "arrive" then add((L.SN_ARRIVE_TAG:gsub("[()]", "")))
   elseif c.kind == "hearth" then add(T.hearth) end
   if c.line and c.line.long then add(T.long) end
+  if c.line and c.line.draft then add(T.draft, false) end
 
   local w = c.line and c.line.when
   if w then
@@ -325,6 +366,7 @@ function S.Tags(c, ctx)
     if w.resting then add(T.resting, ctx.resting) end
     if w.swimming then add(T.swimming, ctx.swimming) end
     if w.moving then add(T.moving, ctx.moving) end
+    if w.sky then add(T.sky, not ctx.indoors and not ctx.roofed) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
     if w.subMatch then
       local found = false
@@ -379,6 +421,7 @@ function S.LinesHere()
   for _, kind in ipairs({ "arrive", "ambient", "hearth" }) do
     for _, c in ipairs(S.Candidates(ctx, kind)) do
       local ok, reason = Check(c.line.when, ctx)
+      if ok and c.line.draft then ok, reason = false, "draft" end
       if ok then
         local rest = Cooldown(c)
         if rest then ok, reason, c.remaining = false, "cooldown", rest end

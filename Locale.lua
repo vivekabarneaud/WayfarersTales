@@ -173,13 +173,20 @@ L.CMD_HELP = {
   "/wt sound - hear your pet's sounds",
   "/wt guide, /wt journal, /wt options - open a tab of the window",
   "/wt resetvisits - forget visited places and line cooldowns (for testing)",
+  "/wt roof - this spot has a roof over your head even if the game says outdoors: no open-sky lines here (again to undo)",
+}
+L.CMD_ROOF = {
+  added = "Roof noted here: lines about the open sky won't play within a few steps of this spot. Type /wt roof again to undo.",
+  removed = "Roof removed: open-sky lines can play here again.",
+  builtin = "This spot is already known to have a roof.",
+  nopos = "Your position can't be read here, sorry.",
 }
 L.CMD_STATUS_HINT = "Type |cffffd100/wt help|r for all commands."
 L.CMD_NO_PET     = "No hunter pet is out right now."
 L.CMD_CHATTY     = "Chattiness set to %d."
 L.CMD_DEBUG      = "Debug mode: %s"
 L.CMD_NO_MEMORY  = "No memories yet. Your story is just beginning!"
-L.LOADED_FIRST   = "is installed! Summon your pet and look for the heart next to its happiness icon. Type /wt to open the window."
+L.LOADED_FIRST   = "is installed! Type /wt to open the window (or click the minimap button)."
 L.ERROR          = "ran into a problem (please report it): %s"
 L.UI_OPT_LANGUAGE = "Language"
 
@@ -936,7 +943,7 @@ L.SN_TAGS = {
   day = "daytime", night = "night", indoors = "indoors", outdoors = "outdoors", resting = "city or inn",
   swimming = "swimming", weather = "weather: %s", crowd = "crowd: %s",
   airBelow = "air below %s", airAbove = "air above %s", notBiomes = "not in: %s", place = "place: %s",
-  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone", calm = "no crowd",
+  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone", calm = "no crowd", sky = "open sky", draft = "draft",
 }
 L.SN_POS = "Position: %s   Spot: %s"
 L.SN_LANDSCAPE = "Landscape: %s   Zone levels: %s"
@@ -1001,6 +1008,7 @@ L.SN_PROPOSE_LABEL = "Propose a line for this place:"
 L.SN_PROPOSE      = "Propose"
 L.SN_PROPOSED     = "Thanks! Your line was saved with this place. It will be in the \"Report & ideas\" box."
 L.UI_REPORT_PROPOSALS = "--- Proposed lines ---"
+L.UI_REPORT_ROOFS = "--- Roofed spots (/wt roof) ---"
 L.SN_PLAY_TT      = "Show this line in the chat now, to see how it reads. (A preview: it doesn't use the line up.)"
 L.SN_REASONS = {
   night = "only at night", day = "only by day", indoors = "only indoors", outdoors = "only outdoors",
@@ -1008,7 +1016,7 @@ L.SN_REASONS = {
   airAbove = "only when warmer", biome = "not in this landscape", sub = "only in a particular place",
   weatherWait = "waiting for weather data", weather = "not in this weather",
   crowdUnknown = "needs to know who's around", crowd = "not with this crowd",
-  cooldown = "already played, back in %s", moving = "only while walking", calm = "not with a crowd around",
+  cooldown = "already played, back in %s", moving = "only while walking", calm = "not with a crowd around", sky = "only under the open sky", draft = "draft, waiting for approval",
 }
 L.SN_BIOMES = {
   forest = "forest", plains = "plains", farmland = "dry farmland", hills = "hills", mountain = "mountains", snow = "snow",

@@ -336,7 +336,7 @@ D.MOMENTS = {
   dawn = {
     { en = "The first light of morning spreads over the land.", fr = "La première lumière du matin se répand sur le pays.", when = { notBiomes = NO_DARK } },
     { en = "Dawn breaks. Slowly, the world takes on its colors again.", fr = "L'aube se lève. Peu à peu, le monde retrouve ses couleurs.", when = { notBiomes = NO_DARK } },
-    { en = "The sky grows paler. A new day is beginning.", fr = "Le ciel pâlit. Un nouveau jour commence.", when = { notBiomes = NO_DARK } },
+    { en = "The sky grows paler. A new day is beginning.", fr = "Le ciel pâlit. Un nouveau jour commence.", when = { sky = true, notBiomes = NO_DARK } },
   },
   dusk = {
     { en = "The light turns golden, then slowly fades. Evening is falling.", fr = "La lumière se fait dorée, puis décline doucement. Le soir tombe.", when = { notBiomes = NO_DARK } },
@@ -357,9 +357,9 @@ D.MOMENTS = {
   },
   goOut = {
     { en = "You step back out into the open air.", fr = "Vous ressortez à l'air libre." },
-    { en = "The open sky above you again.", fr = "Le ciel à nouveau au-dessus de vous." },
+    { en = "The open sky above you again.", fr = "Le ciel à nouveau au-dessus de vous.", when = { sky = true } },
     { en = "You squint a little in the daylight.", fr = "Vous plissez un peu les yeux à la lumière du jour.",
-      when = { night = false, notBiomes = NO_DARK } },
+      when = { sky = true, night = false, notBiomes = NO_DARK } },
     { en = "The night air greets you as you step outside.", fr = "L'air de la nuit vous accueille dehors.", when = { night = true } },
   },
 

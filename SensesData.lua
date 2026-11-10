@@ -68,6 +68,13 @@ D.DANGER_FLAVOR = {
 D.WEATHER_TYPES = { [0] = "clear", [1] = "rain", [2] = "snow", [3] = "sand" }
 D.WEATHER_CONFIRMED = { clear = true }
 
+-- Places the game counts as "outdoors" but with a roof over your head: lines that
+-- need the open sky (sky = true) skip them. map = map ID (raw, as for spots), x/y in %.
+-- Players can add their own with /wt toit; send them in the report to add them here.
+D.ROOFED = {
+  { map = 1438, x = 59.8, y = 41.7, r = 3, name = "Aldrassil (Teldrassil)" },
+}
+
 local OUT = { indoors = false }
 local OUT_WALK = { indoors = false, moving = true } -- lines about your steps: only while you walk
 -- landscapes where "fresh air" would be wrong (foul, dusty or dry air)
@@ -87,9 +94,9 @@ S.generic = {
     when = { indoors = false, notBiomes = NOT_FOUL_AIR } },
   { en = "You roll your shoulders, loosening up.", fr = "Vous faites rouler vos épaules pour vous détendre." },
   { en = "Stars glitter overhead.", fr = "Les étoiles scintillent au-dessus de vous.",
-    when = { indoors = false, night = true, weather = "clear", notBiomes = { undercity = true, gloom = true } } },
+    when = { indoors = false, sky = true, night = true, weather = "clear", notBiomes = { undercity = true, gloom = true } } },
   { en = "Light warms your face for a moment.", fr = "La lumière vous réchauffe un instant le visage.",
-    when = { indoors = false, night = false, weather = "clear", notBiomes = { undercity = true, gloom = true } } },
+    when = { indoors = false, sky = true, night = false, weather = "clear", notBiomes = { undercity = true, gloom = true } } },
   { en = "The night air is cool on your face.", fr = "L'air de la nuit est frais sur votre visage.",
     when = { indoors = false, night = true, airBelow = 20 } },
   { en = "The warm smell of stew fills the room.", fr = "Une bonne odeur de ragoût emplit la salle.",
@@ -130,13 +137,13 @@ S.genericHearth = {
 ---------------------------------------------------------------------------
 S.weather = {
   { en = "Raindrops patter on your shoulders.", fr = "Des gouttes de pluie tapotent sur vos épaules.",
-    when = { indoors = false, weather = "rain" } },
+    when = { indoors = false, sky = true, weather = "rain" } },
   { en = "The smell of wet earth rises around you.", fr = "Une odeur de terre mouillée monte autour de vous.",
     when = { indoors = false, weather = "rain", notBiomes = { city = true, forge = true } } },
   { en = "Rain trickles down the back of your neck.", fr = "La pluie vous coule dans le cou.",
-    when = { indoors = false, weather = "rain" } },
+    when = { indoors = false, sky = true, weather = "rain" } },
   { en = "Snowflakes settle on your sleeves.", fr = "Des flocons se posent sur vos manches.",
-    when = { indoors = false, weather = "snow" } },
+    when = { indoors = false, sky = true, weather = "snow" } },
   { en = "Your breath fogs in the cold air.", fr = "Votre souffle forme de la buée dans l'air froid.",
     when = { indoors = false, airBelow = 3 } },
   { en = "Sand stings your eyes.", fr = "Le sable vous pique les yeux.",
@@ -497,7 +504,7 @@ S.spots = {
 -- Sub-zones (matched by name, English and French)
 ---------------------------------------------------------------------------
 S.subzones = {
-  { id = "sw_trade", names = { "trade district", "quartier commerçant", "the gilded rose", "la rose dorée" },
+  { id = "sw_trade", zone = 1453, names = { "trade district", "quartier commerçant", "the gilded rose", "la rose dorée" },
     ambient = {
       { en = "Merchants' signs creak in the breeze.", fr = "Les enseignes des marchands grincent dans la brise.", when = OUT },
     },
@@ -515,7 +522,7 @@ S.subzones = {
         fr = "De retour à la Rose dorée, en plein cœur de l'animation du Quartier commerçant.",
         when = { indoors = true } },
     } },
-  { id = "sw_canals", names = { "the canals", "les canaux" },
+  { id = "sw_canals", zone = 1453, names = { "the canals", "les canaux" },
     arrive = {
       { long = true,
         en = "The canal water laps gently against the stone. A smell of damp and wet stone rises to meet you.",
@@ -525,7 +532,7 @@ S.subzones = {
     ambient = {
       { en = "Water laps against the stone of the canals.", fr = "L'eau clapote contre la pierre des canaux.", when = OUT },
     } },
-  { id = "sw_mage", names = { "mage quarter", "quartier des mages" },
+  { id = "sw_mage", zone = 1453, names = { "mage quarter", "quartier des mages" },
     arrive = {
       { long = true,
         en = "The air of the Mage Quarter tingles on your skin, heavy with magic, and violet light glows in the tower windows.",
@@ -535,7 +542,7 @@ S.subzones = {
     ambient = {
       { en = "The air tingles faintly with magic.", fr = "L'air picote légèrement de magie." },
     } },
-  { id = "sw_dwarven", names = { "dwarven district", "quartier des nains" }, -- Stormwind's forges
+  { id = "sw_dwarven", zone = 1453, names = { "dwarven district", "quartier des nains" }, -- Stormwind's forges
     arrive = {
       { long = true,
         en = "The air grows thick and warm as you enter the Dwarven District. Smoke drifts from the forges, carrying a smell of hot iron, coal and gunpowder.",
@@ -552,11 +559,11 @@ S.subzones = {
       { en = "A whiff of gunpowder mixes with the forge smoke.", fr = "Une pointe de poudre se mêle à la fumée des forges.", when = OUT },
       { en = "Soot drifts in the air and settles on your sleeves.", fr = "De la suie flotte dans l'air et se dépose sur vos manches.", when = OUT },
     } },
-  { id = "sw_cathedral", names = { "cathedral square", "place de la cathédrale" },
+  { id = "sw_cathedral", zone = 1453, names = { "cathedral square", "place de la cathédrale" },
     ambient = {
       { en = "The great cathedral towers over the square.", fr = "La grande cathédrale domine la place.", when = OUT },
     } },
-  { id = "wf_pumpkins", names = { "furlbrow's pumpkin farm", "ferme de potirons de froncebouille" }, -- Westfall
+  { id = "wf_pumpkins", zone = 1436, names = { "furlbrow's pumpkin farm", "ferme de potirons de froncebouille" }, -- Westfall
     arrive = {
       { long = true,
         en = "Rows of pumpkins stretch out across the dry soil, fat and orange. A smell of machine oil drifts between them: the mechanical harvesters are never far.",
@@ -569,7 +576,7 @@ S.subzones = {
       { en = "A smell of machine oil and hot metal hangs in the air.", fr = "Une odeur d'huile de machine et de métal chaud flotte dans l'air.", when = OUT },
       { en = "Somewhere in the field, gears creak and grind.", fr = "Quelque part dans le champ, des engrenages grincent.", when = OUT },
     } },
-  { id = "goldshire", names = { "goldshire", "comté-de-l'or", "lion's pride inn", "auberge de la fierté du lion" },
+  { id = "goldshire", zone = 1429, names = { "goldshire", "comté-de-l'or", "lion's pride inn", "auberge de la fierté du lion" },
     hearth = {
       { en = "The warmth of the Lion's Pride Inn closes around you again, with its smell of stew and woodsmoke. Your stomach is already growling.",
         fr = "La chaleur de l'auberge de Comté-de-l'Or se referme à nouveau sur vous, avec son odeur de ragoût et de feu de bois. Votre estomac gargouille déjà.",
@@ -584,7 +591,7 @@ S.subzones = {
     ambient = {
       { en = "The smell of the inn's kitchen drifts across the road.", fr = "L'odeur des cuisines de l'auberge flotte jusqu'au chemin.", when = OUT },
     } },
-  { id = "darkshire", names = { "darkshire", "sombre-comté", "scarlet raven tavern" }, -- Duskwood
+  { id = "darkshire", zone = 1431, names = { "darkshire", "sombre-comté", "scarlet raven tavern" }, -- Duskwood
     hearth = {
       { en = "Darkshire's inn is dim and hushed, and outside, the night never ends. You're in no real hurry to step back out there.",
         fr = "L'auberge de Sombre-Comté est sombre et feutrée, et dehors, la nuit ne finit jamais. Vous n'avez pas vraiment hâte de ressortir.",
@@ -593,7 +600,7 @@ S.subzones = {
         fr = "La pénombre de l'auberge de Sombre-Comté, enfin. Dehors, la nuit sans fin vous attend... Vous aimeriez bien pouvoir vous éterniser un peu.",
         when = { indoors = true } },
     } },
-  { id = "if_forge", names = { "the great forge", "la grande forge" },
+  { id = "if_forge", zone = 1455, names = { "the great forge", "la grande forge" },
     arrive = {
       { en = "The heat of the Great Forge washes over you.", fr = "La chaleur de la Grande Forge vous enveloppe." },
     },

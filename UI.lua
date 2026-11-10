@@ -459,9 +459,15 @@ function KT.ShowReport()
       pr.indoors and "indoors" or "outdoors", pr.night and "night" or "day", tostring(pr.weather or "?"),
       tostring(pr.air), pr.text)
   end
+  local roofs = {}
+  for _, r in ipairs(api.GetDB().roofs or {}) do
+    roofs[#roofs + 1] = string.format("%s / %s (map %s at %s,%s)", tostring(r.zone), tostring(r.sub),
+      tostring(r.map), tostring(r.x), tostring(r.y))
+  end
   local text = "Wayfarer's Tales report (" .. date("%Y-%m-%d") .. ", " .. tostring(GetLocale()) .. ")\n"
     .. (#lines > 0 and table.concat(lines, "\n") or L.UI_JOURNAL_NOFLAGS)
     .. (#proposals > 0 and ("\n\n" .. L.UI_REPORT_PROPOSALS .. "\n" .. table.concat(proposals, "\n")) or "")
+    .. (#roofs > 0 and ("\n\n" .. L.UI_REPORT_ROOFS .. "\n" .. table.concat(roofs, "\n")) or "")
     .. (function()
       local errs = {}
       for _, e in ipairs(api.GetDB().errors or {}) do

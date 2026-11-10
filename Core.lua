@@ -1618,6 +1618,10 @@ SlashCmdList.WAYFARERSTALES = function(msg)
         Print(q[1] .. " (" .. q[2] .. "): " .. ((ok and willPlay) and "OK" or "|cffff4040not found|r"))
       end)
     end
+  elseif cmd == "toit" or cmd == "roof" then
+    -- this spot has a roof even though the game says "outdoors": no open-sky lines here
+    local res = KT.Senses and KT.Senses.ToggleRoof() or "nopos"
+    Print(L.CMD_ROOF[res] or res)
   elseif cmd == "resetvisits" then
     -- testing: forget the places visited, so first-visit lines play again
     local s = db.senses and db.senses[CharKey()]

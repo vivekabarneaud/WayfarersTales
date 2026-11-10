@@ -1,7 +1,7 @@
 ## Interface: 16001
 ## Title: Wayfarer's Tales
 ## Notes: Little touches of life on your journey. Kindred: a bond with your hunter pet. Elements: cold, heat, wetness and thirst. Purely cosmetic, everything stays on your computer. Type /wt
-## Version: 0.35.0
+## Version: 0.36.0
 ## Title-frFR: Wayfarer's Tales
 ## Notes-frFR: De petites touches de vie au fil de votre voyage. Kindred : un lien avec votre familier de chasseur. Elements : froid, chaleur, humidité et soif. Purement cosmétique, tout reste sur votre ordinateur. Tapez /wt
 ## SavedVariables: WayfarersTalesDB
