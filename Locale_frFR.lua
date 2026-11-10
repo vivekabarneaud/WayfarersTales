@@ -87,6 +87,19 @@ L.UI_OPT_HEART    = "Afficher le cœur à côté de l'icône de bonheur"
 L.UI_OPT_DEBUG    = "Mode débogage (messages techniques dans le chat)"
 L.UI_OPT_LABEL    = "Afficher « Wayfarer's Tales » devant les messages du familier"
 L.UI_TAB_JOURNAL  = "Journal"
+L.UI_TAB_TRAVELS  = "Carnet"
+
+L.DISC = {
+  title = "Carnet de voyage de %s",
+  total = "Découvertes : %d",
+  intro = "Chaque nouvelle découverte rapporte des points : lieux, saveurs, savoir-faire et voyages.",
+  places = "Lieux", placesLine = "Zones %d  ·  Lieux-dits %d  ·  Endroits particuliers %d  ·  Donjons %d",
+  tastes = "Saveurs", tastesLine = "Aliments et boissons %d",
+  crafts = "Savoir-faire", craftsLine = "Métiers %d  ·  Créations %d",
+  travels = "Voyages", travelsLine = "Destinations de vol %d  ·  Auberges %d",
+  favTastes = "Vos saveurs préférées", dungeonList = "Donjons", flightList = "Destinations de vol", innList = "Auberges",
+  none = "Rien pour l'instant.",
+}
 L.UI_MODULES      = "Modules"
 L.UI_MOD_KINDRED  = "Compagnie du familier (Kindred)"
 L.UI_KINDRED_OFF  = "Le module du familier est désactivé. Vous pouvez le réactiver dans l'onglet Options."

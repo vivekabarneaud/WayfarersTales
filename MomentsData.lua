@@ -36,6 +36,7 @@ D.MOMENT_RULES = {
   craftRare       = { cd = 300,  chance = 1,   gap = 0 },
   craftEpic       = { cd = 0,    chance = 1,   gap = 0 },
   craftFirst      = { cd = 600,  chance = 0.6, gap = 20 },
+  discoveryMilestone = { cd = 0, chance = 1,   gap = 30 },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -79,6 +80,16 @@ end
 D.MEAL_FAMILIAR = 10
 D.MEAL_FAMILIAR_CHANCE = 0.4
 D.MEAL_MILESTONES = { [25] = true, [50] = true, [100] = true }
+
+-- Discovery score ("Carnet" tab): points for each new thing discovered.
+D.DISCOVERY_POINTS = {
+  zones = 10, subzones = 2, spots = 5, dungeons = 15,   -- places
+  tastes = 3,                                            -- foods and drinks
+  professions = 10, crafts = 2,                          -- know-how
+  flights = 3, inns = 3,                                 -- travels
+}
+-- crossing one of these totals brings a line in the chat (once each)
+D.DISCOVERY_MILESTONES = { 50, 100, 250, 500, 1000, 2000, 4000 }
 
 -- How long you stand still (not AFK, not fighting) before a quiet moment
 D.QUIET_AFTER = 150
@@ -473,6 +484,14 @@ D.MOMENTS = {
       fr = "{item}, pour la toute première fois ! Ce n'est peut-être pas parfait, mais c'est de vous." },
     { en = "You look over your creation with quiet pride: {item}, a first.",
       fr = "Vous examinez votre création avec une fierté discrète : {item}, une première." },
+  },
+
+  -- Your discovery score crossed a milestone (see D.DISCOVERY_MILESTONES)
+  discoveryMilestone = {
+    { en = "Looking back, you realize how much ground you've covered since you set out. The world feels a little bigger, and a little more yours.",
+      fr = "En y repensant, vous réalisez tout le chemin parcouru depuis vos débuts. Le monde vous semble un peu plus grand, et un peu plus à vous." },
+    { en = "So many places, so many flavors, so many firsts. You smile at the thought of everything still waiting out there.",
+      fr = "Tant de lieux, tant de saveurs, tant de premières fois. Vous souriez en pensant à tout ce qui vous attend encore." },
   },
 
   -- Back to life

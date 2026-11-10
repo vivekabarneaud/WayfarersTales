@@ -90,6 +90,20 @@ L.UI_OPT_HEART   = "Show the heart next to the happiness icon"
 L.UI_OPT_DEBUG   = "Debug mode (technical messages in chat)"
 L.UI_OPT_LABEL   = "Show \"Wayfarer's Tales\" before your pet's messages"
 L.UI_TAB_JOURNAL = "Journal"
+L.UI_TAB_TRAVELS = "Travels"
+
+-- "Travels" tab: the discovery score
+L.DISC = {
+  title = "%s's travel notebook",
+  total = "Discoveries: %d",
+  intro = "Every new discovery earns points: places, tastes, know-how and travels.",
+  places = "Places", placesLine = "Zones %d  ·  Places %d  ·  Special spots %d  ·  Dungeons %d",
+  tastes = "Tastes", tastesLine = "Foods and drinks %d",
+  crafts = "Know-how", craftsLine = "Professions %d  ·  Creations %d",
+  travels = "Travels", travelsLine = "Flight destinations %d  ·  Inns %d",
+  favTastes = "Your favourite tastes", dungeonList = "Dungeons", flightList = "Flight destinations", innList = "Inns",
+  none = "Nothing yet.",
+}
 L.UI_MODULES     = "Modules"
 L.UI_MOD_KINDRED = "Pet companionship (Kindred)"
 L.UI_KINDRED_OFF = "The pet companionship module is turned off. You can turn it back on in the Options tab."

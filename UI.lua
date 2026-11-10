@@ -759,11 +759,12 @@ local function Build()
   end
 
   local list = { { "companion", "UI_TAB_COMPANION" }, { "body", "UI_TAB_BODY" }, { "senses", "UI_TAB_SENSES" },
-    { "journal", "UI_TAB_JOURNAL" }, { "guide", "UI_TAB_GUIDE" }, { "options", "UI_TAB_OPTIONS" } }
+    { "travels", "UI_TAB_TRAVELS" }, { "journal", "UI_TAB_JOURNAL" }, { "guide", "UI_TAB_GUIDE" },
+    { "options", "UI_TAB_OPTIONS" } }
   for i, t in ipairs(list) do
     local b = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    b:SetSize(96, 26)
-    b:SetPoint("TOPLEFT", 12 + (i - 1) * 99, -30)
+    b:SetSize(82, 26)
+    b:SetPoint("TOPLEFT", 12 + (i - 1) * 85, -30)
     Label(b, t[2])
     b:SetScript("OnClick", function() KT.ShowTab(t[1]) end)
     tabs[t[1]] = b
@@ -800,6 +801,7 @@ local function Build()
   pages.companion = comp
 
   pages.guide = CreateTextPage(content)
+  pages.travels = CreateTextPage(content)
   pages.journal = BuildJournal(content)
   pages.body = BuildBody(content)
   pages.senses = BuildSenses(content)
@@ -904,6 +906,8 @@ function KT.RefreshPanel()
       end
       c.text:SetContent(CompanionText(pet))
     end
+  elseif currentTab == "travels" then
+    pages.travels:SetContent(KT.Discovery and KT.Discovery.PageText() or "")
   elseif currentTab == "guide" then
     pages.guide:SetContent(L.GUIDE .. "\n\n" .. (L.EL_GUIDE or "") .. "\n\n" .. (L.SN_GUIDE or ""))
   elseif currentTab == "options" then
