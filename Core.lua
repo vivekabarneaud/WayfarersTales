@@ -242,6 +242,24 @@ local function AddJournal(module, key, text, delta)
   }
   while #j > MAX_JOURNAL do table.remove(j, 1) end
   if KT.RefreshPanel then KT.RefreshPanel() end
+  if KT.Homework then KT.Homework.Refresh() end
+end
+
+-- Flag the latest line as wrong or odd (/wt nope, or the Homework window), with an
+-- optional comment. Returns the journal entry, or nil if there's none.
+function KT.FlagLastLine(note)
+  local last = db and db.journal[#db.journal]
+  if not last then return nil end
+  last.flagged = true
+  if note and note ~= "" then last.flagNote = note end
+  if KT.RefreshPanel then KT.RefreshPanel() end
+  if KT.Homework then KT.Homework.Refresh() end
+  return last
+end
+
+-- The latest line shown (for the Homework window)
+function KT.LastLine()
+  return db and db.journal[#db.journal]
 end
 
 function KT.ModuleOn(name)
@@ -1571,10 +1589,10 @@ SLASH_WAYFARERSTALES2 = "/kt" -- old Kindred Tales command, still works
 SlashCmdList.WAYFARERSTALES = function(msg)
   local cmd, arg = (msg or ""):lower():match("^(%S*)%s*(.-)$")
   if cmd == "nope" then
-    -- flag the latest journal line as wrong/odd
-    local last = db.journal[#db.journal]
+    -- flag the latest journal line as wrong/odd, with an optional comment (/wt nope too long)
+    local note = (msg or ""):match("^%S*%s*(.-)%s*$")
+    local last = KT.FlagLastLine(note)
     if not last then Print(L.CMD_NOPE_NONE) return end
-    last.flagged = true
     Print(string.format(L.CMD_NOPE, last.text or "?"))
     if KT.RefreshPanel then KT.RefreshPanel() end
   elseif cmd == "help" then

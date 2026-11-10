@@ -449,7 +449,7 @@ function KT.ShowReport()
       lines[#lines + 1] = string.format("[%s] %s / %s (map %s, %s, game time %s, %s) %s.%s: %s",
         date("%Y-%m-%d %H:%M", e.t), tostring(e.zone), tostring(e.sub), tostring(e.mapID),
         e.indoors and "indoors" or "outdoors", tostring(e.gametime), tostring(e.lang),
-        tostring(e.module), tostring(e.key), StripCodes(e.text or ""))
+        tostring(e.module), tostring(e.key), StripCodes(e.text or "")) .. (e.flagNote and ("  >> " .. e.flagNote) or "")
     end
   end
   local proposals = {}

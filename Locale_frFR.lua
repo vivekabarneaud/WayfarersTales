@@ -168,7 +168,7 @@ L.CMD_HELP = {
   "/wt memories - vos souvenirs ensemble",
   "/wt chatty 0-3 - fréquence des réactions : 0 = grands moments seulement, 1 = discret, 2 = normal (par défaut), 3 = bavard",
   "/wt debug - informations techniques (pour les tests)",
-  "/wt nope - signaler la dernière ligne comme fausse ou bizarre",
+  "/wt nope - signaler la dernière ligne comme fausse ou bizarre (avec un commentaire si vous voulez : /wt nope trop long)",
   "/wt sound - écouter les sons de votre familier",
   "/wt guide, /wt journal, /wt options - ouvrir un onglet de la fenêtre",
   "/wt resetvisits - oublier les lieux visités et le repos des lignes (pour les tests)",
@@ -1050,5 +1050,10 @@ L.HW_SAVED = "c'est noté. Ce sera dans votre rapport."
 L.HW_NEED_TARGET = "ciblez d'abord un PNJ."
 L.HW_NO_QUEST = "aucune quête rendue pour l'instant."
 L.HW_NEED_TEXT = "écrivez d'abord votre note dans la case."
+L.HW_LAST = "Dernière ligne :"
+L.HW_LAST_FLAGGED = "Dernière ligne (signalée) :"
+L.HW_LAST_NONE = "(rien pour l'instant)"
+L.HW_BTN_FLAG = "Bizarre"
+L.HW_FLAGGED = "ligne signalée, avec votre commentaire. Ce sera dans votre rapport."
 L.UI_REPORT_NOTES = "--- Notes de devoirs ---"
 L.UI_REPORT_QUESTS = "--- Quêtes rendues (dernières) ---"

@@ -170,7 +170,7 @@ L.CMD_HELP = {
   "/wt memories - your memories together",
   "/wt chatty 0-3 - how often your pet speaks up: 0 = only big moments, 1 = quiet, 2 = normal (default), 3 = very chatty",
   "/wt debug - show technical info (for testing)",
-  "/wt nope - flag the last line as wrong or odd",
+  "/wt nope - flag the last line as wrong or odd (you can add a comment: /wt nope too long)",
   "/wt sound - hear your pet's sounds",
   "/wt guide, /wt journal, /wt options - open a tab of the window",
   "/wt resetvisits - forget visited places and line cooldowns (for testing)",
@@ -1059,6 +1059,11 @@ L.HW_SAVED = "noted. It will be in your report."
 L.HW_NEED_TARGET = "target an NPC first."
 L.HW_NO_QUEST = "no quest turned in yet this time."
 L.HW_NEED_TEXT = "write your note in the box first."
+L.HW_LAST = "Last line:"
+L.HW_LAST_FLAGGED = "Last line (flagged):"
+L.HW_LAST_NONE = "(nothing yet)"
+L.HW_BTN_FLAG = "Odd"
+L.HW_FLAGGED = "line flagged, with your comment. It will be in your report."
 L.UI_REPORT_NOTES = "--- Homework notes ---"
 L.UI_REPORT_QUESTS = "--- Quests turned in (latest) ---"
 

@@ -65,6 +65,17 @@ local function NoteNoSky()
   if res == "added" then AddNote("nosky") end
 end
 
+-- The last line shown felt wrong or odd: flag it, with the comment from the box
+local function FlagLine()
+  local text = frame.input:GetText()
+  local last = KT.FlagLastLine(text)
+  if not last then Say(L.CMD_NOPE_NONE) return end
+  frame.input:SetText("")
+  frame.input:ClearFocus()
+  Say(L.HW_FLAGGED)
+  H.Refresh()
+end
+
 local function NoteFree()
   if frame.input:GetText() == "" then Say(L.HW_NEED_TEXT) frame.input:SetFocus() return end
   AddNote("note")
@@ -82,9 +93,11 @@ local ROWS = {
   { "HW_FREE",  "HW_BTN_NOTE",  NoteFree },
 }
 
+local LAST_H = 62 -- room for the "last line" block at the top
+
 local function Build()
   local f = CreateFrame("Frame", "WayfarersTalesHomework", UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
-  f:SetSize(290, 64 + #ROWS * 30 + 70)
+  f:SetSize(290, 64 + LAST_H + #ROWS * 30 + 70)
   f:SetFrameStrata("MEDIUM")
   f:SetClampedToScreen(true)
   f:SetMovable(true)
@@ -116,9 +129,23 @@ local function Build()
   f.sub:SetWidth(266)
   f.sub:SetJustifyH("LEFT")
 
+  -- the last line shown, with a button to flag it
+  f.lastLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+  f.lastLabel:SetPoint("TOPLEFT", 14, -52)
+  f.lastText = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+  f.lastText:SetPoint("TOPLEFT", 14, -66)
+  f.lastText:SetWidth(180)
+  f.lastText:SetJustifyH("LEFT")
+  f.lastText:SetJustifyV("TOP")
+  if f.lastText.SetMaxLines then f.lastText:SetMaxLines(3) end
+  f.lastButton = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+  f.lastButton:SetSize(78, 22)
+  f.lastButton:SetPoint("TOPRIGHT", -12, -60)
+  f.lastButton:SetScript("OnClick", function() local ok, err = pcall(FlagLine); if not ok then KT.LogError("Homework", err) end end)
+
   f.rows = {}
   for i, row in ipairs(ROWS) do
-    local y = -52 - (i - 1) * 30
+    local y = -52 - LAST_H - (i - 1) * 30
     local label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     label:SetPoint("TOPLEFT", 14, y - 6)
     label:SetWidth(180)
@@ -130,7 +157,7 @@ local function Build()
     f.rows[i] = { label = label, button = b, row = row }
   end
 
-  local y = -52 - #ROWS * 30
+  local y = -52 - LAST_H - #ROWS * 30
   f.inputLabel = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
   f.inputLabel:SetPoint("TOPLEFT", 14, y - 4)
   f.input = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
@@ -161,6 +188,10 @@ function H.Refresh()
     r.label:SetText(L[r.row[1]])
     r.button:SetText(L[r.row[2]])
   end
+  local last = KT.LastLine and KT.LastLine()
+  frame.lastLabel:SetText(last and last.flagged and L.HW_LAST_FLAGGED or L.HW_LAST)
+  frame.lastText:SetText(last and last.text or L.HW_LAST_NONE)
+  frame.lastButton:SetText(L.HW_BTN_FLAG)
   frame.inputLabel:SetText(L.HW_INPUT)
   frame.report:SetText(L.HW_REPORT)
   local n = #(KT.GetDB().fieldNotes or {})
