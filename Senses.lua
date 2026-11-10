@@ -101,6 +101,8 @@ function S.Gear(ctx)
     return ok and l or nil
   end
   ctx.cloak, ctx.boots, ctx.gloves = link(15), link(8), link(10)
+  local okR, _, race = pcall(UnitRace, "player")
+  ctx.race = okR and race or nil -- "Human", "Dwarf", "NightElf", "Gnome", "Orc", "Scourge", "Tauren", "Troll"
   ctx.armor = nil
   local ok, chestID = pcall(GetInventoryItemID, "player", 5)
   if ok and chestID then
@@ -126,6 +128,7 @@ local function InSpot(sp, ctx)
 end
 
 function S.Roofed(ctx)
+  if D.NO_SKY_ZONES and D.NO_SKY_ZONES[ctx.mapID] then return true end
   for _, sp in ipairs(D.ROOFED or {}) do if InSpot(sp, ctx) then return true end end
   for _, sp in ipairs(KT.GetDB().roofs or {}) do if InSpot(sp, ctx) then return true end end
   return false
@@ -151,6 +154,15 @@ end
 -- Conditions: can this line play here and now? (and if not, why)
 ---------------------------------------------------------------------------
 
+-- value is v, or one of the values of list v (e.g. race = { "Dwarf", "Gnome" })
+local function InList(v, value)
+  if type(v) == "table" then
+    for _, x in ipairs(v) do if x == value then return true end end
+    return false
+  end
+  return v == value
+end
+
 local function Check(when, ctx)
   if not when then return true end
   if when.night ~= nil and when.night ~= ctx.night then return false, when.night and "night" or "day" end
@@ -160,6 +172,9 @@ local function Check(when, ctx)
   if when.moving and not ctx.moving then return false, "moving" end
   if when.sky and (ctx.indoors or ctx.roofed) then return false, "sky" end
   if when.still and ctx.moving then return false, "still" end
+  -- race: a lore line can be told differently to a native of the place
+  if when.race and not InList(when.race, ctx.race) then return false, "race" end
+  if when.notRace and InList(when.notRace, ctx.race) then return false, "race" end
   -- shapeshift forms: "furry" = bear, cat, travel form, ghost wolf
   if when.shifted ~= nil and when.shifted ~= (ctx.form ~= nil) then return false, "form" end
   if when.form then
@@ -433,6 +448,8 @@ function S.Tags(c, ctx)
       if w[slot] ~= nil then add(w[slot] and T[slot] or T["no_" .. slot], not ctx.form and w[slot] == (ctx[slot] ~= nil)) end
     end
     if w.armor then add(string.format(T.armor, w.armor), not ctx.form and ctx.armor == w.armor) end
+    if w.race then add(string.format(T.race, type(w.race) == "table" and table.concat(w.race, "/") or w.race), InList(w.race, ctx.race)) end
+    if w.notRace then add(string.format(T.notRace, type(w.notRace) == "table" and table.concat(w.notRace, "/") or w.notRace), not InList(w.notRace, ctx.race)) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
     if w.subMatch then
       local found = false

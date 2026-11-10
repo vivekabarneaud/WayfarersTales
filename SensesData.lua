@@ -71,6 +71,11 @@ D.WEATHER_CONFIRMED = { clear = true }
 -- Places the game counts as "outdoors" but with a roof over your head: lines that
 -- need the open sky (sky = true) skip them. map = map ID (raw, as for spots), x/y in %.
 -- Players can add their own with /wt toit; send them in the report to add them here.
+-- Whole zones where you never see the sky (canopy everywhere), by zone map ID
+D.NO_SKY_ZONES = {
+  [1438] = true, -- Teldrassil: the canopy covers everything
+}
+
 D.ROOFED = {
   { map = 1438, x = 59.8, y = 41.7, r = 3, name = "Aldrassil (Teldrassil)" },
 }
@@ -421,6 +426,12 @@ S.zones = {
     arrive = {
       { en = "Tall grass ripples around you.", fr = "Les hautes herbes ondulent autour de vous.", when = OUT },
     },
+    ambient = {
+      { draft = true, -- for tauren: home
+        en = "Mulgore's wind carries the smell of tall grass and kodos. Here, the Earth Mother is everywhere, and you feel at peace.",
+        fr = "Le vent de Mulgore porte l'odeur des hautes herbes et des kodos. Ici, la Terre-Mère est partout, et vous vous sentez en paix.",
+        when = { indoors = false, race = "Tauren" } },
+    },
   },
   [1417] = { -- Arathi Highlands: open grassy highlands
     arrive = {
@@ -452,6 +463,10 @@ S.zones = {
         en = "At night, Elwynn changes face. The shadows stretch between the oaks, and you walk a little faster than usual.",
         fr = "La nuit, la forêt d'Elwynn change de visage. Les ombres s'allongent entre les chênes, et vous marchez un peu plus vite que d'habitude.",
         when = { indoors = false, night = true, moving = true } },
+      { draft = true, -- for humans: home
+        en = "Elwynn feels a little like home: its oaks, its gentle hills, its quiet farms. Here, you feel you belong.",
+        fr = "Elwynn, c'est un peu chez vous : ses chênes, ses collines douces, ses fermes tranquilles. Ici, vous vous sentez à votre place.",
+        when = { indoors = false, race = "Human" } },
     },
   },
   [1453] = { -- Stormwind
@@ -497,13 +512,17 @@ S.zones = {
         fr = "L'air sent la mousse, l'écorce humide et une pointe de fleurs sauvages. Ici, même le silence semble vivant.",
         when = { indoors = false, calm = true } },
       { draft = true,
-        en = "It is whispered that the Tree never received the blessing of the great dragons. Sometimes, listening to the wind in its branches, you wonder whether it knows.",
-        fr = "On murmure que l'Arbre n'a jamais reçu la bénédiction des grands dragons. Parfois, en écoutant le vent dans ses branches, vous vous demandez s'il le sait.",
-        when = OUT },
+        en = "It is whispered that the Tree never received the blessing of the great dragons. Listening to the wind in its branches, you understand why the elves speak of it with such worry.",
+        fr = "On murmure que l'Arbre n'a jamais reçu la bénédiction des grands dragons. En écoutant le vent dans ses branches, vous comprenez pourquoi les elfes en parlent avec tant d'inquiétude.",
+        when = { indoors = false, notRace = "NightElf" } },
       { draft = true,
         en = "Night falls over Teldrassil without really changing its violet light. The leaves murmur softly, and you feel tiny, but safe.",
         fr = "La nuit tombe sur Teldrassil sans vraiment changer sa lumière violette. Le feuillage murmure doucement, et vous vous sentez minuscule, mais en sécurité.",
         when = { indoors = false, night = true } },
+      { draft = true, -- for night elves: this is home
+        en = "You know the Tree never received the blessing of the great dragons. Listening to the wind in its branches, your heart tightens: this is your home, and the thought that it could one day be corrupted is unbearable.",
+        fr = "Vous savez que l'Arbre n'a jamais reçu la bénédiction des grands dragons. En écoutant le vent dans ses branches, votre cœur se serre : c'est votre foyer, et l'idée qu'il puisse un jour se corrompre vous est insupportable.",
+        when = { indoors = false, race = "NightElf" } },
     },
   },
   [1457] = { -- Darnassus
@@ -521,11 +540,15 @@ S.zones = {
       { draft = true, check = "Temple de la Lune",
         en = "They say the priestesses of Elune pray day and night in the Temple of the Moon. Here, the goddess never seems very far away.",
         fr = "On dit que les prêtresses d'Élune prient jour et nuit au Temple de la Lune. Ici, la déesse ne semble jamais très loin.",
-        when = OUT },
+        when = { indoors = false, notRace = "NightElf" } },
       { draft = true,
         en = "A mild breeze ripples the water of the pools. The calm is so deep you can hear your own breathing.",
         fr = "Une brise tiède fait onduler l'eau des bassins. Le calme est si profond que vous entendez votre propre souffle.",
         when = { indoors = false, calm = true } },
+      { draft = true, check = "Temple de la Lune", -- for night elves
+        en = "Passing near the Temple of the Moon, you whisper a short prayer to Elune, out of habit, and out of love. Here, the goddess watches over your people.",
+        fr = "En passant près du Temple de la Lune, vous murmurez une courte prière à Élune, par habitude, et par amour. Ici, la déesse veille sur les vôtres.",
+        when = { indoors = false, race = "NightElf" } },
     },
   },
   [1439] = { -- Darkshore
@@ -543,11 +566,15 @@ S.zones = {
       { draft = true,
         en = "They say elven ruins haunt these woods, and that some souls never left Ameth'Aran. Despite yourself, you glance over your shoulder.",
         fr = "On raconte que des ruines elfiques hantent ces bois, et que certaines âmes n'ont jamais quitté Ameth'Aran. Malgré vous, vous jetez un œil par-dessus votre épaule.",
-        when = OUT },
+        when = { indoors = false, notRace = "NightElf" } },
       { draft = true,
         en = "The dark trees of the coast bend in the wind, their branches creaking softly. The place seems to carry an old sorrow.",
         fr = "Les arbres sombres de la côte ploient sous le vent, et leurs branches grincent doucement. L'endroit semble porter un vieux chagrin.",
         when = OUT },
+      { draft = true, -- for night elves
+        en = "You know the stories of Ameth'Aran, the city that fell to ruin not far from here. They say some souls never left it, and that old sorrow is a little bit yours.",
+        fr = "Vous connaissez les histoires d'Ameth'Aran, la cité tombée en ruine non loin d'ici. On dit que certaines âmes ne l'ont jamais quittée, et ce chagrin ancien est un peu le vôtre.",
+        when = { indoors = false, race = "NightElf" } },
     },
   },
   [1440] = { -- Ashenvale
@@ -561,7 +588,7 @@ S.zones = {
       { draft = true, check = "Grommash Hurlenfer",
         en = "They say this is where Cenarius fell to Grommash Hellscream's axe. The forest has not forgotten.",
         fr = "On dit que c'est ici que Cenarius est tombé sous la hache de Grommash Hurlenfer. La forêt, elle, n'a pas oublié.",
-        when = OUT },
+        when = { indoors = false, notRace = { "NightElf", "Orc" } } },
       { draft = true,
         en = "The leaves rustle overhead like a thousand whispers. You can't help but listen.",
         fr = "Les feuilles bruissent au-dessus de vous comme mille voix chuchotées. Vous ne pouvez pas vous empêcher de tendre l'oreille.",
@@ -570,6 +597,14 @@ S.zones = {
         en = "The air is cool and damp beneath the great trees, and each step sinks a little into the moss. This forest is older than anything you know.",
         fr = "L'air est frais et humide sous les grands arbres, et chaque pas s'enfonce un peu dans la mousse. Cette forêt est plus vieille que tout ce que vous connaissez.",
         when = { indoors = false, moving = true } },
+      { draft = true, check = "Grommash Hurlenfer", -- for night elves
+        en = "This is where Cenarius, demigod of the forest, fell to Grommash Hellscream's axe. Every time you think of it, a dull anger rises in your heart.",
+        fr = "C'est ici que Cenarius, le demi-dieu de la forêt, est tombé sous la hache de Grommash Hurlenfer. Chaque fois que vous y pensez, une colère sourde vous monte au cœur.",
+        when = { indoors = false, race = "NightElf" } },
+      { draft = true, check = "Grommash Hurlenfer, Mannoroth", -- for orcs
+        en = "It was in these woods that Grommash Hellscream slew Mannoroth and broke your people's chains. The price was heavy, but you walk with your head held high.",
+        fr = "C'est dans ces bois que Grommash Hurlenfer a abattu Mannoroth et brisé les chaînes de votre peuple. Le prix fut lourd, mais vous marchez la tête haute.",
+        when = { indoors = false, race = "Orc" } },
     },
   },
   [1436] = { -- Westfall (the farmland landscape already has its own lines)
@@ -577,11 +612,15 @@ S.zones = {
       { draft = true, check = "Confrérie Défias",
         en = "They say the stonemasons who rebuilt Stormwind were never paid. Since then, the Defias Brotherhood has roamed these hills, red masks over their faces.",
         fr = "On raconte que les tailleurs de pierre qui ont rebâti Hurlevent n'ont jamais été payés. Depuis, la Confrérie Défias rôde dans ces collines, un foulard rouge sur le visage.",
-        when = OUT },
+        when = { indoors = false, notRace = "Human" } },
       { draft = true,
         en = "The farms here were abandoned one by one. You can't help wondering what became of the people who lived in them.",
         fr = "Les fermes d'ici ont été abandonnées une à une. Vous ne pouvez pas vous empêcher de vous demander ce que sont devenus ceux qui y vivaient.",
         when = OUT },
+      { draft = true, check = "Confrérie Défias", -- for humans
+        en = "Stormwind was rebuilt by these stonemasons, and the city never paid them. Thinking of the Defias Brotherhood, you feel a mix of anger and shame.",
+        fr = "Hurlevent a été rebâtie par ces tailleurs de pierre, et la ville ne les a jamais payés. En pensant à la Confrérie Défias, vous ressentez un mélange de colère et de honte.",
+        when = { indoors = false, race = "Human" } },
     },
   },
   [1426] = { -- Dun Morogh
@@ -595,11 +634,19 @@ S.zones = {
       { draft = true,
         en = "They say the gnomes had to flee Gnomeregan when their city was overrun. Thinking of them, the cold feels a little sharper.",
         fr = "On dit que les gnomes ont dû fuir Gnomeregan quand leur cité a été envahie. En pensant à eux, le froid vous semble un peu plus mordant.",
-        when = OUT },
+        when = { indoors = false, notRace = "Gnome" } },
       { draft = true,
         en = "The wind comes down from the peaks and stings your cheeks. You dream of a crackling fireplace and a warm mug.",
         fr = "Le vent descend des sommets et vous pique les joues. Vous rêvez d'un feu de cheminée et d'une chope bien chaude.",
         when = OUT },
+      { draft = true, -- for gnomes
+        en = "Somewhere beneath these mountains, Gnomeregan is lost. Every time you think of it, your throat tightens: one day, your people will take it back.",
+        fr = "Quelque part sous ces montagnes, Gnomeregan est perdue. Chaque fois que vous y pensez, votre gorge se serre : un jour, votre peuple la reprendra.",
+        when = { indoors = false, race = "Gnome" } },
+      { draft = true, -- for dwarves: home
+        en = "Icy air, the smell of pine and forge smoke: you're home, and every gust of cold wind reminds you of it.",
+        fr = "L'air glacé, l'odeur du pin et de la fumée des forges : vous êtes chez vous, et chaque bouffée de vent froid vous le rappelle.",
+        when = { indoors = false, race = "Dwarf" } },
     },
   },
   [1432] = { -- Loch Modan
@@ -618,6 +665,10 @@ S.zones = {
         en = "They say troggs crawled up from the depths when the dwarves dug too deep. You eye the rocks around you with suspicion.",
         fr = "On raconte que des troggs sont sortis des profondeurs quand les nains ont creusé trop loin. Vous jetez un œil méfiant aux rochers alentour.",
         when = OUT },
+      { draft = true, -- for dwarves
+        en = "Dwarves like to say the great dam of the Loch was built to last a thousand years. You don't doubt it for a second: that's dwarven work.",
+        fr = "Entre nains, on aime dire que le grand barrage du Loch a été bâti pour durer mille ans. Vous n'en doutez pas une seconde : c'est du travail de nain.",
+        when = { indoors = false, race = "Dwarf" } },
     },
   },
   [1433] = { -- Redridge Mountains
@@ -693,11 +744,41 @@ S.zones = {
       { draft = true,
         en = "They say the city was carved out of the mountain itself, centuries ago, and has never fallen. Within these walls, you feel safe from everything.",
         fr = "On dit que la cité a été taillée dans la montagne elle-même, il y a des siècles, et qu'elle n'est jamais tombée. Entre ces murs, vous vous sentez à l'abri de tout.",
-        when = { indoors = true } },
+        when = { indoors = true, notRace = { "Dwarf", "Gnome" } } },
       { draft = true,
         en = "The orange glow of the forges dances on the stone. Here, even the mountain feels warm.",
         fr = "La lumière orangée des forges danse sur la pierre. Ici, même la montagne semble chaleureuse.",
         when = { indoors = true } },
+      { draft = true, -- for dwarves
+        en = "Ironforge, the city of your ancestors, carved into the heart of the mountain. You walk its halls with quiet pride.",
+        fr = "Forgefer, la cité de vos ancêtres, taillée au cœur de la montagne. Vous la parcourez avec une fierté tranquille.",
+        when = { indoors = true, race = "Dwarf" } },
+      { draft = true, -- for gnomes
+        en = "The dwarves opened their gates to you when Gnomeregan fell. Within these walls, you feel safe, and a little in their debt.",
+        fr = "Les nains vous ont ouvert leurs portes quand Gnomeregan est tombée. Entre ces murs, vous vous sentez à l'abri, et un peu redevable.",
+        when = { indoors = true, race = "Gnome" } },
+    },
+  },
+
+  -- Horde homelands: a line for the people who live there
+  [1411] = { -- Durotar
+    ambient = {
+      { draft = true, check = "Durotar, Thrall", -- for orcs
+        en = "Durotar's red earth is dry and hard, like your people. Thrall named it after his father, and you tread it with pride.",
+        fr = "La terre rouge de Durotar est sèche et dure, comme votre peuple. Thrall lui a donné le nom de son père, et vous la foulez avec fierté.",
+        when = { indoors = false, race = "Orc" } },
+      { draft = true, check = "îles de l'Écho, Sombrelances", -- for trolls
+        en = "The Echo Isles aren't far, and the smell of the sea reminds you that the Darkspear have finally found a home.",
+        fr = "Les îles de l'Écho ne sont pas loin, et l'odeur de la mer vous rappelle que les Sombrelances ont enfin trouvé un foyer.",
+        when = { indoors = false, race = "Troll" } },
+    },
+  },
+  [1420] = { -- Tirisfal Glades
+    ambient = {
+      { draft = true, -- for the Forsaken
+        en = "These glades were once your kingdom, alive and full of light. All that's left is the grey mist, and a memory that gives you no peace.",
+        fr = "Ces clairières étaient autrefois votre royaume, vivantes et lumineuses. Il n'en reste que la brume grise, et un souvenir qui ne vous laisse pas en paix.",
+        when = { indoors = false, race = "Scourge" } },
     },
   },
 }
