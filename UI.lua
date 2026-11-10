@@ -173,7 +173,7 @@ local function RefreshSenses(p)
     string.format(L.SN_TIME, ctx.night and L.SN_NIGHT or L.SN_DAY, KT.Elements and KT.Elements.FormatAir(ctx.air or 15) or ""),
     string.format(L.SN_INOUT, ctx.indoors and yes or no, ctx.resting and yes or no),
     string.format(L.SN_CROWD, crowd, ctx.players or 0, ctx.chatter or 0),
-    string.format(L.SN_POS, ctx.x and string.format("%.1f, %.1f", ctx.x, ctx.y) or "?", (function()
+    string.format(L.SN_POS, ctx.x and string.format("%.1f, %.1f (map %s)", ctx.x, ctx.y, tostring(ctx.rawMapID)) or "?", (function()
       local names = {}
       for _, sp in ipairs(S.SpotsHere(ctx)) do names[#names + 1] = S.SpotName(sp) end
       return #names > 0 and table.concat(names, ", ") or "-"

@@ -789,7 +789,47 @@ S.zones = {
 -- "when" adds conditions for the whole spot (e.g. resting = only in the inn's rest area).
 -- The most precise level of all.
 ---------------------------------------------------------------------------
+-- Moonwells: the same lines for every moonwell. Add each moonwell as a spot below
+-- (a wide spot around it, and a small one for standing in the water at its centre).
+local MOONWELL_ARRIVE = {
+  { draft = true, long = true,
+    en = "The bluish light of the moonwell dances on the pale stone. The air is cool, smelling of clear water and dew, and a familiar peace comes over you: here, Elune watches.",
+    fr = "La lumière bleutée du puits de lune danse sur la pierre pâle. L'air est frais, il sent l'eau claire et la rosée, et une paix familière vous envahit : ici, Élune veille.",
+    when = { race = "NightElf" } },
+  { draft = true, long = true,
+    en = "The bluish light of the moonwell dances on the pale stone. The air smells of cool water and wet stone, and an almost sacred silence makes you lower your voice.",
+    fr = "La lumière bleutée du puits de lune danse sur la pierre pâle. L'air sent l'eau fraîche et la pierre mouillée, et un silence presque sacré vous fait baisser la voix.",
+    when = { notRace = "NightElf" } },
+}
+local MOONWELL_AMBIENT = {
+  { draft = true,
+    en = "The water shimmers softly, as if it kept a little starlight deep inside.",
+    fr = "L'eau scintille doucement, comme si elle gardait au fond d'elle un peu de clarté d'étoile." },
+  { draft = true,
+    en = "A coolness rises from the basin and brushes your face, with a smell of dew and damp stone.",
+    fr = "Une fraîcheur monte du bassin et vous caresse le visage, avec une odeur de rosée et de pierre humide." },
+  { draft = true,
+    en = "You brush the surface with your fingertips. The water is cool, almost cold, and a faint tingle runs up your arm. As always, your heart settles.",
+    fr = "Vous effleurez la surface du bout des doigts. L'eau est fraîche, presque froide, et un léger picotement vous remonte le long du bras. Comme chaque fois, votre cœur s'apaise.",
+    when = { race = "NightElf", shifted = false } },
+  { draft = true, check = "Puits d'éternité",
+    en = "They say the water of the moonwells comes from the Well of Eternity itself. You gaze at it with newfound respect.",
+    fr = "On dit que l'eau des puits de lune vient du Puits d'éternité lui-même. Vous la contemplez avec un respect tout neuf.",
+    when = { notRace = "NightElf" } },
+}
+local MOONWELL_WATER = {
+  { draft = true,
+    en = "Here you are in the middle of the moonwell. The cool water wraps you in a strange serenity, like a hand resting on your shoulder.",
+    fr = "Vous voilà au milieu du puits de lune. L'eau fraîche vous enveloppe d'une sérénité étrange, comme une main posée sur votre épaule." },
+}
+
 S.spots = {
+  { id = "mw_shadowglen", map = 1438, x = 59.9, y = 33.0, r = 0.9, when = { indoors = false },
+    names = { en = "the Shadowglen moonwell", fr = "le puits de lune de Sombrevallon" },
+    arrive = MOONWELL_ARRIVE, ambient = MOONWELL_AMBIENT },
+  { id = "mw_shadowglen_water", map = 1438, x = 59.9, y = 33.0, r = 0.25, when = { indoors = false },
+    names = { en = "in the Shadowglen moonwell", fr = "dans le puits de lune de Sombrevallon" },
+    ambient = MOONWELL_WATER },
   { id = "sw_dwarven_forge", map = 1453, x = 63.7, y = 36.7, r = 2.5, when = { indoors = false },
     names = { en = "the Dwarven District forge", fr = "la forge du Quartier des Nains" },
     arrive = {
