@@ -930,7 +930,11 @@ local function IdleMoment()
   elseif pet.mood and math.random() < 0.4 then
     pool = "idleMood_" .. pet.mood.key
   end
-  if Flavor(pool, 0.08 * MoodMult("idle")) then Mark("idle") end
+  if Flavor(pool, 0.08 * MoodMult("idle")) then
+    Mark("idle")
+    -- it brought you something: a thank-you (/thank) in the next minute makes it proud
+    if pool == "idleFind" and (M.thanked or KT.IsDev()) then state.found = { expires = GetTime() + D.FOUND_WINDOW } end
+  end
 end
 
 local function ResolveFeed(itemID, link)
@@ -1568,6 +1572,13 @@ function H.CHAT_MSG_TEXT_EMOTE(text, sender, ...)
       if lower:find(w, 1, true) then kind = "affection" break end
     end
   else
+    return
+  end
+  -- thanking your pet right after it brought you something (no need to target it)
+  local found = state.found
+  if token and D.THANK[token] and found and GetTime() <= found.expires then
+    state.found = nil
+    Say("thanked", nil, Gain("thanked"), true)
     return
   end
   if not targeted and not D.EMOTE_UNTARGETED[kind or ""] then return end

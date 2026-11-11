@@ -53,6 +53,9 @@ D.CELEBRATE = { CHEER = true, CLAP = true, APPLAUD = true, BRAVO = true, WOOT = 
 D.GAIN.anniversary = { amount = 3 }
 D.GAIN.petSolo     = { amount = 1, cap = 2 } -- won a fight you didn't take part in
 D.PET_SOLO_COOLDOWN = 600
+D.GAIN.thanked     = { amount = 1, cap = 3 } -- thanked your pet for something it brought you
+D.FOUND_WINDOW     = 60 -- seconds to thank your pet after it brings you something
+D.THANK = { THANK = true, PRAISE = true } -- emotes that count as thanks
 
 -- Food types a pet can have as secret favorite / dislike.
 D.FOOD_KINDS = { "meat", "fish", "cheese", "bread", "fungus", "fruit" }
@@ -222,7 +225,7 @@ D.POOL_SOUND = {
   rude = "hurt",
   tierUp = "ui:big", loyaltyUp = "ui:big", anniversary = "ui:big", daysTogether = "ui:big",
   feedFavoriteFirst = "ui:discover", favoriteRevealed = "ui:discover",
-  treatGiven = "happy", celebrated = "excited",
+  treatGiven = "happy", celebrated = "excited", thanked = "happy",
   treatAsk = "happy", treatAskFavorite = "excited", petLevel = "excited", -- requests: the sound is the cue
 
   petDangerHigh = "excited", petDangerNear = "excited",

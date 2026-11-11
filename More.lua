@@ -357,6 +357,17 @@ D.BODY_MORE = {
 -- Message pools (pet, body, danger feelings): extra lines while testing
 ---------------------------------------------------------------------------
 D.POOL_DRAFTS = {
+  -- you thanked your pet (/thank, /praise) for something it just brought you
+  thanked = {
+    { en = "{pet} puffs out its chest, bursting with pride. That find was a masterpiece.",
+      fr = "{pet} bombe le torse, débordant de fierté. Cette trouvaille, c'était du grand art." },
+    { en = "{pet} trots around you, head held high. A thank-you is something to savor.",
+      fr = "{pet} se met à trottiner autour de vous, la tête haute. Un merci, ça se savoure." },
+    { en = "Your thanks make {pet}'s eyes shine. You get the feeling another find is coming soon.",
+      fr = "Vos remerciements font briller les yeux de {pet}. Vous sentez qu'une nouvelle trouvaille ne va pas tarder." },
+    { en = "{pet} lets out a happy little sound and looks at you with immense pride.",
+      fr = "{pet} laisse échapper un petit bruit de joie et vous regarde avec une immense fierté." },
+  },
   -- outdoors, while you stand still: your pet brings you something it found
   idleFind = {
     { en = "{pet} proudly drops a pebble at your feet. A perfectly ordinary pebble, but clearly a very important one.",
