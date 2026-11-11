@@ -31,8 +31,8 @@ D.SENSES_MORE = {
         en = "The rain finally stops. Everything is dripping, and a fresh smell rises from everywhere.",
         fr = "La pluie s'arrête enfin. Tout ruisselle, et une odeur fraîche monte de partout." },
       { draft = true,
-        en = "The last drops fall, then nothing. The world seems to breathe again.",
-        fr = "Les dernières gouttes tombent, puis plus rien. Le monde semble respirer à nouveau." },
+        en = "The last drops fall, then nothing. Only the sound of dripping water still breaks the silence.",
+        fr = "Les dernières gouttes tombent, puis plus rien. Seul le bruit de l'eau qui s'égoutte trouble encore le silence." },
     },
   },
   biomes = {
@@ -437,6 +437,92 @@ D.POOL_DRAFTS = {
 }
 
 ---------------------------------------------------------------------------
+-- Sounds (2026-11-11: "we lack hearing lines"): what you hear, by landscape.
+-- Only sounds that fit any spot of that landscape, at the right time of day.
+---------------------------------------------------------------------------
+local NIGHT_CLEAR = { indoors = false, night = true, weather = "clear" }
+local DAY_CLEAR = { indoors = false, night = false, weather = "clear" }
+local WALKING = { indoors = false, moving = true }
+D.SENSES_SOUNDS = {
+  forest = {
+    { draft = true, when = NIGHT_CLEAR,
+      en = "Crickets chirp in the undergrowth, a steady song that lulls the night.",
+      fr = "Les grillons chantent dans les fourrés, un chant régulier qui berce la nuit." },
+    { draft = true, when = OUT,
+      en = "The wind passes through the leaves with a long rustle, then everything grows calm again.",
+      fr = "Le vent passe dans les feuillages avec un long bruissement, puis tout redevient calme." },
+  },
+  plains = {
+    { draft = true, when = OUT,
+      en = "The tall grass rustles in the wind, a long murmur rippling all around you.",
+      fr = "Les herbes hautes bruissent dans le vent, un long murmure qui ondule autour de vous." },
+    { draft = true, when = NIGHT_CLEAR,
+      en = "In the grass, the crickets sing without pause. The night is far from silent.",
+      fr = "Dans l'herbe, les grillons chantent sans relâche. La nuit est loin d'être silencieuse." },
+  },
+  hills = {
+    { draft = true, when = DAY_CLEAR,
+      en = "Birds sing in the bushes, and the air hums with a quiet little life.",
+      fr = "Des oiseaux chantent dans les buissons, et l'air bourdonne d'une petite vie tranquille." },
+  },
+  farmland = {
+    { draft = true, when = OUT,
+      en = "The dry stalks rustle in the wind with a sound like crumpled paper.",
+      fr = "Les tiges sèches bruissent au vent, avec un son de papier froissé." },
+  },
+  mountain = {
+    { draft = true, when = OUT,
+      en = "The wind whistles between the rocks, and its echo fades into the heights.",
+      fr = "Le vent siffle entre les rochers, et son écho se perd dans les hauteurs." },
+  },
+  snow = {
+    { draft = true, when = WALKING,
+      en = "The snow crunches under your steps. In this frozen silence, every step seems to echo.",
+      fr = "La neige crisse sous vos pas. Dans ce silence glacé, chaque pas semble résonner." },
+  },
+  desert = {
+    { draft = true, when = WALKING,
+      en = "The sand crunches under your feet, and the hot wind whistles softly in your ears.",
+      fr = "Le sable crisse sous vos pas, et le vent chaud siffle doucement à vos oreilles." },
+  },
+  savanna = {
+    { draft = true, when = OUT,
+      en = "The dry wind makes the yellow grass sing, a long whistle that never quite stops.",
+      fr = "Le vent sec fait chanter les herbes jaunes, un long sifflement qui ne s'arrête jamais vraiment." },
+  },
+  swamp = {
+    { draft = true, when = OUT,
+      en = "Frogs croak all around you, a concert that never really ends.",
+      fr = "Des grenouilles coassent tout autour de vous, un concert qui ne s'arrête jamais vraiment." },
+  },
+  marsh = {
+    { draft = true, when = OUT,
+      en = "Frogs croak among the reeds, and somewhere, water gurgles under the mud.",
+      fr = "Des grenouilles coassent entre les roseaux, et quelque part, l'eau glougloute sous la vase." },
+  },
+  jungle = {
+    { draft = true, when = OUT,
+      en = "Animal cries echo under the canopy, though you never quite see where they come from.",
+      fr = "Des cris d'animaux résonnent sous la canopée, sans que vous ne voyiez jamais d'où ils viennent." },
+  },
+  coast = {
+    { draft = true, when = OUT,
+      en = "The waves roll up the sand, then pull back with a long hiss, again and again.",
+      fr = "Les vagues roulent sur le sable puis se retirent dans un long chuintement, encore et encore." },
+  },
+  gloom = {
+    { draft = true, when = OUT,
+      en = "A branch snaps somewhere in the shadows, then nothing. You strain your ears.",
+      fr = "Une branche craque quelque part dans l'ombre, puis plus rien. Vous tendez l'oreille." },
+  },
+  city = {
+    { draft = true, when = { indoors = false, crowd = { "lively", "crowded" } },
+      en = "Snatches of conversation and the sound of footsteps rise all around you: the city never falls silent.",
+      fr = "Des bribes de conversations et des bruits de pas montent de partout autour de vous : la ville ne se tait jamais." },
+  },
+}
+
+---------------------------------------------------------------------------
 -- Add the place, moment and body lines to the lines they extend
 ---------------------------------------------------------------------------
 local function Append(dst, src)
@@ -479,4 +565,9 @@ end
 for key, lines in pairs(D.BODY_MORE) do
   D.BODY_LINES[key] = D.BODY_LINES[key] or {}
   Append(D.BODY_LINES[key], lines)
+end
+for biome, lines in pairs(D.SENSES_SOUNDS) do
+  S.biomes[biome] = S.biomes[biome] or {}
+  S.biomes[biome].ambient = S.biomes[biome].ambient or {}
+  Append(S.biomes[biome].ambient, lines)
 end

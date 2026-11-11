@@ -51,6 +51,8 @@ D.MOMENT_RULES = {
   npc             = { cd = 120,  chance = 1,   gap = 20 },
   questAccept_2159 = { cd = 0,   chance = 1,   gap = 0 },
   questDone_22     = { cd = 0,   chance = 1,   gap = 0 },
+  questWanted      = { cd = 30,  chance = 1,   gap = 0 },  -- you take a wanted poster
+  flightNew        = { cd = 60,  chance = 1,   gap = 0 },  -- a new flight path
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -1132,3 +1134,63 @@ D.MOMENTS.questDone_22 = {
     en = "Salma hands you a pie that's still hot, along with its recipe. The smell of golden pastry and meat warms your heart.",
     fr = "Salma vous tend une tourte encore chaude, avec sa recette. L'odeur de pâte dorée et de viande vous réchauffe le cœur." },
 }
+
+-- Any wanted poster (a quest whose title has one of these words): you take the parchment
+D.WANTED_WORDS = { "avis de recherche", "wanted" }
+D.MOMENTS.questWanted = {
+  { draft = true,
+    en = "You take down the wanted poster, fold it carefully and slip it into your bag. The name written on it stays in your mind.",
+    fr = "Vous décrochez l'avis de recherche, le pliez soigneusement et le glissez dans votre sac. Le nom inscrit dessus vous reste en tête." },
+  { draft = true,
+    en = "The parchment is rough under your fingers, the ink a little faded. You roll it up and put it away: the hunt is on.",
+    fr = "Le parchemin est rugueux sous vos doigts, l'encre un peu passée. Vous le roulez et le rangez : la chasse est ouverte.",
+    when = { shifted = false } },
+}
+
+-- A new flight path discovered
+D.MOMENTS.flightNew = {
+  { draft = true,
+    en = "A new flight path! Just thinking of the wind on your face up there, your heart beats a little faster.",
+    fr = "Une nouvelle route aérienne ! Rien qu'en pensant au vent sur votre visage, là-haut, votre cœur bat un peu plus vite." },
+  { draft = true,
+    en = "One more name on the map of flight paths. The world suddenly feels a little smaller, and a little more yours.",
+    fr = "Un nom de plus sur la carte des routes aériennes. Le monde vous semble soudain un peu plus petit, et un peu plus à vous." },
+}
+
+-- NPCs noted in Elwynn and Redridge (2026-11-11)
+D.NPCS[931]  = { race = "Human", role = "flight_master" } -- Ariena Stormfeather, Redridge: big pilot goggles too
+D.NPCS[344]  = { race = "Human", role = "mayor" }         -- Magistrate Solomon, Lakeshire: old, balding, Lakeshire under siege
+D.NPCS[5620] = { race = "Human", role = "innkeeper" }     -- Wental the innkeeper, Lakeshire: good cheese and bread
+-- Darkmoon Faire (Elwynn, near Goldshire, when it's in town): games, drinks, snacks
+for _, id in ipairs({ 14829, 14832, 14833, 14841, 14844, 14845, 14846, 14847 }) do
+  D.NPCS[id] = { role = "darkmoon" }
+end
+
+local NPC_REDRIDGE = {
+  { draft = true,
+    en = "Behind her big pilot goggles, {npc} looks every bit at home in the sky. Just seeing her makes you want to take to the air.",
+    fr = "Derrière ses grosses lunettes d'aviatrice, {npc} a tout l'air d'une habituée des hauteurs. Rien qu'à la voir, vous avez envie de prendre les airs.",
+    when = { npcID = 931 } },
+  { draft = true,
+    en = "{npc}, an old man with a balding head, urges you to hurry: Lakeshire is under siege, and every hour counts.",
+    fr = "{npc}, un vieil homme au front dégarni, vous presse de faire vite : Comté-du-Lac est assiégée, et chaque heure compte.",
+    when = { npcID = 344 } },
+  { draft = true,
+    en = "They say {npc}'s cheese and bread are the best in Lakeshire. Just thinking about it, your stomach rumbles.",
+    fr = "On dit que le fromage et le pain de {npc} sont les meilleurs de Comté-du-Lac. Rien qu'à y penser, votre estomac gargouille.",
+    when = { npcID = 5620 } },
+  -- Darkmoon Faire
+  { draft = true,
+    en = "All around you, the Darkmoon Faire is in full swing: laughter, shouts from the games, and a smell of fried food and sugar drifting between the tents.",
+    fr = "Autour de vous, la Foire de Sombrelune bat son plein : des rires, des cris autour des jeux, et une odeur de friture et de sucre qui flotte entre les tentes.",
+    when = { npcRole = "darkmoon" } },
+  { draft = true,
+    en = "{npc} fills a mug with a broad grin. At the faire, drinks flow freely, and the cheer is catching.",
+    fr = "{npc} remplit une chope avec un grand sourire. À la foire, la boisson coule à flots, et la bonne humeur est contagieuse.",
+    when = { npcID = 14844 } },
+  { draft = true,
+    en = "{npc} hands you something to nibble on. The sweet smell of the faire's treats makes your mouth water.",
+    fr = "{npc} vous tend de quoi grignoter. L'odeur sucrée des friandises de la foire vous met l'eau à la bouche.",
+    when = { npcID = 14845 } },
+}
+for _, line in ipairs(NPC_REDRIDGE) do table.insert(D.MOMENTS.npc, line) end

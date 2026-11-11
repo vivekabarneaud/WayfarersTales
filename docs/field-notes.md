@@ -117,3 +117,28 @@ in-game report at the next login.
 | The bar under the title in the header isn't needed | done | Removed (the Carnet keeps its bar) |
 | "Poppo vous rapporte un bâton…" should be outdoors only, and more like it | done | Its own pool: outdoors, out of towns and inns, while you stand still; 6 new lines (draft) |
 | (seen in the screenshot) "Début de votre histoire : [zone]" and "après 1 jours" | done | Old memory without its place gets "Début de votre histoire."; one day has its own text |
+
+## 2026-11-11 — Redridge playtest + review page, third round
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| — | Bug | Minimap button and thermometer: the dark disc and icon don't fill the ring | done | Bigger, centered on the ring |
+| — | Review | Night air "la fatigue s'éloigne": keep tiredness/relief for real rest | done | Rewrite: "vos idées s'éclaircissent" |
+| — | Review | Hearth fire: a word about the wood cracking | done | "Une bûche craque et projette une gerbe d'étincelles" |
+| — | Review | "Le monde semble respirer": metaphors only if very subtle | done | Rewritten (wet earth, rain stop); saved as a writing rule |
+| — | Review | Redridge "sans trop savoir pourquoi" (we know why) + a gnoll line | done | "par précaution"; new gnoll line (draft) |
+| — | Review | Duskwood Night Watch line needs a feeling | done | + a shiver down your spine |
+| — | Review | Duskwood "always night" approved + wind in the trees like voices | done | Approved; 3 new lines (draft) |
+| — | Review | Delete my review notes once handled | done | The review page clears handled notes (tools/review/handled.json) |
+| 13:36 | Place | Darkmoon Faire near Goldshire: games, drinks, snacks | done | Faire NPCs noted; faire lines when you talk to them (draft) |
+| 14:04 | NPC | Ariena Stormfeather (931), flight master, big goggles | done | `D.NPCS` + line (draft) |
+| 14:07 | Idea | Flight master lines when discovering a new flight path | done | "New flight path" moment (draft) |
+| 14:08 | Idea | Wanted posters: taking the parchment, pocketing it | done | Any "Avis de recherche / Wanted" quest (draft) |
+| 14:15 | NPC | Magistrate Solomon (344): old, balding, Lakeshire under siege | done | `D.NPCS` + line (draft); his quest line waits for its ID (TODO) |
+| 14:19 | Idea | Each inn discovered gets its own line | todo | TODO.md |
+| 14:20 | Idea | Specific lines for some foods and drinks | todo | TODO.md |
+| 14:21 | Idea | Titles for each kind of discovery (foodie, drinker, crafter, hero...) | todo | TODO.md, to discuss |
+| 14:24 | NPC | Wental (5620), innkeeper, good cheese and bread | done | `D.NPCS` + line (draft) |
+| 14:25 | Question | A pet line at the inn: would a non-hunter see something? | info | Yes: ambiance lines are for everyone; pet lines come on top for hunters |
+| 14:39 | Place | Birds singing at Lake Everstill | done | Lake Everstill lines: birds, lapping water (draft) |
+| 14:46 | Idea | Not enough "hearing" lines | done | 17 sound lines across landscapes (draft) |

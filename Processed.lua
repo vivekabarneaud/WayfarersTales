@@ -23,6 +23,10 @@ D.PROCESSED = {
     ["2026-11-11 10:19"] = true, ["2026-11-11 12:09"] = true, ["2026-11-11 12:16"] = true, -- Erika, Dungar, eating
     ["2026-11-11 12:17"] = true, ["2026-11-11 12:29"] = true, ["2026-11-11 12:33"] = true, -- eating, flies, Saldean
     ["2026-11-11 12:34"] = true, ["2026-11-11 12:40"] = true, ["2026-11-11 12:45"] = true, -- quest 22, two lines, pet solo
+    ["2026-11-11 13:36"] = true, ["2026-11-11 14:04"] = true, ["2026-11-11 14:07"] = true, -- faire, Ariena, flight paths
+    ["2026-11-11 14:08"] = true, ["2026-11-11 14:15"] = true, ["2026-11-11 14:19"] = true, -- wanted, Solomon, inns
+    ["2026-11-11 14:20"] = true, ["2026-11-11 14:21"] = true, ["2026-11-11 14:24"] = true, -- foods, titles, Wental
+    ["2026-11-11 14:25"] = true, ["2026-11-11 14:39"] = true, ["2026-11-11 14:46"] = true, -- question, birds, sounds
   },
   flagsAt = {
     ["2026-11-11 08:45"] = true, ["2026-11-11 09:15"] = true, ["2026-11-11 09:21"] = true, -- mail, bomb, canals

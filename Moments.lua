@@ -669,7 +669,7 @@ end
 local f = CreateFrame("Frame")
 for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED",
-  "QUEST_ACCEPTED", "QUEST_TURNED_IN" }) do
+  "QUEST_ACCEPTED", "QUEST_TURNED_IN", "UI_INFO_MESSAGE" }) do
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
@@ -713,6 +713,7 @@ f:SetScript("OnEvent", function(_, event, ...)
     elseif event == "CHAT_MSG_SYSTEM" then
       local msg = ...
       After(0.5, function() OnSystemMessage(msg) end, "learn") -- after the game's own message
+      if ERR_NEWTAXIPATH and msg == ERR_NEWTAXIPATH then After(1.5, function() Play("flightNew") end, "flight") end
     elseif ERRANDS[event] then
       -- the NPC's own line if we know them, else the errand's line (bank, mail...)
       local key = ERRANDS[event]
@@ -729,7 +730,27 @@ f:SetScript("OnEvent", function(_, event, ...)
       local a, b = ...
       local id = b or a
       local key = id and ("questAccept_" .. tostring(id))
-      if key and D.MOMENTS[key] then After(1, function() Play(key) end, "quest") end
+      if key and D.MOMENTS[key] then
+        After(1, function() Play(key) end, "quest")
+      elseif id then
+        -- a wanted poster ("Avis de recherche", "Wanted"): you take the parchment
+        After(1, function()
+          local title
+          if C_QuestLog and C_QuestLog.GetTitleForQuestID then
+            local ok, t = pcall(C_QuestLog.GetTitleForQuestID, id)
+            if ok and type(t) == "string" then title = t end
+          end
+          title = title and title:lower() or ""
+          for _, w in ipairs(D.WANTED_WORDS) do
+            if title:find(w, 1, true) then Play("questWanted") return end
+          end
+        end, "quest")
+      end
+    elseif event == "UI_INFO_MESSAGE" then
+      -- "New flight path discovered!" (args: type, message; or just the message in older clients)
+      local a, b = ...
+      local msg = type(b) == "string" and b or a
+      if ERR_NEWTAXIPATH and msg == ERR_NEWTAXIPATH then After(1.5, function() Play("flightNew") end, "flight") end
     elseif event == "QUEST_TURNED_IN" then
       local id = ...
       local key = id and ("questDone_" .. tostring(id))

@@ -517,6 +517,13 @@ public static class Extractor {
           }
         }
       }
+      // sounds by landscape (D.SENSES_SOUNDS = { biome = { lines } })
+      if (MG.ContainsKey("D.SENSES_SOUNDS"))
+        foreach (var kv in MG["D.SENSES_SOUNDS"].Map) {
+          PlaceBiome = kv.Key as string;
+          Lines("senses:biome:" + kv.Key + ":sounds", "Places", "Landscape: " + kv.Key, "Sounds", kv.Value, null);
+          PlaceBiome = null;
+        }
       if (MG.ContainsKey("D.MOMENTS_MORE"))
         foreach (var kv in MG["D.MOMENTS_MORE"].Map) {
           string k = kv.Key as string; if (k == null) continue;

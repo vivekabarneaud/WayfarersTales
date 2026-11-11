@@ -239,6 +239,23 @@ let state = { reviews: {}, general: "", tab: "Places" };
 try { const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (saved) state = Object.assign(state, saved); } catch (e) {}
 function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
 
+// Notes Claude has already handled (handled.json): cleared from this page, as long as
+// the note is still the same text (a new comment on the same line stays).
+const HANDLED = __HANDLED__;
+(function clearHandled() {
+  let n = 0;
+  for (const h of HANDLED) {
+    if (h.id === "general") {
+      if ((state.general || "").trim() === (h.comment || "").trim()) { state.general = ""; n++; }
+      continue;
+    }
+    const r = state.reviews[h.id];
+    if (!r) continue;
+    if ((r.comment || "").trim() === (h.comment || "").trim()) { delete state.reviews[h.id]; n++; }
+  }
+  if (n) save();
+})();
+
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const groupLabel = (g) => POOL_LABELS[g] || g;
