@@ -281,10 +281,11 @@ function E.Tick()
     state.hunger = Clamp(state.hunger - rate * dt)
   end
 
-  -- Energy: ~2h of adventuring from rested to exhausted (walking in town counts too).
-  -- You recover indoors and still in a resting place (an inn, a house in town), sitting
+  -- Energy: ~2h of adventuring from rested to exhausted.
+  -- Fully rested: indoors and still in a resting place (an inn, a house in town), sitting
   -- by a campfire, eating or drinking, dozing off (AFK), or napping (/sleep, fast).
-  -- Sitting elsewhere helps a little, up to 60; standing still only stops the drop.
+  -- Up to 60 only: anywhere else in town, or sitting down elsewhere.
+  -- Standing still only stops the drop.
   local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
   if (moving or env.combat) and (sitting or napping) then E.StandUp() end
   local recover = 0
@@ -295,6 +296,11 @@ function E.Tick()
   if napping then recover = math.max(recover, D.NAP_RATE) end
   if recover > 0 then
     state.energy = Clamp(state.energy + recover * dt)
+  elseif env.resting then
+    -- in town: you get your breath back, up to 60 (above that, it holds)
+    if state.energy < D.SIT_ENERGY_CAP then
+      state.energy = math.min(D.SIT_ENERGY_CAP, state.energy + 0.05 * dt)
+    end
   elseif sitting then
     if state.energy < D.SIT_ENERGY_CAP then
       state.energy = math.min(D.SIT_ENERGY_CAP, state.energy + D.SIT_RATE * dt)

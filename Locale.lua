@@ -846,7 +846,7 @@ L.EL_HERE         = "Here: %s"
 L.EL_MOVE_HINT    = "Click: details. Shift + drag: move."
 L.EL_OFF          = "The body comfort module is turned off. You can turn it back on in the Options tab."
 L.EL_PAGE_INTRO   = "How your character feels. Pure flavor: nothing here changes your stats."
-L.EL_PAGE_TIPS    = "Warm up: a campfire, an inn, any roof over your head.\nCool down: get indoors, wait for the night, take a swim.\nDry off: time, and much faster by a fire.\nThirst: drink anything. It drops faster in the heat.\nHunger: sit down and eat.\nEnergy: rest indoors without moving (an inn, a house in town), sit by a campfire, or take a nap (/sleep). Sitting down elsewhere helps a little (up to 60%); standing still just stops it dropping.\nRain soaks you outdoors, and cools the air."
+L.EL_PAGE_TIPS    = "Warm up: a campfire, an inn, any roof over your head.\nCool down: get indoors, wait for the night, take a swim.\nDry off: time, and much faster by a fire.\nThirst: drink anything. It drops faster in the heat.\nHunger: sit down and eat.\nEnergy: rest indoors without moving (an inn, a house in town), sit by a campfire, or take a nap (/sleep). Walking around town or sitting down elsewhere helps a little (up to 60%); standing still just stops it dropping.\nRain soaks you outdoors, and cools the air."
 L.EL_GUIDE = table.concat({
   "|cffffd100Body comfort (Elements)|r",
   "Your character feels the cold, the heat, the water, thirst, hunger and tiredness, and tells you about it in the chat. The Body tab shows the details. (In Options, you can also show icons or bars by your portrait.)",
