@@ -22,9 +22,22 @@ That's all you need. No bots for now.
 
 ## 2. Messages to paste
 
+English first, French second.
+
 ### `#bienvenue`
 
-**Bienvenue sur le Discord de Wayfarer's Tales !** / **Welcome!**
+**Welcome to the Wayfarer's Tales Discord!**
+
+Wayfarer's Tales adds little lines of story to your WoW adventures: the world described around you, a body that feels the cold and the rain, and a real bond with your hunter pet.
+
+- 📣 **#annonces**: new versions
+- 🐞 **#rapports**: a line felt wrong, or something doesn't work
+- 💡 **#idées**: your ideas for lines and features
+- 💬 **#discussion**: to chat
+
+**A few simple rules**: be kind, no spoilers without a warning, no ads. Write in English or French, as you prefer.
+
+**Bienvenue sur le Discord de Wayfarer's Tales !**
 
 Wayfarer's Tales ajoute de petites lignes d'histoire à vos aventures dans WoW : le monde décrit autour de vous, un corps qui ressent le froid et la pluie, et un vrai lien avec votre familier de chasseur.
 
@@ -33,40 +46,49 @@ Wayfarer's Tales ajoute de petites lignes d'histoire à vos aventures dans WoW :
 - 💡 **#idées** : vos idées de lignes et de fonctionnalités
 - 💬 **#discussion** : pour papoter
 
-**Quelques règles simples** : soyez bienveillant·e·s, pas de spoil sans prévenir, pas de pub.
-
-*Wayfarer's Tales adds little lines of story to your WoW adventures. English speakers are very welcome too: write in English or French, as you prefer.*
+**Quelques règles simples** : soyez bienveillant·e·s, pas de spoil sans prévenir, pas de pub. Écrivez en français ou en anglais, comme vous préférez.
 
 ### `#rapports` (Post Guidelines)
 
-**Comment envoyer un rapport** / **How to send a report**
+**How to send a report**
+
+1. In game, type **/wt tester** (once) to switch on tester mode.
+2. An odd line? Click the **!** next to it in the Journal tab, and tell us what's wrong.
+3. Whenever you like, click **Send the report** (Journal tab), then Ctrl+A, Ctrl+C.
+4. Create a post here and paste the report. A screenshot always helps!
+
+**Comment envoyer un rapport**
 
 1. En jeu, tapez **/wt tester** (une seule fois) pour passer en mode testeur.
 2. Une ligne bizarre ? Cliquez sur le **!** à côté d'elle dans l'onglet Journal, et dites-nous ce qui ne va pas.
 3. Quand vous voulez, cliquez sur **Envoyer le rapport** (onglet Journal), puis Ctrl+A, Ctrl+C.
 4. Créez un post ici et collez le rapport. Une capture d'écran aide toujours !
 
-*In game, type /wt tester once. Flag odd lines with the ! button in the Journal tab, then click "Send the report", copy it all and paste it in a new post here.*
-
 ### `#idées` (Post Guidelines)
 
-**Proposer une idée** / **Share an idea**
+**Share an idea**
 
-Un post par idée, avec un titre clair. Pour une idée de ligne : dites-nous **où** (zone, lieu, coordonnées si possible), **quand** (jour, nuit, météo) et **ce que votre personnage ressent** (une odeur, un bruit, une émotion). Réagissez avec 👍 aux idées que vous aimez !
+One post per idea, with a clear title. For a new line, tell us **where** (zone, place, coordinates if you can), **when** (day, night, weather) and **what your character feels** (a smell, a sound, an emotion). React with 👍 to the ideas you like!
 
-*One post per idea. For a new line: where, when, and what your character feels. React with 👍 to the ideas you like!*
+**Proposer une idée**
+
+Un post par idée, avec un titre clair. Pour une idée de ligne, dites-nous **où** (zone, lieu, coordonnées si possible), **quand** (jour, nuit, météo) et **ce que votre personnage ressent** (une odeur, un bruit, une émotion). Réagissez avec 👍 aux idées que vous aimez !
 
 ### `#annonces`: first announcement (on release day)
 
-**Wayfarer's Tales 0.60.0, la première bêta publique, est disponible sur CurseForge !** 🎉
+**Wayfarer's Tales 0.60.0, the first public beta, is out on CurseForge!** 🎉
 
 [CurseForge link]
 
-Ce que contient cette première version : (paste the French part of CHANGELOG.md)
+What's in this first version: (paste the English part of CHANGELOG.md)
+
+Thanks to everyone who tested! Reports go in #rapports, ideas in #idées.
+
+**Wayfarer's Tales 0.60.0, la première bêta publique, est disponible sur CurseForge !** 🎉
+
+Ce que contient cette première version : (collez la partie française de CHANGELOG.md)
 
 Merci à tous ceux qui ont testé ! Vos rapports vont dans #rapports, vos idées dans #idées.
-
-*Wayfarer's Tales 0.60.0, the first public beta, is out on CurseForge! (paste the English part of CHANGELOG.md)*
 
 ## 3. Day to day
 
