@@ -346,6 +346,15 @@ end
 -- Professions and recipes, from the game's own system messages ("You have learned
 -- a new spell: [Engineering]", "You have learned how to create a new item: ...").
 -- The game's message formats are turned into patterns, so it works in any language.
+-- Something that goes boom? (D.BOOM_WORDS in the item or recipe name)
+local function IsBoom(text)
+  local name = type(text) == "string" and (text:match("%[(.-)%]") or text):lower() or ""
+  for _, w in ipairs(D.BOOM_WORDS or {}) do
+    if name:find(w, 1, true) then return true end
+  end
+  return false
+end
+
 local function ToPattern(fmt)
   if type(fmt) ~= "string" then return nil end
   local p = fmt:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
@@ -412,7 +421,7 @@ local function OnSystemMessage(msg)
 
   local recipe = ToPattern(ERR_LEARN_RECIPE_S) and msg:match(ToPattern(ERR_LEARN_RECIPE_S))
   if recipe and GetTime() - professionAt > 10 then
-    Play("learnRecipe", { item = recipe })
+    Play(IsBoom(recipe) and "learnRecipe_boom" or "learnRecipe", { item = recipe })
   end
 end
 
@@ -458,7 +467,7 @@ local function OnLootMessage(msg)
     end
     if q and q >= 4 then Play("craftEpic", { item = created })
     elseif q == 3 then Play("craftRare", { item = created })
-    elseif n == 1 then Play("craftFirst", { item = created }) end
+    elseif n == 1 then Play(IsBoom(created) and "craftFirst_boom" or "craftFirst", { item = created }) end
     return
   end
   local looted = MatchAny(msg, LOOT_FORMATS)
@@ -642,7 +651,7 @@ local function NPCLine(info)
   if not known or not state then return false end
   state.npcLine = state.npcLine or {}
   if time() - (state.npcLine[info.id] or 0) < D.NPC_LINE_CD then return false end
-  if Play("npc", { npc = info.name }, { npcRace = known.race, npcRole = known.role, npcSex = info.sex }) then
+  if Play("npc", { npc = info.name }, { npcRace = known.race, npcRole = known.role, npcSex = info.sex, npcID = info.id }) then
     state.npcLine[info.id] = time()
     return true
   end
@@ -694,7 +703,12 @@ f:SetScript("OnEvent", function(_, event, ...)
     elseif ERRANDS[event] then
       -- the NPC's own line if we know them, else the errand's line (bank, mail...)
       local key = ERRANDS[event]
-      After(0.3, function() if not NPCLine(npcInfo) then Play(key) end end, "errand")
+      After(0.3, function()
+        if NPCLine(npcInfo) then return end
+        -- the mailbox only has something to say when there's mail waiting
+        if key == "mail" and not (HasNewMail and HasNewMail()) then return end
+        Play(key)
+      end, "errand")
     elseif NPC_EVENTS[event] then
       After(0.3, function() NPCLine(npcInfo) end, "npc")
     elseif event == "QUEST_ACCEPTED" then

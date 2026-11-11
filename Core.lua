@@ -958,7 +958,9 @@ local function OnPlayerEat(itemID, link)
   After(D.MEAL_WINDOW + 1, function()
     if state.meal == thisMeal then
       state.meal = nil
-      if pet and Chance(0.5) then Say("mealExpired") end
+      -- lying down only if you're not walking away
+      local walking = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
+      if pet and Chance(0.5) then Say(walking and "mealExpiredMoving" or "mealExpired") end
     end
   end)
 end

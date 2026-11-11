@@ -268,6 +268,7 @@ public static class Extractor {
       else if (k == "npcRace") parts.Add("NPC race: " + (v is string ? (string)v : ListStr(v)));
       else if (k == "npcRole") parts.Add("NPC role: " + (v is string ? (string)v : ListStr(v)));
       else if (k == "npcSex") parts.Add("NPC: " + (Num(v) == "3" ? "female" : "male"));
+      else if (k == "npcID") { var t2 = Resolve(v); parts.Add("only NPC " + (t2 != null ? string.Join("/", t2.Arr.ConvertAll(x => Num(x)).ToArray()) : Num(v))); }
       else if (k == "hungerBelow" || k == "thirstBelow" || k == "energyBelow") parts.Add(k.Replace("Below", "") + " below " + Num(v) + "%");
       else if (k == "crowd") parts.Add("crowd: " + (v is string ? (string)v : ListStr(v)));
       else if (k == "weather") parts.Add("weather: " + Str(v));
@@ -400,6 +401,11 @@ public static class Extractor {
       if (!kv.Key.StartsWith("D.MOMENTS.")) continue;
       string k = kv.Key.Substring(10);
       Lines("moment:" + k, "Moments", MomentGroup(k), k, kv.Value, null);
+    }
+    // NPC lines kept in local lists (NPC_MORE...) and added to D.MOMENTS.npc in a loop
+    foreach (var kv in Cur.Locals) {
+      if (!kv.Key.StartsWith("NPC_")) continue;
+      Lines("moment:npc:" + kv.Key, "Moments", "NPCs", "npc", kv.Value, null);
     }
     foreach (var pair in new[] { new[] { "D.BIRTH_RACE", "race" }, new[] { "D.BIRTH_CLASS", "class" } }) {
       if (!G.ContainsKey(pair[0])) continue;

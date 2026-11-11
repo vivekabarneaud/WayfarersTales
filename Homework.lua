@@ -224,16 +224,37 @@ end
 
 -- Notes and flagged lines already handled (D.PROCESSED, Processed.lua): removed from
 -- the notes, unflagged in the journal, so the report only shows what's still waiting.
+-- by exact time, or by the minute shown in the report ("2026-11-11 09:12")
+local function Done(list, listAt, t)
+  if not t then return false end
+  return (list and list[t]) or (listAt and listAt[date("%Y-%m-%d %H:%M", t)]) or false
+end
+
+-- "0.30.0" < "0.31.0"?
+local function VersionLess(a, b)
+  local function parts(v) local p = {} for n in tostring(v):gmatch("%d+") do p[#p + 1] = tonumber(n) end return p end
+  local x, y = parts(a), parts(b)
+  for i = 1, math.max(#x, #y) do
+    if (x[i] or 0) ~= (y[i] or 0) then return (x[i] or 0) < (y[i] or 0) end
+  end
+  return false
+end
+
 function H.Prune()
   local P = D.PROCESSED
   if not P then return end
   local db = KT.GetDB()
   local notes = db.fieldNotes or {}
   for i = #notes, 1, -1 do
-    if notes[i].t and P.notes[notes[i].t] then table.remove(notes, i) end
+    if Done(P.notes, P.notesAt, notes[i].t) then table.remove(notes, i) end
   end
   for _, e in ipairs(db.journal or {}) do
-    if e.flagged and e.t and P.flags[e.t] then e.flagged, e.flagNote = nil, nil end
+    if e.flagged and Done(P.flags, P.flagsAt, e.t) then e.flagged, e.flagNote = nil, nil end
+  end
+  -- errors from versions that fixed them
+  local errs = db.errors or {}
+  for i = #errs, 1, -1 do
+    if P.errorsBefore and errs[i].version and VersionLess(errs[i].version, P.errorsBefore) then table.remove(errs, i) end
   end
 end
 

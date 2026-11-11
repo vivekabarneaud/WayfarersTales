@@ -191,6 +191,15 @@ S.weather = {
     en = "The rain flattens your fur against your skin. You shake yourself, to little effect.",
     fr = "La pluie plaque votre fourrure contre votre peau. Vous vous ébrouez, sans grand effet.",
     when = { indoors = false, sky = true, weather = "rain", form = "furry" } },
+  -- Rain heard from inside (an inn, a city building): drafts
+  { draft = true,
+    en = "Outside, the rain drums on the roof. Sheltered and warm, the sound has something comforting about it.",
+    fr = "Dehors, la pluie tambourine sur le toit. À l'abri et au chaud, ce bruit a quelque chose de réconfortant.",
+    when = { indoors = true, resting = true, weather = "rain", notBiomes = { forge = true, undercity = true } } },
+  { draft = true,
+    en = "The patter of the rain on the roof fills the room with a soothing murmur. You're in no hurry to go back out.",
+    fr = "Le crépitement de la pluie sur le toit emplit la salle d'un murmure apaisant. Vous n'êtes pas pressé{|e|·e} de ressortir.",
+    when = { indoors = true, resting = true, weather = "rain", notBiomes = { forge = true, undercity = true } } },
 }
 
 -- When the weather changes (outdoors only)

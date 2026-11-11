@@ -77,6 +77,8 @@ D.MOMENT_RULES = {
   learnProfession = { cd = 0,    chance = 1,   gap = 0 },
   craftRankUp     = { cd = 600,  chance = 1,   gap = 0 },
   learnRecipe     = { cd = 1800, chance = 0.35, gap = 30 },
+  learnRecipe_boom = { cd = 1800, chance = 1,  gap = 30, shares = "learnRecipe" }, -- bombs, dynamite, powder...
+  craftFirst_boom = { cd = 600,  chance = 1,   gap = 20, shares = "craftFirst" },
   revive          = { cd = 0,    chance = 1,   gap = 0 },
   reviveSick      = { cd = 0,    chance = 1,   gap = 0, shares = "revive" },
 }
@@ -274,11 +276,11 @@ D.MOMENTS = {
 
   drink = {
     { en = "You drink in long, slow sips.", fr = "Vous buvez à longues gorgées, sans vous presser." },
-    { en = "You sit down and drink slowly, letting your breath settle.", fr = "Vous vous asseyez et buvez lentement, le temps de reprendre votre souffle." },
+    { en = "You sit down and drink slowly, taking your time.", fr = "Vous vous asseyez et buvez lentement, en prenant votre temps." },
   },
   drinkItem = {
     { en = "You sip your {item} slowly. It does you good.", fr = "Vous sirotez votre {item} lentement. Ça fait du bien." },
-    { en = "You sit down and drink slowly, letting your breath settle.", fr = "Vous vous asseyez et buvez lentement, le temps de reprendre votre souffle." },
+    { en = "You sit down and drink slowly, taking your time.", fr = "Vous vous asseyez et buvez lentement, en prenant votre temps." },
   },
   -- by kind of drink (see D.DRINK_WORDS)
   drinkWater = {
@@ -389,9 +391,13 @@ D.MOMENTS = {
     { en = "The banker greets you with a polite nod.", fr = "On vous accueille au guichet d'un signe de tête poli." },
     { en = "Behind the counter, coins clink softly as they are counted.", fr = "Derrière le comptoir, des pièces tintent doucement tandis qu'on les compte." },
   },
-  mail = {
-    { en = "You open the mailbox, hoping for good news.", fr = "Vous ouvrez la boîte aux lettres, en espérant de bonnes nouvelles." },
-    { en = "You check the mailbox, just in case.", fr = "Vous jetez un œil à la boîte aux lettres, au cas où." },
+  mail = { -- only when you have new mail (you already know before opening: the minimap shows it)
+    { draft = true,
+      en = "Letters are waiting for you. You take them out one by one, curious about what they hold.",
+      fr = "Du courrier vous attend. Vous sortez les lettres une à une, {curieux|curieuse|curieux·se} de ce qu'elles contiennent." },
+    { draft = true,
+      en = "A few letters in the box. You break the first seal with a little thrill of anticipation.",
+      fr = "Quelques lettres dans la boîte. Vous brisez le premier sceau avec un petit frisson d'impatience." },
   },
   auction = {
     { en = "The auctioneer barely looks up from a long list of prices.", fr = "Au comptoir des enchères, on lève à peine les yeux d'une longue liste de prix." },
@@ -982,3 +988,85 @@ D.MOMENTS.fishJunk = {
     en = "You reel in your line... and there's {item}. Not quite a fish, but it's something.",
     fr = "Vous remontez votre ligne… et voilà {item}. Pas tout à fait un poisson, mais c'est toujours ça." },
 }
+
+---------------------------------------------------------------------------
+-- Things that go boom (engineering): recipes and first crafts whose name has one
+-- of these words get their own lines.
+---------------------------------------------------------------------------
+D.BOOM_WORDS = { "bomb", "bombe", "dynamite", "explos", "grenade", "poudre", "powder" }
+
+D.MOMENTS.learnRecipe_boom = {
+  { draft = true,
+    en = "You go over the recipe again and again, hoping with all your heart it won't blow up before it's finished: {item}.",
+    fr = "Vous repassez la recette encore et encore, en espérant de tout cœur que ça n'explosera pas avant la fin : {item}." },
+  { draft = true,
+    en = "A new recipe that smells of powder and singed eyebrows: {item}. What could possibly go wrong?",
+    fr = "Une nouvelle recette qui sent la poudre et les sourcils roussis : {item}. Qu'est-ce qui pourrait mal tourner ?" },
+}
+D.MOMENTS.craftFirst_boom = {
+  { draft = true,
+    en = "Your very first {item}! You set it down gently. Very, very gently.",
+    fr = "Votre toute première création : {item} ! Vous la posez délicatement. Très, très délicatement." },
+}
+
+---------------------------------------------------------------------------
+-- More NPCs, noted in Stormwind (2026-11-11). npcID lines are for one NPC only.
+---------------------------------------------------------------------------
+D.NPCS[11026] = { race = "Gnome", role = "trainer_engineering" }  -- Fée Dérailleur, Dwarven District
+D.NPCS[5518]  = { race = "Gnome", role = "trainer_engineering" }  -- Lilliam Sparkspindle, Dwarven District
+D.NPCS[5511]  = { race = "Dwarf", role = "trainer_blacksmith" }   -- Therum Deepforge, Dwarven District
+D.NPCS[5512]  = { race = "Dwarf", role = "vendor_smith" }         -- Kaita Deepforge, kind, Dwarven District
+D.NPCS[957]   = { race = "Human", role = "trainer_blacksmith" }   -- Dane Lindgren, busy, straight to the point
+D.NPCS[15659] = { race = "Human", role = "auctioneer" }           -- Jaxon, on a crate in the middle of the hall
+D.NPCS[2455]  = { race = "Human", role = "banker" }               -- Olivia Burnside, red hair and bangs
+D.NPCS[2456]  = { race = "Human", role = "banker" }               -- Newton Burnside, proud of the security
+D.NPCS[2457]  = { race = "Human", role = "banker" }               -- John Burnside, balding, proud of the security
+D.NPCS[6740]  = { race = "Human", role = "innkeeper" }            -- Allison, the Gilded Rose
+
+local NPC_MORE = {
+  { draft = true,
+    en = "{npc} greets you with overflowing enthusiasm, fingers stained with grease. Around you, it smells of oil and powder.",
+    fr = "{npc} vous accueille avec un enthousiasme débordant, les doigts tachés de cambouis. Autour de vous, ça sent l'huile et la poudre.",
+    when = { npcRace = "Gnome", npcRole = "trainer_engineering" } },
+  { draft = true,
+    en = "{npc} talks so fast you only catch every other word, but the enthusiasm is contagious.",
+    fr = "{npc} parle si vite que vous ne saisissez qu'un mot sur deux, mais l'enthousiasme est contagieux.",
+    when = { npcRace = "Gnome", npcRole = "trainer_engineering" } },
+  { draft = true,
+    en = "{npc} greets you in a deep voice that carries over the roar of the forges. His forearms, thick as tree trunks, bear the marks of a thousand sparks.",
+    fr = "{npc} vous salue d'une voix grave qui porte par-dessus le grondement des forges. Ses avant-bras, épais comme des troncs, portent les traces de mille étincelles.",
+    when = { npcRace = "Dwarf", npcRole = "trainer_blacksmith", npcSex = 2 } },
+  { draft = true,
+    en = "{npc} welcomes you with a broad smile. She has a way of putting you at ease, as if you were already family.",
+    fr = "{npc} vous accueille d'un large sourire. Elle a une façon bien à elle de vous mettre à l'aise, comme si vous faisiez déjà partie de la famille.",
+    when = { npcRace = "Dwarf", npcRole = "vendor_smith", npcSex = 3 } },
+  { draft = true,
+    en = "{npc} barely looks up from the work. Here, you get straight to the point: no time for pleasantries.",
+    fr = "{npc} lève à peine les yeux de son ouvrage. Ici, on va droit au but : pas de temps pour les politesses.",
+    when = { npcID = 957 } },
+  { draft = true,
+    en = "Standing on a crate in the middle of the hall, {npc} calls out the bids in a ringing voice, one hand raised above the crowd.",
+    fr = "Debout sur une caisse au milieu de la salle, {npc} lance les enchères d'une voix forte, une main levée au-dessus de la foule.",
+    when = { npcID = 15659 } },
+  { draft = true,
+    en = "All around, people jostle and haggle out loud. Standing on a crate, {npc} tries to make herself heard over the din.",
+    fr = "Autour de vous, ça se bouscule et ça marchande à voix haute. Debout sur une caisse, {npc} tente de couvrir le vacarme.",
+    when = { npcID = 15659, crowd = { "lively", "crowded" } } },
+  { draft = true,
+    en = "Behind the counter, {npc} greets you with impeccable politeness. Here, everything breathes order and carefully counted coins.",
+    fr = "Derrière le comptoir, {npc} vous accueille avec une politesse impeccable. Ici, tout respire l'ordre et les pièces bien comptées.",
+    when = { npcRace = "Human", npcRole = "banker" } },
+  { draft = true,
+    en = "{npc} assures you, not without pride, that nobody has ever stolen anything from here. You'd almost believe him.",
+    fr = "{npc} vous assure, non sans fierté, que personne n'a jamais rien volé ici. Vous le croiriez presque.",
+    when = { npcID = { 2456, 2457 } } },
+  { draft = true,
+    en = "{npc} gives you a model employee's smile, a red lock falling across her forehead. She seems ready to open an account for you on the spot.",
+    fr = "{npc} vous adresse un sourire d'employée modèle, une mèche rousse tombant sur son front. Elle semble prête à vous ouvrir un compte sur-le-champ.",
+    when = { npcID = 2455 } },
+  { draft = true,
+    en = "{npc} greets you with a sincere smile, between two customers. Here, she never gets a moment's rest.",
+    fr = "{npc} vous accueille d'un sourire sincère, entre deux clients. Ici, elle ne chôme jamais.",
+    when = { npcRace = "Human", npcRole = "innkeeper", npcSex = 3 } },
+}
+for _, line in ipairs(NPC_MORE) do table.insert(D.MOMENTS.npc, line) end

@@ -51,3 +51,30 @@ in-game report at the next login.
 | — | Idea | More need levels: a little (75), yes (50), a lot (25) for hunger, thirst and energy | done | Four levels with new labels (Petit creux / Faim / Grande faim...), first-level lines (draft) |
 | — | Idea | Energy: standing still stops the drop; sitting helps up to 60; /sleep nap fast (10%/s), wake-up line full or not | done | Sitting (X key, /sit) and napping (/sleep) followed until you move; lines (draft) |
 | — | Flag | Fishing: got "stop and look around" lines while fishing | done | Fishing lines: casting, waiting (replaces the quiet moment), catch, first of a kind, junk (draft) |
+
+### Playtest report, Stormwind (Kitty, hunter)
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 08:45 | Flag | Mailbox "au cas où": you already know whether there's mail before opening | done | Mailbox lines only when there's new mail, rewritten (draft) |
+| 09:12 | Idea | Ambient lines should stop when AFK | done | No Senses lines at all while AFK |
+| 09:14 | NPC | Fée Dérailleur (11026), female gnome, master engineer | done | `D.NPCS` + gnome engineering trainer lines (draft) |
+| 09:15 | Flag | Learning "Bombe grossière en cuivre": a fun line for bombs | done | Explosive recipes and first crafts get their own lines (draft) |
+| 09:16 | NPC | Therum Deepforge (5511), male dwarf, master blacksmith | done | `D.NPCS` + dwarf blacksmith line (draft) |
+| 09:17 | NPC | Dane Lindgren (957), male human, master blacksmith, busy and blunt | done | `D.NPCS` + his own line (draft) |
+| 09:19 | NPC | Kaita Deepforge (5512), female dwarf, smith supplies, kind | done | `D.NPCS` + her line (draft) |
+| 09:21 | Flag | Canals "malgré vous" | done | Rewrite proposal reworded ("vous apaise doucement") |
+| 09:24 | Question | Got (+0,9) feeding the pet: will it show (+0) at 100? | info | It filled the last 0.9 to 100; at 100 gains are 0 and no number is shown |
+| 09:25 | Flag | Auction house: the auctioneer stands on a crate, lots of players | done | Jaxon's own lines, one for a crowd (draft) |
+| 09:27 | NPC | Commissaire-priseur Jaxon (15659), female human, on a crate | done | `D.NPCS` + lines (draft) |
+| 09:31 | Question | Raining but the minimap shows a sun | info | The game's own day/night clock |
+| 09:36 | NPC | Lilliam Sparkspindle (5518), male gnome, expert engineer | done | `D.NPCS` + gnome engineering trainer lines (draft) |
+| 09:42 | Flag | "…le temps de reprendre votre souffle" while standing still for a while | done | Now "en prenant votre temps" |
+| 09:54 | Flag | Poppo "se couche avec un petit soupir" while walking | done | Walking version: he follows you, head a little low |
+| 09:55 | Idea | At the inn, the rain on the roof could have lines | done | Rain heard from indoors (inn, city building) (draft) |
+| 09:57 | NPC | Newton Burnside (2456), human banker, proud of the security | done | `D.NPCS` + banker lines, proud line (draft) |
+| 09:58 | NPC | Olivia Burnside (2455), human banker, red hair and bangs | done | `D.NPCS` + her own line (draft) |
+| 09:58 | NPC | John Burnside (2457), balding human banker, proud of the security | done | `D.NPCS` + banker lines, proud line (draft) |
+| — | NPC | Aubergiste Allison (6740), Gilded Rose (from the NPC log) | done | `D.NPCS` human innkeeper + line (draft) |
+| — | NPC | Meri Ironweave (3613), Dolanaar, vendor (from the NPC log) | todo | Race and what she sells? |
+| — | Error | Old secret value errors (v0.30) | done | Fixed in v0.31; old errors are cleared at login |

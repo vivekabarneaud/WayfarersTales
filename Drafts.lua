@@ -1,4 +1,4 @@
--- Wayfarer's Tales - rewrite proposals waiting for review (generated from the review page).
+-- Wayfarer's Tales - rewrite proposals waiting for review (generated from tools/review/rewrites.json).
 -- Key = the line's id (as in the Ambiance dev panel). They replace the current text only
 -- when the option "Try new lines" is on. Approved ones get moved into SensesData.lua.
 
@@ -241,8 +241,8 @@ D.REWRITES = {
     fr = "Ici, on fait avec le peu qu'on a. Et pourtant, malgré la misère, on se serre les coudes, et ça vous réchauffe le cœur." },
   ["sub:sw_trade:ambient:1"] = { en = "Merchants' signs creak in the breeze, and a smell of new leather and polished wood drifts out of the shops. You want to look at everything.",
     fr = "Les enseignes des marchands grincent dans la brise, et une odeur de cuir neuf et de bois ciré s'échappe des boutiques. Vous avez envie de tout regarder." },
-  ["sub:sw_canals:ambient:1"] = { en = "Water laps against the stone of the canals, and the air smells of damp and moss. The sound of the water calms you in spite of yourself.",
-    fr = "L'eau clapote contre la pierre des canaux, et l'air sent l'humidité et la mousse. Le bruit de l'eau vous apaise malgré vous." },
+  ["sub:sw_canals:ambient:1"] = { en = "Water laps against the stone of the canals, and the air smells of damp and moss. The sound of the water gently soothes you.",
+    fr = "L'eau clapote contre la pierre des canaux, et l'air sent l'humidité et la mousse. Le bruit de l'eau vous apaise doucement." },
   ["sub:sw_mage:ambient:1"] = { en = "The air tingles faintly with magic, and a light shiver runs along your arms. Here, even the air seems to know things.",
     fr = "L'air picote légèrement de magie, et un léger frisson vous parcourt les bras. Ici, même l'air semble savoir des choses." },
   ["sub:sw_dwarven:ambient:2"] = { en = "A smell of coal smoke and hot iron hangs over the district. It reminds you this city was built with sweat and hammers.",

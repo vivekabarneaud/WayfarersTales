@@ -197,6 +197,7 @@ local function Check(when, ctx)
   if when.npcRace and not InList(when.npcRace, ctx.npcRace) then return false, "npc" end
   if when.npcRole and not InList(when.npcRole, ctx.npcRole) then return false, "npc" end
   if when.npcSex and when.npcSex ~= ctx.npcSex then return false, "npc" end
+  if when.npcID and not InList(when.npcID, ctx.npcID) then return false, "npc" end
   -- body needs (filled in by the Elements module): below a value from 0 to 100
   for _, need in ipairs({ "hunger", "thirst", "energy" }) do
     local below = when[need .. "Below"]
@@ -571,6 +572,7 @@ local function Rhythm() return KT.GetDB().settings.sensesRhythm or 2 end
 local function CanSpeak()
   if not state or not KT.ModuleOn("senses") or Rhythm() == 0 then return false end
   if UnitIsDeadOrGhost("player") or UnitAffectingCombat("player") then return false end
+  if UnitIsAFK and UnitIsAFK("player") then return false end -- away from the keyboard: nobody to tell
   if UnitOnTaxi and UnitOnTaxi("player") then return false end
   return true
 end
