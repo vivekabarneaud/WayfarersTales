@@ -304,7 +304,7 @@ local function BuildJournal(parent)
   p.showBig:SetScript("OnClick", function() api.GetDB().settings.journalBig = true; p.page = 1; KT.RefreshPanel() end)
 
   p.header = paper:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  p.header:SetPoint("LEFT", p.showBig, "RIGHT", 12, 0)
+  -- (placed under the report button, see below)
   p.header:SetShadowOffset(0, 0)
 
   local copy = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
@@ -313,6 +313,8 @@ local function BuildJournal(parent)
   Label(copy, "UI_JOURNAL_COPY")
   copy:SetScript("OnClick", function() KT.ShowReport() end)
   p.copy = copy -- testers only (see RefreshJournal)
+  -- reported lines count (testers), right under the report button
+  p.header:SetPoint("TOPRIGHT", copy, "BOTTOMRIGHT", 0, -3)
 
   -- page buttons, centered below the paper
   p.pageText = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
