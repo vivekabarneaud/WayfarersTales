@@ -6,6 +6,7 @@ How we work on Wayfarer's Tales, so we're always on the same page.
 - **`dev`**: all work happens here, always. It must always load in game without errors.
 - **`main`**: released versions only. We merge `dev` into `main` when we release.
 - Claude commits after each change and pushes `dev` to GitHub at the end of each session.
+- Any other branch is deleted once it's merged (only `dev` and `main` stay).
 
 ## Commit messages
 - Written in player language: what a player would notice ("Fishing: new lines for your first catch").
@@ -25,7 +26,7 @@ How we work on Wayfarer's Tales, so we're always on the same page.
 ## Who sees what
 - **Players**: no dev windows, no dev data written to the saved file.
 - **Testers** (`/wt tester`): Homework window, Bizarre button, report, NPC / quest / error logging.
-- **Us** (`/wt dev`): tester features plus "Try new lines", the dev panel and roof marking.
+- **Us (dev)**: on automatically when the addon runs from the repo; not possible to switch on in game. Drafts play, plus the "possible lines" window and the weather log.
 
 ## Playtest notes
 - Testers paste their report (on Discord, once it exists). The user brings it to Claude.
