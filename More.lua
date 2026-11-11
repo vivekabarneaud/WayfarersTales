@@ -357,6 +357,21 @@ D.BODY_MORE = {
 -- Message pools (pet, body, danger feelings): extra lines while testing
 ---------------------------------------------------------------------------
 D.POOL_DRAFTS = {
+  -- outdoors, while you stand still: your pet brings you something it found
+  idleFind = {
+    { en = "{pet} proudly drops a pebble at your feet. A perfectly ordinary pebble, but clearly a very important one.",
+      fr = "{pet} dépose fièrement un caillou à vos pieds. Un caillou tout à fait ordinaire, mais visiblement très important." },
+    { en = "{pet} comes back with a feather in the corner of its mouth, and waits for your praise.",
+      fr = "{pet} revient avec une plume au coin de la gueule, et attend vos félicitations." },
+    { en = "{pet} offers you a branch far too big to be of any use. You don't turn down a gift like that.",
+      fr = "{pet} vous tend une branche bien trop grande pour servir à quoi que ce soit. On ne refuse pas un tel cadeau." },
+    { en = "{pet} brings you something wet and frankly suspicious. You say thank you politely, without touching it too much.",
+      fr = "{pet} vous rapporte quelque chose de mouillé et de franchement douteux. Vous dites merci poliment, sans trop y toucher." },
+    { en = "{pet} lays a leaf at your feet, then looks at you as if it were a treasure.",
+      fr = "{pet} dépose une feuille à vos pieds, puis vous regarde comme s'il s'agissait d'un trésor." },
+    { en = "{pet} digs furiously, stops, sniffs the hole... then trots back to you as if nothing happened. The mystery remains.",
+      fr = "{pet} creuse frénétiquement, s'arrête, renifle le trou... puis revient vers vous comme si de rien n'était. Le mystère reste entier." },
+  },
   -- your pet won a fight you didn't take part in (no attack, spell or shot from you)
   petSolo = {
     { en = "{pet} handled that fight without your help, and holds their head high.",

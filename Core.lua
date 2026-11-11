@@ -422,7 +422,12 @@ local function MemoryText(m, rec)
     vars.foodKind = KeyOf(KT.EN.L.FOOD_KINDS, vars.food) or (KT.FR and KeyOf(KT.FR.L.FOOD_KINDS, vars.food))
   end
   if vars.foodKind then vars.food = L.FOOD_KINDS[vars.foodKind] end
-  return Fill(L.MEMORY[m.key] or m.key, vars)
+  local key = m.key
+  -- "1 jours": one day has its own text
+  if key == "reunion" and tonumber(vars.days) == 1 then key = "reunionOne" end
+  -- very old saves noted the first meeting without its place
+  if key == "met" and (not vars.zone or tostring(vars.zone):find("^[%[{]")) then key = "metNoZone" end
+  return Fill(L.MEMORY[key] or L.MEMORY[m.key] or m.key, vars)
 end
 
 local UpdateHeart -- forward
@@ -917,6 +922,9 @@ local function IdleMoment()
     pool = "idleResting"
   elseif not pet.archetype and IsPlayerMoving and IsPlayerMoving() and math.random() < 0.5 then
     pool = "idleWalking" -- lines about walking only while you walk
+  elseif not pet.archetype and not IsIndoors() and not IsResting() and not (IsPlayerMoving and IsPlayerMoving())
+    and math.random() < 0.3 then
+    pool = "idleFind" -- something found outside: a stick, a pebble, a feather...
   elseif hour and (hour >= 21 or hour < 6) and not IsIndoors() and math.random() < 0.4 then
     pool = "idleNight" -- (one looks up at the stars: not indoors)
   elseif pet.mood and math.random() < 0.4 then

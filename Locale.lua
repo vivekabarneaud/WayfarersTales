@@ -53,6 +53,8 @@ L.MEMORY = {
   days          = "{days} days together.",
   anniversary   = "{years} year(s) together!",
   petSolo       = "{pet} won a fight without you for the first time.",
+  reunionOne    = "Reunited after a day apart.",
+  metNoZone     = "Your tale together began.",
 }
 
 -- Tooltip / command texts
@@ -635,11 +637,14 @@ M.idle = {
   {
     "{pet} rubs against your leg affectionately.",
     "{pet} looks up at you with total trust.",
-    "{pet} brings you a stick. Or maybe a bone. Best not to ask.",
     "{pet} presses so close to you that you don't dare move. Worth it.",
   },
 }
--- while you're walking (the lines above work standing still too)
+-- outdoors only: your pet brings you something it found (Core: IdleMoment)
+M.idleFind = {
+  "{pet} brings you a stick. Or maybe a bone. Best not to ask.",
+}
+-- while you're walking (the idle lines work standing still too)
 M.idleWalking = {
   {
     "{pet} stops to scratch an ear, then hurries to catch up.",

@@ -834,14 +834,7 @@ local function CompanionText(pet)
     add(Head(L.UI_TOGETHER))
     add(string.format(L.UI_STATS, api.FormatDuration(s.minutes or 0), s.kills or 0, s.feeds or 0,
       s.meals or 0, s.campfires or 0, s.emotes or 0))
-
-    add("")
-    add(Head(L.UI_MEMORIES))
-    if #pet.memories == 0 then add(Grey(L.CMD_NO_MEMORY)) end
-    for i = #pet.memories, 1, -1 do -- newest first
-      local m = pet.memories[i]
-      add(Grey(date("%Y-%m-%d", m.t)) .. "  " .. api.MemoryText(m, pet))
-    end
+    -- (memories have their own scrolling box below)
   else
     add(L.CMD_NO_PET)
   end
@@ -892,6 +885,34 @@ local function BuildCompanion(parent)
   page.top = page:Add(top, 10)
   page.text = Para(page, "GameFontHighlight", 12)
 
+  -- Memories: a box of its own that scrolls, newest first
+  local mem = Box(page.p, 200)
+  local mh = mem:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  mh:SetPoint("TOPLEFT", 10, -9)
+  Label(mh, "UI_MEMORIES")
+  local sc = CreateFrame("ScrollFrame", nil, mem, "UIPanelScrollFrameTemplate")
+  sc:SetPoint("TOPLEFT", 8, -28)
+  sc:SetPoint("BOTTOMRIGHT", -28, 8)
+  local child = CreateFrame("Frame", nil, sc)
+  child:SetSize(PAGE_W - 44, 10)
+  sc:SetScrollChild(child)
+  local mfs = child:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+  mfs:SetPoint("TOPLEFT", 2, 0)
+  mfs:SetWidth(PAGE_W - 48)
+  mfs:SetJustifyH("LEFT")
+  mfs:SetSpacing(2)
+  function mem:SetMemories(pet)
+    local lines = {}
+    if #pet.memories == 0 then lines[1] = Grey(L.CMD_NO_MEMORY) end
+    for i = #pet.memories, 1, -1 do -- newest first
+      local m = pet.memories[i]
+      lines[#lines + 1] = Grey(date("%Y-%m-%d", m.t)) .. "  " .. api.MemoryText(m, pet)
+    end
+    mfs:SetText(table.concat(lines, "\n"))
+    child:SetHeight(mfs:GetStringHeight() + 6)
+  end
+  page.memories = page:Add(mem, 12)
+
   local set = Box(page.p, 120)
   BoxLabel(set, 10, -10, "UI_OPT_CHATTY")
   page.chatty = Segmented(set, 10, -30, {
@@ -914,6 +935,8 @@ local function RefreshCompanion(page)
   local on = db.modules.kindred ~= false
   local pet = on and api.GetPet() or nil
   page.top:SetShown(pet ~= nil)
+  page.memories:SetShown(pet ~= nil)
+  if pet then page.memories:SetMemories(pet) end
   page.settings:SetShown(on)
   page.guide:SetShown(on)
   if not on then
@@ -1184,8 +1207,6 @@ local function RefreshHeader()
   local score = KT.Discovery.Score()
   local name, at, _, nextAt = KT.Discovery.Title(score)
   header.line:SetText(string.format(L.DISC_TITLE_LINE, Pink(name), score))
-  header.bar:SetMinMaxValues(at or 0, nextAt or ((at or 0) + 1))
-  header.bar:SetValue(nextAt and score or ((at or 0) + 1))
 end
 
 local function Build()
@@ -1230,14 +1251,6 @@ local function Build()
   tb.line = tb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   tb.line:SetPoint("TOPLEFT", 0, 0)
   tb.line:SetTextColor(0.72, 0.68, 0.6)
-  tb.bar = CreateFrame("StatusBar", nil, tb)
-  tb.bar:SetSize(220, 4)
-  tb.bar:SetPoint("TOPLEFT", tb.line, "BOTTOMLEFT", 0, -4)
-  tb.bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-  tb.bar:SetStatusBarColor(0.95, 0.75, 0.2)
-  local bbg = tb.bar:CreateTexture(nil, "BACKGROUND")
-  bbg:SetAllPoints()
-  bbg:SetColorTexture(0, 0, 0, 0.6)
   tb:SetScript("OnClick", function() KT.ShowTab("travels") end)
   tb:SetScript("OnEnter", function(self)
     if not KT.Discovery then return end

@@ -52,6 +52,8 @@ L.MEMORY = {
   days          = "{days} jours ensemble.",
   anniversary   = "{years} an(s) ensemble !",
   petSolo       = "{pet} a remporté un combat sans vous pour la première fois.",
+  reunionOne    = "Retrouvailles après un jour de séparation.",
+  metNoZone     = "Début de votre histoire.",
 }
 
 L.TT_SCORE      = "Affection : %d / 100"
@@ -629,11 +631,14 @@ M.idle = {
   {
     "{pet} vient se frotter affectueusement contre votre jambe.",
     "{pet} lève vers vous un regard plein de confiance.",
-    "{pet} vous rapporte un bâton. Ou peut-être un os. Mieux vaut ne pas demander.",
     "{pet} se serre si près de vous que vous n'osez plus bouger. Ça vaut le coup.",
   },
 }
--- en marchant (les lignes ci-dessus marchent aussi à l'arrêt)
+-- dehors seulement : votre familier vous rapporte une trouvaille (Core : IdleMoment)
+M.idleFind = {
+  "{pet} vous rapporte un bâton. Ou peut-être un os. Mieux vaut ne pas demander.",
+}
+-- en marchant (les lignes idle marchent aussi à l'arrêt)
 M.idleWalking = {
   {
     "{pet} s'arrête pour se gratter l'oreille, puis se dépêche de vous rattraper.",

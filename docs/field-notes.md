@@ -108,3 +108,12 @@ in-game report at the next login.
 | Dwarven forge embers | note: only right by the fire (63.9, 37.0) | done | New small spot by the fire |
 | Dwarven District "Avant même de voir les forges" | tweak: sounds like arriving | done | Rewrite that fits any time |
 | Writing rule | "on raconte" only for what's not fully known | info | Saved as a rule for all lines |
+
+## 2026-11-11 — New window, first look
+
+| Note | Status | What we did |
+|---|---|---|
+| Memories: make that part scroll on its own | done | Memories in their own scrolling box |
+| The bar under the title in the header isn't needed | done | Removed (the Carnet keeps its bar) |
+| "Poppo vous rapporte un bâton…" should be outdoors only, and more like it | done | Its own pool: outdoors, out of towns and inns, while you stand still; 6 new lines (draft) |
+| (seen in the screenshot) "Début de votre histoire : [zone]" and "après 1 jours" | done | Old memory without its place gets "Début de votre histoire."; one day has its own text |
