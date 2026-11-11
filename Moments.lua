@@ -304,6 +304,14 @@ local SPELL_MOMENTS = { [2366] = "herb", [2575] = "mine", [8613] = "skin", [8690
 local spellByName = {}
 local hearthAt
 local herbAt -- when you last gathered an herb (waiting for its loot message)
+local fishingSince, fishEndAt -- your line is in the water since... / it just came out (for the catch)
+local fishingName -- "Fishing" in your language
+local function IsFishing(spellID)
+  fishingName = fishingName or SpellName(7620)
+  if spellID == 7620 then return true end
+  local n = spellID and SpellName(spellID)
+  return n ~= nil and n == fishingName
+end
 local function OnSpell(spellID)
   local key = SPELL_MOMENTS[spellID]
   if not key then
@@ -455,6 +463,24 @@ local function OnLootMessage(msg)
   end
   local looted = MatchAny(msg, LOOT_FORMATS)
   if not looted then return end
+  -- what you just pulled out of the water: a fish (the first of its kind?) or something else
+  if fishEndAt and GetTime() - fishEndAt < 6 then
+    fishEndAt = nil
+    local id = tonumber(looted:match("item:(%d+)"))
+    local isFish = id and KT.FoodKind and KT.FoodKind(id, looted) == "fish"
+    local state = S.State()
+    if isFish and state then
+      state.fishCaught = state.fishCaught or {}
+      local first = not state.fishCaught[id]
+      state.fishCaught[id] = (state.fishCaught[id] or 0) + 1
+      if first and Play("fishFirst", { item = looted }) then return end
+      Play("fishCatch", { item = looted })
+      return
+    end
+    local q = Quality(looted)
+    if not q or q < 3 then Play("fishJunk", { item = looted }) return end
+    -- a rare find from the water: the rare loot lines below
+  end
   -- the herb you just gathered: its own lines if it has some
   if herbAt and GetTime() - herbAt < D.HERB_LOOT_WAIT then
     local herb = D.HERBS[tonumber(looted:match("item:(%d+)"))]
@@ -557,7 +583,9 @@ local function Tick()
   end
 
   -- standing still for a while (not AFK, not fighting, not swimming)
-  local busy = onTaxi or UnitAffectingCombat("player") or UnitIsAFK("player") or IsSwimming()
+  -- fishing: no "you stop to look around" (you're busy), a fishing line instead after a while
+  if fishingSince and now - fishingSince > 12 then Play("fishWait") end
+  local busy = onTaxi or UnitAffectingCombat("player") or UnitIsAFK("player") or IsSwimming() or fishingSince
   if busy or S.Moving() then
     stillSince, quietDone = nil, nil
   else
@@ -628,7 +656,7 @@ for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENA
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
-for _, ev in ipairs({ "UNIT_AURA", "UNIT_SPELLCAST_SUCCEEDED" }) do
+for _, ev in ipairs({ "UNIT_AURA", "UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_CHANNEL_STOP" }) do
   if not (f.RegisterUnitEvent and pcall(f.RegisterUnitEvent, f, ev, "player")) then
     pcall(f.RegisterEvent, f, ev)
   end
@@ -680,6 +708,13 @@ f:SetScript("OnEvent", function(_, event, ...)
       if unit ~= "player" then return end
       if event == "UNIT_AURA" then
         CheckMeal()
+      elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
+        if IsFishing(select(3, ...)) then
+          fishingSince = GetTime()
+          After(1, function() Play("fishCast") end, "fish")
+        end
+      elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" then
+        if fishingSince then fishingSince, fishEndAt = nil, GetTime() end
       elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
         OnSpell(select(3, ...))
       end

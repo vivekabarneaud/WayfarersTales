@@ -19,6 +19,7 @@ local TEMP_HALFLIFE = 240 -- seconds for your body to get halfway to what the ai
 
 local state               -- this character's saved values
 local swimStart
+local sitting, napping    -- sat down (X key, /sit) and napping (/sleep), until you move
 local lastEnv = {}
 local tip                 -- the hover panel with bars (created on first hover)
 
@@ -57,6 +58,38 @@ local function Say(poolKey, vars, important)
   KT.Narrate("elements", poolKey, vars, important)
 end
 
+-- Sitting down and napping. The game doesn't tell addons whether you're sitting,
+-- so we follow the sit key (X), /sit, /sleep and /stand, and moving gets you up.
+function E.StandUp()
+  if napping and state then
+    -- the wake-up line depends on how rested you are
+    Say(state.energy >= D.NAP_FULL and "napWakeFull" or "napWakeShort", nil, true)
+  end
+  sitting, napping = false, false
+end
+
+local function OnEmote(token)
+  if not state or type(token) ~= "string" then return end
+  token = token:upper()
+  if token == "SIT" then
+    sitting = true
+  elseif token == "SLEEP" then
+    if not napping then
+      napping, sitting = true, true
+      Say("napStart", nil, true)
+    end
+  elseif token == "STAND" then
+    E.StandUp()
+  end
+end
+pcall(hooksecurefunc, "DoEmote", OnEmote)
+if C_ChatInfo and C_ChatInfo.PerformEmote then pcall(hooksecurefunc, C_ChatInfo, "PerformEmote", OnEmote) end
+-- the sit key toggles between sitting and standing
+pcall(hooksecurefunc, "SitStandOrDescendStart", function()
+  if not state then return end
+  if sitting then E.StandUp() else sitting = true end
+end)
+
 local function Ready(key, seconds)
   local t = state.cd[key]
   return not t or time() - t >= seconds
@@ -78,20 +111,28 @@ local function TempState(t, prev)
   return "ok"
 end
 
--- Needs: thirst, hunger, energy. Each has an ok / mild / serious state.
+-- Needs: thirst, hunger, energy. Four levels: fine (above 75), a little (50-75),
+-- yes (25-50), a lot (below 25). A level is only left 5 points above its limit,
+-- so a bar hovering around a limit doesn't keep flipping.
 local NEEDS = {
-  { key = "thirst", states = { "ok", "thirsty", "parched" },  relief = "drinkRelief", remind = 900 },
-  { key = "hunger", states = { "ok", "hungry", "starving" },  relief = "eatRelief",   remind = 1200 },
-  { key = "energy", states = { "ok", "tired", "exhausted" },  relief = "restRelief",  remind = 1500 },
+  { key = "thirst", states = { "ok", "thirstyLight", "thirsty", "parched" },  relief = "drinkRelief", remind = 900 },
+  { key = "hunger", states = { "ok", "peckish", "hungry", "starving" },       relief = "eatRelief",   remind = 1200 },
+  { key = "energy", states = { "ok", "tiredLight", "tired", "exhausted" },    relief = "restRelief",  remind = 1500 },
 }
+local NEED_LIMITS = { 75, 50, 25 }
+
+local function NeedRank(st, s)
+  for i = 1, #s do if s[i] == st then return i - 1 end end
+  return 0
+end
 
 local function NeedState(v, prev, s)
-  local r = (prev == s[3] and 2) or (prev == s[2] and 1) or 0
-  if v <= 15 + (r >= 2 and 5 or 0) then return s[3] end
-  if v <= 40 + (r >= 1 and 5 or 0) then return s[2] end
+  local r = prev and NeedRank(prev, s) or 0
+  for level = #NEED_LIMITS, 1, -1 do -- the most serious level first
+    if v <= NEED_LIMITS[level] + (r >= level and 5 or 0) then return s[level + 1] end
+  end
   return s[1]
 end
-local function NeedRank(st, s) return (st == s[3] and 2) or (st == s[2] and 1) or 0 end
 
 ---------------------------------------------------------------------------
 -- How warm does the place make your body feel?
@@ -238,14 +279,25 @@ function E.Tick()
   end
 
   -- Energy: ~3h30 of adventuring from rested to exhausted.
-  -- You recover at an inn or in a city, sitting by a campfire, eating or drinking, or dozing off.
+  -- You recover at an inn or in a city, sitting by a campfire, eating or drinking, dozing
+  -- off (AFK), or napping (/sleep, fast). Sitting elsewhere helps a little, up to 60;
+  -- standing still only stops the drop.
+  local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
+  if (moving or env.combat) and (sitting or napping) then E.StandUp() end
   local recover = 0
   if env.seatedAtFire then recover = math.max(recover, 0.15) end
   if env.afk then recover = math.max(recover, 0.1) end
   if env.eating or env.drinking then recover = math.max(recover, 0.08) end
   if env.resting then recover = math.max(recover, 0.05) end
+  if napping then recover = math.max(recover, D.NAP_RATE) end
   if recover > 0 then
     state.energy = Clamp(state.energy + recover * dt)
+  elseif sitting then
+    if state.energy < D.SIT_ENERGY_CAP then
+      state.energy = math.min(D.SIT_ENERGY_CAP, state.energy + D.SIT_RATE * dt)
+    end
+  elseif not moving and not env.combat and not env.swimming then
+    -- standing still: you don't get more tired, but you don't rest either
   else
     local rate = 100 / 12600
     if env.combat or env.swimming then rate = rate * 1.5 end
@@ -591,7 +643,7 @@ function E.UpdateIcons()
   if state.wet > 30 then show[#show + 1] = { ICONS.wet, state.wet > 80 } end
   for _, n in ipairs(NEEDS) do
     local s = state[n.key .. "State"] or "ok"
-    if s ~= "ok" then show[#show + 1] = { ICONS[n.key], s == n.states[3] } end
+    if s ~= "ok" then show[#show + 1] = { ICONS[n.key], NeedRank(s, n.states) >= 3 } end
   end
   if #show == 0 then show[1] = { ICONS.fine, false } end -- all good: one calm icon
   for i, slot in ipairs(strip.icons) do

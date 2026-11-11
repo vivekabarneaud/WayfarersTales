@@ -778,8 +778,9 @@ L.EL_WET          = "Humidité : %d %%"
 L.EL_THIRST       = "Soif : %s"
 L.EL_HUNGER       = "Faim : %s"
 L.EL_ENERGY       = "Énergie : %s"
-L.EL_NEED_STATES  = { ok = "Ça va", thirsty = "Soif", parched = "Gorge desséchée", hungry = "Faim", starving = "{Affamé|Affamée|Affamé·e}",
-  tired = "Fatigue", exhausted = "À bout de forces" }
+L.EL_NEED_STATES  = { ok = "Ça va", thirstyLight = "Légère soif", thirsty = "Soif", parched = "Grande soif",
+  peckish = "Petit creux", hungry = "Faim", starving = "Grande faim",
+  tiredLight = "Légère fatigue", tired = "Fatigue", exhausted = "Épuisement" }
 L.UI_OPT_THERMO   = "Afficher le thermomètre près de la minicarte"
 L.UI_OPT_GENDER   = "Votre personnage (pour les accords)"
 L.UI_GENDER_AUTO  = "Auto"
@@ -799,7 +800,7 @@ L.EL_HERE         = "Ici : %s"
 L.EL_MOVE_HINT    = "Clic : détails. Maj + glisser : déplacer."
 L.EL_OFF          = "Le module de confort du corps est désactivé. Vous pouvez le réactiver dans l'onglet Options."
 L.EL_PAGE_INTRO   = "Ce que ressent votre personnage. Purement cosmétique : rien ici ne change vos caractéristiques."
-L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp, une auberge, un toit au-dessus de la tête.\nSe rafraîchir : rentrer à l'intérieur, attendre la nuit, se baigner.\nSe sécher : le temps, et bien plus vite près d'un feu.\nLa soif : buvez n'importe quoi. Elle monte plus vite quand il fait chaud.\nLa faim : asseyez-vous et mangez.\nL'énergie : reposez-vous dans une auberge ou en ville, asseyez-vous au coin du feu, ou somnolez un moment."
+L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp, une auberge, un toit au-dessus de la tête.\nSe rafraîchir : rentrer à l'intérieur, attendre la nuit, se baigner.\nSe sécher : le temps, et bien plus vite près d'un feu.\nLa soif : buvez n'importe quoi. Elle monte plus vite quand il fait chaud.\nLa faim : asseyez-vous et mangez.\nL'énergie : reposez-vous dans une auberge ou en ville, asseyez-vous au coin du feu, ou faites une sieste (/sleep). S'asseoir ailleurs aide un peu (jusqu'à 60 %) ; rester immobile évite juste de se fatiguer.\nLa pluie vous trempe dehors, et rafraîchit l'air."
 L.EL_GUIDE = table.concat({
   "|cffffd100Confort du corps (Elements)|r",
   "Votre personnage ressent le froid, la chaleur, l'eau, la soif, la faim et la fatigue, et vous le dit dans le chat. L'onglet Corps montre les détails. (Dans les Options, vous pouvez aussi afficher des icônes ou des barres près de votre portrait.)",

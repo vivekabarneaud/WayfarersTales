@@ -48,3 +48,6 @@ in-game report at the next login.
 | 09:31 | Weather | It rains, the Ambiance tab shows "type 1, intensity 0.88" | done | Rain confirmed as weather type 1: rain lines switched on |
 | 09:31 | Question | The minimap still shows a sun while it rains | info | That's the game's own day/night clock icon, not the addon's; it never shows weather |
 | — | Idea | Rain: get wet, light vs heavy rain, gear in the rain, the pet in the rain | done | Rain soaks you outdoors (2 to 6 min) and cools the air up to 4°C; drizzle / downpour lines; helmet, cloak and fur lines; pet rain lines (drafts) |
+| — | Idea | More need levels: a little (75), yes (50), a lot (25) for hunger, thirst and energy | done | Four levels with new labels (Petit creux / Faim / Grande faim...), first-level lines (draft) |
+| — | Idea | Energy: standing still stops the drop; sitting helps up to 60; /sleep nap fast (10%/s), wake-up line full or not | done | Sitting (X key, /sit) and napping (/sleep) followed until you move; lines (draft) |
+| — | Flag | Fishing: got "stop and look around" lines while fishing | done | Fishing lines: casting, waiting (replaces the quiet moment), catch, first of a kind, junk (draft) |

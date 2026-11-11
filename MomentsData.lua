@@ -43,6 +43,11 @@ D.MOMENT_RULES = {
   campSit         = { cd = 900,  chance = 1,   gap = 10 },
   campRested      = { cd = 900,  chance = 1,   gap = 10 },
   petRain         = { cd = 900,  chance = 0.1, gap = 30 }, -- checked every 5 s while it rains
+  fishCast        = { cd = 600,  chance = 1,   gap = 10 },
+  fishWait        = { cd = 900,  chance = 1,   gap = 30 },
+  fishCatch       = { cd = 300,  chance = 1,   gap = 0 },
+  fishFirst       = { cd = 0,    chance = 1,   gap = 0 },
+  fishJunk        = { cd = 600,  chance = 1,   gap = 0 },
   npc             = { cd = 120,  chance = 1,   gap = 20 },
   questAccept_2159 = { cd = 0,   chance = 1,   gap = 0 },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
@@ -661,19 +666,62 @@ local FUR_FIRE = { draft = true,
   fr = "Vous vous approchez du feu, et sa chaleur pénètre doucement votre fourrure.",
   when = { form = "furry" } }
 
--- When a need gets pressing (below 25%), these lines take over ("always").
-local HUNGRY_MORE = { draft = true, always = true,
+-- Extra versions for the middle level (25-50%: hungry, thirsty, tired).
+local HUNGRY_MORE = { draft = true,
   en = "Your stomach growls loudly. It's really time to eat something.",
   fr = "Votre estomac gargouille bruyamment. Il serait vraiment temps de manger quelque chose.",
-  when = { hungerBelow = 25 } }
-local THIRSTY_MORE = { draft = true, always = true,
+  when = { hungerBelow = 50 } }
+local THIRSTY_MORE = { draft = true,
   en = "Your throat is dry and your lips are starting to crack. You need a drink, and soon.",
   fr = "Votre gorge est sèche et vos lèvres commencent à craqueler. Il vous faut boire, et vite.",
-  when = { thirstBelow = 25 } }
-local TIRED_MORE = { draft = true, always = true,
+  when = { thirstBelow = 50 } }
+local TIRED_MORE = { draft = true,
   en = "Your eyelids keep closing on their own, and your steps grow heavy. A real rest would do you a world of good.",
   fr = "Vos paupières se ferment toutes seules et vos pas se font lourds. Un vrai repos vous ferait le plus grand bien.",
-  when = { energyBelow = 25 } }
+  when = { energyBelow = 50 } }
+
+-- The first level (50-75%): just starting to feel it ("always": these pools have no usual lines)
+local PECKISH_1 = { draft = true, always = true,
+  en = "A little hunger is creeping in. Nothing serious, but you could do with a snack.",
+  fr = "Un petit creux se fait sentir. Rien de grave, mais vous grignoteriez bien quelque chose." }
+local PECKISH_2 = { draft = true, always = true,
+  en = "Your stomach gives a small, discreet gurgle. Snack time might be near.",
+  fr = "Votre estomac émet un petit gargouillis discret. L'heure du goûter approche, peut-être." }
+local THIRSTY_LIGHT_1 = { draft = true, always = true,
+  en = "You could do with a little sip of cool water.",
+  fr = "Vous boiriez bien une petite gorgée d'eau fraîche." }
+local THIRSTY_LIGHT_2 = { draft = true, always = true,
+  en = "Your mouth is getting a little dry.",
+  fr = "Votre bouche commence à être un peu sèche." }
+local TIRED_LIGHT_1 = { draft = true, always = true,
+  en = "A slight tiredness settles in your legs. Nothing a break wouldn't fix.",
+  fr = "Une légère fatigue se fait sentir dans vos jambes. Rien qu'une pause ne puisse arranger." }
+local TIRED_LIGHT_2 = { draft = true, always = true,
+  en = "You stifle a small yawn.",
+  fr = "Vous étouffez un petit bâillement." }
+
+-- Napping (/sleep): lying down, then waking up when you move (full or not quite)
+D.NAP_RATE = 10        -- energy points per second while napping
+D.NAP_FULL = 95        -- waking up at this much energy or more: "fully rested"
+D.SIT_RATE = 0.05      -- sitting down elsewhere than an inn or a campfire...
+D.SIT_ENERGY_CAP = 60  -- ...helps a little, up to this
+local NAP_START = { draft = true, always = true,
+  en = "You lie down and close your eyes. Just a few minutes...",
+  fr = "Vous vous allongez et fermez les yeux. Juste quelques minutes…",
+  when = { shifted = false } }
+local NAP_START_FUR = { draft = true, always = true,
+  en = "You curl up in a ball, nose tucked under your tail, and close your eyes.",
+  fr = "Vous vous roulez en boule, le museau sous la queue, et fermez les yeux.",
+  when = { form = "furry" } }
+local NAP_FULL_1 = { draft = true, always = true,
+  en = "You stretch for a long time. You wake up feeling great: that little nap did you a world of good.",
+  fr = "Vous vous étirez longuement. Vous vous réveillez en pleine forme : ce petit somme vous a fait un bien fou." }
+local NAP_SHORT_1 = { draft = true, always = true,
+  en = "You get up with a yawn. You'd gladly have slept a little longer.",
+  fr = "Vous vous relevez en bâillant. Vous auriez bien dormi encore un peu." }
+local NAP_SHORT_2 = { draft = true, always = true,
+  en = "You open one eye, then the other. Already? You'd have liked to stay a little longer.",
+  fr = "Vous ouvrez un œil, puis l'autre. Déjà ? Vous seriez bien resté{|e|·e} encore un peu." }
 
 D.BODY_LINES = {
   coldEnter      = { CLOAK_COLD, NOCLOAK_COLD, PLATE_COLD, MAIL_COLD, FUR_COLD },
@@ -690,6 +738,12 @@ D.BODY_LINES = {
   body_hungry    = { HUNGRY_MORE },
   body_thirsty   = { THIRSTY_MORE },
   body_tired     = { TIRED_MORE },
+  body_peckish   = { PECKISH_1, PECKISH_2 },
+  body_thirstyLight = { THIRSTY_LIGHT_1, THIRSTY_LIGHT_2 },
+  body_tiredLight = { TIRED_LIGHT_1, TIRED_LIGHT_2 },
+  napStart       = { NAP_START, NAP_START_FUR },
+  napWakeFull    = { NAP_FULL_1 },
+  napWakeShort   = { NAP_SHORT_1, NAP_SHORT_2 },
 }
 
 ---------------------------------------------------------------------------
@@ -888,4 +942,43 @@ D.MOMENTS.petRain = {
     en = "{pet} looks up at the sky, blinking at the raindrops.",
     fr = "{pet} lève les yeux vers le ciel et cligne des paupières sous les gouttes.",
     when = { indoors = false, sky = true, weather = "rain" } },
+}
+
+---------------------------------------------------------------------------
+-- Fishing: casting, waiting (instead of "you stop to look around"), the catch.
+-- {item} = what you pulled out. fishFirst = the first catch of a kind of fish.
+---------------------------------------------------------------------------
+D.MOMENTS.fishCast = {
+  { draft = true,
+    en = "You cast your line. The float lands on the water with a little plop, and you wonder what's going to bite this time.",
+    fr = "Vous lancez votre ligne. Le bouchon se pose sur l'eau avec un petit « plop », et vous vous demandez ce qui va bien pouvoir mordre cette fois-ci." },
+  { draft = true,
+    en = "You settle at the water's edge, rod firmly in hand. No hurry: here, patience is king.",
+    fr = "Vous vous installez au bord de l'eau, la canne bien en main. Rien ne presse : ici, la patience est reine." },
+}
+D.MOMENTS.fishWait = {
+  { draft = true,
+    en = "The float bobs gently on the ripples. You hold your breath at every twitch.",
+    fr = "Le bouchon danse doucement au gré des vaguelettes. Vous retenez votre souffle à chaque frémissement." },
+  { draft = true,
+    en = "The water laps softly. You watch the float, your mind finally at peace.",
+    fr = "L'eau clapote doucement. Vous fixez le bouchon, l'esprit enfin tranquille." },
+}
+D.MOMENTS.fishCatch = {
+  { draft = true,
+    en = "A tug! You strike sharply, and out of the water comes {item}, thrashing.",
+    fr = "Une secousse ! Vous ferrez d'un coup sec, et votre prise jaillit de l'eau en se débattant : {item}." },
+  { draft = true,
+    en = "The float dips all at once. You reel in your catch, still wriggling and dripping: {item}.",
+    fr = "Le bouchon plonge d'un coup. Vous remontez votre prise, encore frétillante et ruisselante : {item}." },
+}
+D.MOMENTS.fishFirst = {
+  { draft = true,
+    en = "A first! You look your {item} over from every angle, its scales still dripping. You won't forget this one soon.",
+    fr = "Une première ! Vous observez votre {item} sous toutes les coutures, ses écailles encore ruisselantes. Vous ne l'oublierez pas de sitôt." },
+}
+D.MOMENTS.fishJunk = {
+  { draft = true,
+    en = "You reel in your line... and there's {item}. Not quite a fish, but it's something.",
+    fr = "Vous remontez votre ligne… et voilà {item}. Pas tout à fait un poisson, mais c'est toujours ça." },
 }

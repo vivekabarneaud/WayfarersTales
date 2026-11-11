@@ -337,6 +337,7 @@ public static class Extractor {
     if (k.StartsWith("questAccept_") || k.StartsWith("questDone_")) return "Quests";
     if (k == "npc") return "NPCs";
     if (k == "petRain") return "Pet in the rain";
+    if (k.StartsWith("fish")) return "Fishing";
     return "Other";
   }
 
@@ -426,7 +427,7 @@ public static class Extractor {
         var ex = new StringBuilder();
         if (line.Get("draft") is bool && (bool)line.Get("draft")) ex.Append(",\"draft\":true");
         ExtraJson = ex.ToString();
-        Emit("bodyline:" + name, "Body", "Gear and animal forms", "used for: " + string.Join(", ", used[name].ToArray()),
+        Emit("bodyline:" + name, "Body", "Gear, forms, needs and naps", "used for: " + string.Join(", ", used[name].ToArray()),
           Str(line.Get("en")), Str(line.Get("fr")), When(line.Get("when")), false,
           "Replaces the usual line some of the time when it fits (always in an animal form). Items show as links in game.");
       }
