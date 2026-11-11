@@ -1569,12 +1569,12 @@ function H.CHAT_MSG_LOOT(msg)
   if msg then OnLoot(msg) end
 end
 
--- Your pet won a fight without you: the pet was fighting (its combat flag) and you
--- got the kill's experience, while you didn't attack, shoot or cast at an enemy since
--- the fight began (you were mining, turning in a quest, away...). Draft lines for now:
--- only in dev mode until they're approved.
+-- Your pet won a fight without you: the pet was fighting (its combat flag) and its
+-- target died (or you got the kill's experience), while you didn't attack, shoot or
+-- cast at an enemy since the fight began (you were mining, turning in a quest,
+-- away...). Draft lines for now: only in dev mode until they're approved.
 local function CheckSoloWin()
-  if not (M.petSolo or KT.IsDev()) then return end
+  if not (M.petSolo or KT.IsDev()) or not PetAlive() then return end
   local start = state.petFightAt
   if not start or state.meleeOn or state.shooting then return end
   if state.actedAt and state.actedAt >= start - 2 then return end
@@ -1597,6 +1597,23 @@ function H.UNIT_FLAGS(unit)
   if unit ~= "pet" or not pet then return end
   if UnitAffectingCombat("pet") then
     state.petFightAt = state.petFightAt or GetTime()
+    -- watch the pet's target during the fight: grey enemies give no experience,
+    -- so a dead target is how we know the pet won
+    if not state.petWatch then
+      state.petWatch = C_Timer.NewTicker(0.5, function()
+        local ok, dead = pcall(function() return UnitExists("pettarget") and UnitIsDead("pettarget") and true or false end)
+        if ok and dead == true then state.petKilledAt = GetTime() end
+        local okC, fighting = pcall(UnitAffectingCombat, "pet")
+        if not okC or not fighting then
+          if state.petWatch then state.petWatch:Cancel(); state.petWatch = nil end
+          if state.petKilledAt and GetTime() - state.petKilledAt < 5 then
+            state.petKilledAt = nil
+            local okW, err = pcall(CheckSoloWin)
+            if not okW then KT.LogError("Kindred petSolo", err) end
+          end
+        end
+      end)
+    end
   elseif state.petFightAt then
     -- the kill's experience can arrive just after the fight: forget it a little later
     local t = state.petFightAt
