@@ -168,6 +168,9 @@ add("fungus", { 4604, 4605, 4606, 4607, 4608, 8948 })
 ---------------------------------------------------------------------------
 
 -- Pet family (EN/FR names) -> sound set below.
+-- A boar's nose has its own word ({snout} in pet lines; family names as the game gives them)
+D.SNOUT = { Boar = { en = "snout", fr = "groin" }, Sanglier = { en = "snout", fr = "groin" } }
+
 D.FAMILY_SOUND = {
   Bear = "bear", Ours = "bear",
   Wolf = "wolf", Loup = "wolf",

@@ -95,9 +95,21 @@ function KT.G(text)
   end))
 end
 
+-- The pet's nose in a line ({snout}): "museau" / "nose", or the family's own word
+-- (a boar has a "groin" / "snout": D.SNOUT)
+local function SnoutWord()
+  local fr = KT.CurrentLanguage and KT.CurrentLanguage() == "fr"
+  local w = pet and pet.family and D.SNOUT and D.SNOUT[pet.family]
+  if w then return fr and w.fr or w.en end
+  return fr and "museau" or "nose"
+end
+
 local function Fill(text, vars)
   text = KT.G(text)
-  return (text:gsub("{(%w+)}", function(k) return vars[k] and tostring(vars[k]) or ("{" .. k .. "}") end))
+  return (text:gsub("{(%w+)}", function(k)
+    if k == "snout" and not vars.snout then return SnoutWord() end
+    return vars[k] and tostring(vars[k]) or ("{" .. k .. "}")
+  end))
 end
 
 local function FormatNumber(n)

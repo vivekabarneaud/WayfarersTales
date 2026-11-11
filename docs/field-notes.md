@@ -172,3 +172,4 @@ in-game report at the next login.
 | — | Bug | Energy never seems to go down (100% after a long session without /sleep) | done | Now about 2 hours to exhausted; towns rest you again but only up to 60% (like sitting); full rest indoors and still (inn, house), campfire, /sleep, AFK |
 | — | Idea | Thirst goes down too quickly | done | About 2h15 from full to empty in mild air (was 1h30) |
 | — | Idea | Allison: lines that change with the number of visits (she recognizes you, a loyal customer...) | done | Visits counted per NPC (a new visit after 30 min away); Allison gets lines at 2, 5 and 15 visits (draft). Works for any NPC from now on |
+| — | Idea | A boar has a "groin", not a "museau" | done | Pet lines use {snout}: "museau"/"nose" by default, "groin"/"snout" for boars (D.SNOUT) |

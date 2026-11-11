@@ -227,7 +227,7 @@ M.summon = {
 M.reunion = {
   "{pet} bondit vers vous, débordant de joie !",
   "{pet} tourne joyeusement autour de vous. Ça faisait longtemps !",
-  "{pet} vous pousse la main du museau, comme pour demander : où étiez-vous ?",
+  "{pet} vous pousse la main du {snout}, comme pour demander : où étiez-vous ?",
 }
 M.stableReunion = {
   "{pet} revient de l'écurie, débordant de joie !",
@@ -323,7 +323,7 @@ M.sad = {
   },
   {
     "{pet} s'approche et s'assoit tranquillement près de vous.",
-    "{pet} pousse doucement votre main du museau.",
+    "{pet} pousse doucement votre main du {snout}.",
   },
   {
     "{pet} se serre contre vous et vous lèche la main. Vous n'êtes pas {seul|seule|seul·e}.",
@@ -360,7 +360,7 @@ M.sorryForgive = {
     "{pet} garde ses distances, mais les oreilles se redressent.",
   },
   {
-    "{pet} vous pardonne d'un petit coup de museau.",
+    "{pet} vous pardonne d'un petit coup de {snout}.",
     "{pet} renifle votre main et décide de vous pardonner.",
   },
   {
@@ -513,7 +513,7 @@ M.attentionRequest = {
     "{pet} s'assoit un peu plus près que d'habitude en vous jetant des coups d'œil.",
   },
   {
-    "{pet} pousse votre main du museau pour réclamer de l'attention.",
+    "{pet} pousse votre main du {snout} pour réclamer de l'attention.",
     "{pet} se couche à vos pieds et lève les yeux vers vous avec espoir.",
   },
   {
@@ -556,10 +556,10 @@ M.lootFood = {
 M.fishing = {
   "{pet} regarde votre {item} frétiller avec fascination.",
   "{pet} lorgne votre {item}. C'est pour partager ?",
-  "{pet} se rapproche de votre {item}, le museau frémissant.",
+  "{pet} se rapproche de votre {item}, le {snout} frémissant.",
 }
 M.cooking = {
-  "L'odeur de votre {item} fait frémir le museau de {pet}.",
+  "L'odeur de votre {item} fait frémir le {snout} de {pet}.",
   "{pet} s'assoit très poliment à côté de votre {item}. Très, très poliment.",
 }
 M.mealRequest = {
@@ -587,7 +587,7 @@ M.mealExpired = {
 }
 M.campfireNear = {
   "{pet} dresse la tête. Un feu de camp, tout près !",
-  "Le museau de {pet} se tourne vers l'odeur de fumée de bois.",
+  "Le {snout} de {pet} se tourne vers l'odeur de fumée de bois.",
 }
 M.campfireRest = {
   "Vous vous installez au coin du feu avec {pet}. Ces moments calmes comptent.",

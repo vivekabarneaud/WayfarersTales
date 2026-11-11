@@ -561,10 +561,10 @@ M.lootFood = {
 M.fishing = {
   "{pet} watches the {item} flop around, fascinated.",
   "{pet} eyes the fresh {item}. Is that for sharing?",
-  "{pet} creeps closer to the {item}, nose twitching.",
+  "{pet} creeps closer to the {item}, {snout} twitching.",
 }
 M.cooking = {
-  "The smell of {item} makes {pet}'s nose twitch.",
+  "The smell of {item} makes {pet}'s {snout} twitch.",
   "{pet} sits very politely next to the {item}. Very, very politely.",
 }
 M.mealRequest = {
@@ -593,7 +593,7 @@ M.mealExpired = {
 }
 M.campfireNear = {
   "{pet} perks up. A campfire is nearby!",
-  "{pet}'s nose lifts toward the smell of woodsmoke.",
+  "{pet}'s {snout} lifts toward the smell of woodsmoke.",
 }
 M.campfireRest = {
   "You and {pet} settle down by the fire. These quiet moments matter.",
