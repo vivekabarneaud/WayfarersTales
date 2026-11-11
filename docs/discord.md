@@ -55,14 +55,14 @@ Wayfarer's Tales ajoute de petites lignes d'histoire à vos aventures dans WoW :
 1. In game, type **/wt tester** (once) to switch on tester mode.
 2. An odd line? Click the **!** next to it in the Journal tab, and tell us what's wrong.
 3. Whenever you like, click **Send the report** (Journal tab), then Ctrl+A, Ctrl+C.
-4. Create a post here and paste the report. A screenshot always helps!
+4. Create a post here and paste the report. A long report comes in numbered parts (buttons 1, 2, 3...): paste part 1 in the post, then each next part as a reply. A screenshot always helps!
 
 **Comment envoyer un rapport**
 
 1. En jeu, tapez **/wt tester** (une seule fois) pour passer en mode testeur.
 2. Une ligne bizarre ? Cliquez sur le **!** à côté d'elle dans l'onglet Journal, et dites-nous ce qui ne va pas.
 3. Quand vous voulez, cliquez sur **Envoyer le rapport** (onglet Journal), puis Ctrl+A, Ctrl+C.
-4. Créez un post ici et collez le rapport. Une capture d'écran aide toujours !
+4. Créez un post ici et collez le rapport. Un long rapport arrive en plusieurs parties numérotées (boutons 1, 2, 3...) : collez la partie 1 dans le post, puis chaque partie suivante en réponse. Une capture d'écran aide toujours !
 
 ### `#idées` (Post Guidelines)
 
