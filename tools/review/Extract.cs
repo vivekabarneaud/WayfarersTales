@@ -259,7 +259,9 @@ public static class Extractor {
       else if (k == "still") parts.Add("standing still");
       else if (k == "shifted") parts.Add((v is bool && (bool)v) ? "animal form" : "normal shape");
       else if (k == "form") parts.Add("form: " + Str(v) + (Str(v) == "furry" ? " (bear, cat, travel, ghost wolf)" : ""));
-      else if (k == "cloak" || k == "boots" || k == "gloves") parts.Add(((v is bool && (bool)v) ? "wearing " : "no ") + k);
+      else if (k == "cloak" || k == "boots" || k == "gloves" || k == "helm") parts.Add(((v is bool && (bool)v) ? "wearing " : "no ") + (k == "helm" ? "helmet" : k));
+      else if (k == "intensityAbove") parts.Add("heavier than " + Num(v));
+      else if (k == "intensityBelow") parts.Add("lighter than " + Num(v));
       else if (k == "armor") parts.Add("chest armor: " + Str(v));
       else if (k == "race") parts.Add("race: " + (v is string ? (string)v : ListStr(v)));
       else if (k == "notRace") parts.Add("not for: " + (v is string ? (string)v : ListStr(v)));
@@ -334,6 +336,7 @@ public static class Extractor {
     if (k.StartsWith("camp")) return "Campfires";
     if (k.StartsWith("questAccept_") || k.StartsWith("questDone_")) return "Quests";
     if (k == "npc") return "NPCs";
+    if (k == "petRain") return "Pet in the rain";
     return "Other";
   }
 

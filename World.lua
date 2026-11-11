@@ -116,6 +116,7 @@ function W.AirTemp(env)
   local h, m = GetGameTime()
   local hour = (h or 12) + (m or 0) / 60
   c = c + 4 * math.cos((hour - 15) / 24 * 2 * math.pi)       -- warmest ~15h, coolest ~3h
+  if env.rain and not env.indoors then c = c - (1 + 3 * env.rain) end -- rain cools the air (up to -4°C)
   if env.indoors then c = c + (18 - c) * 0.6 end             -- roofs soften everything
   if env.nearFire then c = c + 6 end
   return c
@@ -141,6 +142,9 @@ function W.Snapshot()
     eating = W.HasAura(D.SPELL_FOOD_AURA, true),
     drinking = W.HasAura(D.SPELL_DRINK_AURA, true),
   }
+  -- rain (only once its weather type is confirmed): 0 to 1
+  local wok, w = pcall(function() return KT.Senses and KT.Senses.Weather and KT.Senses.Weather() end)
+  if wok and w and w.confirmed and w.name == "rain" then env.rain = tonumber(w.intensity) or 0.5 end
   env.air = W.AirTemp(env)
   -- your position on the zone map, in % like the coordinates under the minimap
   local raw = W.MapID()

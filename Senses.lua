@@ -118,7 +118,7 @@ function S.Gear(ctx)
     local ok, l = pcall(GetInventoryItemLink, "player", slot)
     return ok and l or nil
   end
-  ctx.cloak, ctx.boots, ctx.gloves = link(15), link(8), link(10)
+  ctx.cloak, ctx.boots, ctx.gloves, ctx.helm = link(15), link(8), link(10), link(1)
   local okR, _, race = pcall(UnitRace, "player")
   ctx.race = okR and race or nil -- "Human", "Dwarf", "NightElf", "Gnome", "Orc", "Scourge", "Tauren", "Troll"
   ctx.armor = nil
@@ -209,7 +209,7 @@ local function Check(when, ctx)
     if not ok then return false, "form" end
   end
   -- gear: only in your normal shape (true = wearing one, false = not)
-  for _, slot in ipairs({ "cloak", "boots", "gloves" }) do
+  for _, slot in ipairs({ "cloak", "boots", "gloves", "helm" }) do
     if when[slot] ~= nil then
       if ctx.form then return false, "form" end
       if when[slot] ~= (ctx[slot] ~= nil) then return false, slot end
@@ -231,6 +231,10 @@ local function Check(when, ctx)
     if not ctx.weather or ctx.weather.name ~= when.weather then return false, "weather" end
   end
   if when.calm and (ctx.crowd == "lively" or ctx.crowd == "crowded") then return false, "calm" end
+  -- how hard it rains or snows (0 to 1): drizzle = intensityBelow 0.3, downpour = intensityAbove 0.7
+  local inten = ctx.weather and tonumber(ctx.weather.intensity)
+  if when.intensityAbove and not (inten and inten > when.intensityAbove) then return false, "intensity" end
+  if when.intensityBelow and not (inten and inten < when.intensityBelow) then return false, "intensity" end
   if when.alone and not ctx.alone then return false, "alone" end
   if when.crowd then
     if not ctx.crowd then return false, "crowdUnknown" end
@@ -426,6 +430,10 @@ function S.Show(c, preview, extra, vars, lead)
   local text = S.LineText(c.line)
   if lead then text = lead .. " " .. text end
   if extra then text = text .. " " .. extra end
+  -- your gear, for lines that mention it ({cloak}, {boots}, {gloves}, {helm})
+  vars = vars or {}
+  local gear = S.Gear({})
+  for _, k in ipairs({ "cloak", "boots", "gloves", "helm" }) do vars[k] = vars[k] or gear[k] end
   KT.NarrateText("senses", c.id, text, vars, true)
 end
 
@@ -472,7 +480,7 @@ function S.Tags(c, ctx)
     if w.still then add(T.still, not ctx.moving) end
     if w.form then add(string.format(T.form, w.form), (w.form == "furry" and S.FURRY[ctx.form]) or w.form == ctx.form) end
     if w.shifted ~= nil then add(w.shifted and T.shifted or T.unshifted, w.shifted == (ctx.form ~= nil)) end
-    for _, slot in ipairs({ "cloak", "boots", "gloves" }) do
+    for _, slot in ipairs({ "cloak", "boots", "gloves", "helm" }) do
       if w[slot] ~= nil then add(w[slot] and T[slot] or T["no_" .. slot], not ctx.form and w[slot] == (ctx[slot] ~= nil)) end
     end
     if w.armor then add(string.format(T.armor, w.armor), not ctx.form and ctx.armor == w.armor) end
@@ -480,6 +488,9 @@ function S.Tags(c, ctx)
     if w.notRace then add(string.format(T.notRace, type(w.notRace) == "table" and table.concat(w.notRace, "/") or w.notRace), not InList(w.notRace, ctx.race)) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
     if w.alone then add(T.alone, ctx.alone) end
+    local inten = ctx.weather and tonumber(ctx.weather.intensity)
+    if w.intensityAbove then add(string.format(T.intensityAbove, w.intensityAbove), inten and inten > w.intensityAbove or false) end
+    if w.intensityBelow then add(string.format(T.intensityBelow, w.intensityBelow), inten and inten < w.intensityBelow or false) end
     if w.subMatch then
       local found = false
       for _, s in ipairs(w.subMatch) do

@@ -42,6 +42,7 @@ D.MOMENT_RULES = {
   fallHard        = { cd = 300,  chance = 1,   gap = 0, shares = "fall" },
   campSit         = { cd = 900,  chance = 1,   gap = 10 },
   campRested      = { cd = 900,  chance = 1,   gap = 10 },
+  petRain         = { cd = 900,  chance = 0.1, gap = 30 }, -- checked every 5 s while it rains
   npc             = { cd = 120,  chance = 1,   gap = 20 },
   questAccept_2159 = { cd = 0,   chance = 1,   gap = 0 },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
@@ -869,4 +870,22 @@ D.MOMENTS.npc = {
     en = "{npc}'s eyes glow softly with a silvery light, like those of every night elf.",
     fr = "Les yeux de {npc} luisent doucement d'un éclat argenté, comme ceux de tous les elfes de la nuit.",
     when = { npcRace = "NightElf" } },
+}
+
+---------------------------------------------------------------------------
+-- Your hunter pet in the rain (needs the Kindred module). {pet} = its name.
+---------------------------------------------------------------------------
+D.MOMENTS.petRain = {
+  { draft = true,
+    en = "{pet} shakes off vigorously and splashes you in passing. Thanks a lot.",
+    fr = "{pet} s'ébroue vigoureusement et vous asperge au passage. Merci bien.",
+    when = { indoors = false, sky = true, weather = "rain" } },
+  { draft = true,
+    en = "{pet} presses against your legs, clearly finding this rain has lasted long enough.",
+    fr = "{pet} se serre contre vos jambes, l'air de trouver que cette pluie a assez duré.",
+    when = { indoors = false, sky = true, weather = "rain" } },
+  { draft = true,
+    en = "{pet} looks up at the sky, blinking at the raindrops.",
+    fr = "{pet} lève les yeux vers le ciel et cligne des paupières sous les gouttes.",
+    when = { indoors = false, sky = true, weather = "rain" } },
 }

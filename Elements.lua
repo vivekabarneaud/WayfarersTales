@@ -184,9 +184,18 @@ function E.Tick()
   local before = { temp = state.temp, wet = state.wet, thirst = state.thirst, hunger = state.hunger, energy = state.energy }
 
   -- Wetness
+  -- in the rain, outdoors and not under a roof (Aldrassil, Teldrassil's canopy...)
+  local inRain = env.rain and not env.indoors and not (KT.Senses and KT.Senses.Roofed and KT.Senses.Roofed(env))
   if env.swimming then
     swimStart = swimStart or GetTime()
     state.wet = 100
+  elseif inRain then
+    -- soaked in about 2 to 6 minutes, depending on how hard it rains
+    state.wet = Clamp(state.wet + (0.25 + 0.5 * env.rain) * dt)
+    if state.wet >= 80 and not state.soaked then
+      state.soaked = true
+      Say("soaked")
+    end
   else
     if swimStart then
       if GetTime() - swimStart >= 5 then
