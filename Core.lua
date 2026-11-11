@@ -230,7 +230,13 @@ end
 -- Journal: every line shown is kept with where/when it happened, so players can
 -- reread their story and flag lines that felt wrong (see the Journal tab).
 local MAX_JOURNAL = 500
+local lastShownAt = 0
+-- Lines on a timer wait D.LINE_GAP seconds after any line (from any module),
+-- so two of them never show up at the same moment.
+function KT.LineGapOK() return time() - lastShownAt >= D.LINE_GAP end
+
 local function AddJournal(module, key, text, delta)
+  lastShownAt = time()
   local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
   local h, m = GetGameTime()
   local j = db.journal
@@ -838,6 +844,7 @@ end
 -- Pet asks for cuddles now and then; answer with /pet in time for a bonus.
 local function MaybeAskAttention()
   if state.attention or state.meal or InCombat() or db.settings.chatty == 0 then return false end
+  if not KT.LineGapOK() then return false end
   if not Ready("attention", D.ATTENTION_COOLDOWN) or not Chance(0.05 * MoodMult("attention")) then return false end
   Mark("attention")
   local a = { expires = GetTime() + D.ATTENTION_WINDOW }

@@ -595,6 +595,7 @@ local function AmbientTick()
     ambientDue = base + math.random(r.min, r.max)
   end
   if time() < ambientDue then return end
+  if not KT.LineGapOK() then return end -- another line just played: wait a little
   local ctx = S.Context()
   if ctx.eating or ctx.drinking then -- you're busy with your meal (it has its own line)
     ambientDue = time() + 30
@@ -663,7 +664,7 @@ end
 local function EnteredSubzone(ctx)
   local r = RHYTHM[Rhythm()]
   if not r or time() - (state.lastEntry or 0) < r.entry then return end
-  if time() - (state.lastLine or 0) < ENTRY_AFTER_LINE then return end
+  if time() - (state.lastLine or 0) < ENTRY_AFTER_LINE or not KT.LineGapOK() then return end
   local list = {}
   for _, c in ipairs(S.Candidates(ctx, "ambient")) do
     if c.src ~= "generic" then list[#list + 1] = c end

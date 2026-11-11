@@ -534,7 +534,7 @@ M.comfort = {
 M.feed = {
   "{pet} munches on the {item} happily.",
   "{pet} gobbles up the {item} in no time.",
-  "{pet} eats the {item}, then licks up the last crumbs.",
+  "{pet} eats the {item} down to the very last bite.",
   "{pet} savors the {item}, very pleased with you.",
 }
 M.lootFood = {

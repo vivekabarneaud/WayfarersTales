@@ -152,6 +152,9 @@ end
 ---------------------------------------------------------------------------
 
 local function CheckStates(env)
+  -- another line just played: wait (states stay as they were, so the change is
+  -- noticed again on a later tick)
+  if not KT.LineGapOK() then return end
   -- Temperature
   local prev = state.tempState or "ok"
   local ts = TempState(state.temp, prev)
@@ -233,7 +236,7 @@ function E.Tick()
   elseif inRain then
     -- soaked in about 2 to 6 minutes, depending on how hard it rains
     state.wet = Clamp(state.wet + (0.25 + 0.5 * env.rain) * dt)
-    if state.wet >= 80 and not state.soaked then
+    if state.wet >= 80 and not state.soaked and KT.LineGapOK() then
       state.soaked = true
       Say("soaked")
     end
@@ -249,7 +252,7 @@ function E.Tick()
     if env.indoors then dry = dry + 0.1 end
     if env.nearFire then dry = dry + 0.8 end
     state.wet = Clamp(state.wet - dry * dt)
-    if state.soaked and state.wet <= 5 then
+    if state.soaked and state.wet <= 5 and KT.LineGapOK() then
       state.soaked = nil
       Say("dry")
     end

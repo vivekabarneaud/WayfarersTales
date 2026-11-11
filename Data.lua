@@ -114,6 +114,7 @@ D.MEAL_SNIFF_COOLDOWN = 1200 -- pet makes a face at food it won't eat
 D.COMFORT_WINDOW     = 300
 D.FISHING_WINDOW     = 40
 D.FLAVOR_COOLDOWN    = 25    -- minimum gap between two random flavor messages
+D.LINE_GAP           = 30    -- lines on a timer (ambiance, body, pet asking...) wait this long after any line
 D.CHATTY_MULT        = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 1.6 }
 
 -- Pet family (as the game names it) -> body type, so reactions fit the animal.

@@ -36,6 +36,8 @@ local function After(sec, fn, name) C_Timer.After(sec, Safe(fn, name or "timer")
 -- ones (gathering, recipes...) keep a chance below 1, so they don't fire every time.
 local RHYTHM_CD = { [1] = 1.5, [2] = 1, [3] = 0.6 }
 
+local ticking = false -- true while Tick runs (moments on a timer, not reactions)
+
 -- Can moment `key` play now? (its own timer, the gap since the last line, its chance)
 local function Ready(key)
   local state = S.State()
@@ -47,6 +49,7 @@ local function Ready(key)
   local cd = (rule.cd or 0) * (RHYTHM_CD[S.Rhythm()] or 1)
   if now - (state.moments[rule.shares or key] or 0) < cd then return nil end
   if now - (state.lastLine or 0) < (rule.gap or 60) then return nil end
+  if ticking and not KT.LineGapOK() then return nil end -- timed moments wait after any line
   if (rule.chance or 1) < 1 and math.random() >= rule.chance then return nil end
   return rule, state
 end
@@ -681,7 +684,12 @@ f:SetScript("OnEvent", function(_, event, ...)
       if okL then npcInfo = info end
     end
     if event == "PLAYER_LOGIN" then
-      C_Timer.NewTicker(5, Safe(Tick, "tick"))
+      C_Timer.NewTicker(5, Safe(function()
+        ticking = true
+        local ok, err = pcall(Tick)
+        ticking = false
+        if not ok then error(err, 0) end
+      end, "tick"))
       After(3, CheckBirth, "birth") -- a brand new character?
       -- remember the professions you already have (skills may load a bit later)
       After(5, function() if S.State() then KnownProfessions(S.State()) end end, "professions")
