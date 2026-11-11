@@ -7,9 +7,9 @@ Kept in the repo so it can be updated with each release.
 
 ## Summary (the short line under the name)
 
-**EN:** Little touches of life on your journey: the world described around you, a body that feels the cold and the rain, and a real bond with your hunter pet. Purely cosmetic.
+**EN:** Your character comes alive: the smell of an inn, the sound of the rain, the cold in their fingers, and a real bond with your hunter pet. Purely cosmetic.
 
-**FR :** De petites touches de vie au fil du voyage : le monde décrit autour de vous, un corps qui ressent le froid et la pluie, et un vrai lien avec votre familier de chasseur. Purement cosmétique.
+**FR :** Votre personnage prend vie : l'odeur d'une auberge, le bruit de la pluie, le froid au bout des doigts, et un vrai lien avec votre familier de chasseur. Purement cosmétique.
 
 ---
 

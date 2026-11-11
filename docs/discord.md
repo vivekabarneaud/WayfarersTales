@@ -28,7 +28,7 @@ English first, French second.
 
 **Welcome to the Wayfarer's Tales Discord!**
 
-Wayfarer's Tales adds little lines of story to your WoW adventures: the world described around you, a body that feels the cold and the rain, and a real bond with your hunter pet.
+Wayfarer's Tales adds little lines of story to your WoW adventures: the smell of an inn, the sound of the rain, the cold in your fingers, and a real bond with your hunter pet.
 
 - 📣 **#annonces**: new versions
 - 🐞 **#rapports**: a line felt wrong, or something doesn't work
@@ -39,7 +39,7 @@ Wayfarer's Tales adds little lines of story to your WoW adventures: the world de
 
 **Bienvenue sur le Discord de Wayfarer's Tales !**
 
-Wayfarer's Tales ajoute de petites lignes d'histoire à vos aventures dans WoW : le monde décrit autour de vous, un corps qui ressent le froid et la pluie, et un vrai lien avec votre familier de chasseur.
+Wayfarer's Tales ajoute de petites lignes d'histoire à vos aventures dans WoW : l'odeur d'une auberge, le bruit de la pluie, le froid au bout des doigts, et un vrai lien avec votre familier de chasseur.
 
 - 📣 **#annonces** : les nouvelles versions
 - 🐞 **#rapports** : une ligne vous a semblé fausse, ou quelque chose ne marche pas
