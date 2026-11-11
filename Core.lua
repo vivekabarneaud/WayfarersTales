@@ -1260,6 +1260,7 @@ local function OnItemDecreased(id, link)
   -- (a drink isn't a meal to share: eating and drinking together, the drink must not count)
   if IsFoodItem(id) and not IsDrink(id) then state.lastFoodDrop = { id = id, link = link, t = GetTime() } end
   if ItemClass(id) == 0 then state.lastConsumableDrop = { id = id, link = link, t = GetTime() } end
+  if IsDrink(id) then state.lastDrinkDrop = { id = id, link = link, t = GetTime() } end
 end
 
 -- The food or drink that just left your bags (for the Senses eating line), or nil.
@@ -1270,6 +1271,11 @@ function KT.LastFood(maxAge)
 end
 
 -- The last consumable you used (alcohol: no Drink buff, Moments hears the "tipsy" message)
+-- The last drink that left your bags (drink lines must not pick up the food you eat with it)
+function KT.LastDrink(maxAge)
+  local f = state.lastDrinkDrop
+  if f and GetTime() - f.t <= (maxAge or 5) then return f.id, f.link end
+end
 function KT.LastConsumable(maxAge)
   local f = state.lastConsumableDrop
   if f and GetTime() - f.t <= (maxAge or 5) then return f.id, f.link end

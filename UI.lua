@@ -217,7 +217,7 @@ end
 -- Journal page: newest lines first, a flag button on each
 ---------------------------------------------------------------------------
 
-local JOURNAL_ROWS = 10
+local JOURNAL_ROWS = 8
 local JOURNAL_DATE_W = 78 -- width of the date column
 
 -- Reporting a line: a small window with the line and a "why?" box
@@ -276,7 +276,7 @@ local function BuildJournal(parent)
   -- its spine on the left (the text starts after it: p.leftPad)
   p.leftPad = 16
   local PAGES = {
-    { "Interface\\Spellbook\\Spellbook-Page-1", { 0, 1, 0, 0.94 }, 92 },
+    { "Interface\\Spellbook\\Spellbook-Page-1", { 0, 1, 0, 0.94 }, 116 },
     { "Interface\\Stationery\\StationeryTest1", { 0, 1, 0, 1 }, 16 },
   }
   for _, pg in ipairs(PAGES) do
@@ -292,7 +292,7 @@ local function BuildJournal(parent)
   p.paper = paper
 
   p.header = paper:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  p.header:SetPoint("TOPLEFT", p.leftPad, -14)
+  p.header:SetPoint("TOPLEFT", p.leftPad, -46)
   p.header:SetShadowOffset(0, 0)
 
   local copy = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
@@ -387,9 +387,9 @@ local function RefreshJournal(p, db)
   p.nxt:SetShown(total > 0)
 
   -- lines stacked from the top, each as tall as its text
-  local width = p.paper:GetWidth() - p.leftPad - 30 -- (more room on the right too)
+  local width = p.paper:GetWidth() - p.leftPad - 56 -- (margin on the right too)
   if width < 200 then width = 470 end
-  local y = 40
+  local y = 76 -- (a generous top margin, under the page's decoration)
   for i, row in ipairs(p.rows) do
     local e = j[total - (p.page - 1) * JOURNAL_ROWS - (i - 1)]
     row.entry = e

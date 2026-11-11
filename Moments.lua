@@ -283,7 +283,8 @@ end
 local function MealLine(drink, tries, chained)
   -- (not "KT.LastFood and KT.LastFood(6)": "and" would keep only the first value, the id)
   local itemID, link
-  if KT.LastFood then itemID, link = KT.LastFood(6) end
+  local last = drink and KT.LastDrink or KT.LastFood -- (eating and drinking together: each its own item)
+  if last then itemID, link = last(6) end
   if not link and tries < 2 then
     After(1.5, function() MealLine(drink, tries + 1, chained) end, "meal")
     return
