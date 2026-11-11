@@ -7,7 +7,7 @@ local api -- KT.api, set by Core.lua; read at runtime
 
 local frame, mm
 local tabs, pages = {}, {}
-local currentTab = "companion"
+local currentTab = "body"
 local CONTENT_WIDTH = 470
 
 local function Icon() return D.CUSTOM_ICON or "Interface\\Icons\\INV_ValentinesCandy" end
@@ -49,17 +49,6 @@ local function Label(widget, key)
   widget:SetText(L[key] or key)
 end
 
-function KT.RelabelPanel()
-  for _, w in ipairs(labelled) do w:SetText(L[w.labelKey] or w.labelKey) end
-  if KT.Homework then KT.Homework.Refresh() end
-  local p = pages.options
-  if p then
-    for n, b in pairs(p.chattyButtons) do b:SetText(L.UI_CHATTY[n]) end
-    for n, b in pairs(p.rhythmButtons) do b:SetText(L.UI_RHYTHM[n]) end
-    for st, b in pairs(p.styleButtons) do b:SetText(L.UI_STYLE[st]) end
-    for bs, b in pairs(p.bodyStyleButtons) do b:SetText(L.UI_BODYSTYLE[bs]) end
-  end
-end
 
 ---------------------------------------------------------------------------
 -- Ambiance page (Senses): what the addon sees here, and every line for this place
@@ -229,6 +218,34 @@ end
 
 local JOURNAL_ROWS = 10
 
+-- Reporting a line: a small window with the line and a "why?" box
+local function FlagWithNote(dialog, entry)
+  if not entry then return end
+  local eb = dialog.editBox or dialog.EditBox or (dialog.GetName and _G[(dialog:GetName() or "") .. "EditBox"])
+  local note = eb and eb:GetText() or ""
+  note = note:gsub("^%s+", ""):gsub("%s+$", "")
+  entry.flagged = true
+  entry.flagNote = note ~= "" and note or nil
+  KT.RefreshPanel()
+  if KT.Homework then KT.Homework.Refresh() end
+end
+StaticPopupDialogs.WAYFARERSTALES_FLAG_LINE = {
+  text = "%s", button1 = OKAY, button2 = CANCEL,
+  hasEditBox = true, maxLetters = 250,
+  OnShow = function(self)
+    local eb = self.editBox or self.EditBox or (self.GetName and _G[(self:GetName() or "") .. "EditBox"])
+    if eb then eb:SetText(""); eb:SetFocus() end
+  end,
+  OnAccept = function(self, entry) FlagWithNote(self, entry) end,
+  EditBoxOnEnterPressed = function(self)
+    local dialog = self:GetParent()
+    FlagWithNote(dialog, dialog.data)
+    dialog:Hide()
+  end,
+  EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+  timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
+}
+
 local function BuildJournal(parent)
   local p = CreateFrame("Frame", nil, parent)
   p:SetAllPoints()
@@ -239,16 +256,16 @@ local function BuildJournal(parent)
 
   local prev = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
   prev:SetSize(28, 20)
-  prev:SetPoint("TOPRIGHT", -152, -4)
+  prev:SetPoint("TOPRIGHT", -192, -4)
   prev:SetText("<")
   prev:SetScript("OnClick", function() p.page = math.max(1, p.page - 1); KT.RefreshPanel() end)
   local nxt = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
   nxt:SetSize(28, 20)
-  nxt:SetPoint("TOPRIGHT", -120, -4)
+  nxt:SetPoint("TOPRIGHT", -160, -4)
   nxt:SetText(">")
   nxt:SetScript("OnClick", function() p.page = p.page + 1; KT.RefreshPanel() end)
   local copy = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-  copy:SetSize(110, 20)
+  copy:SetSize(150, 20)
   copy:SetPoint("TOPRIGHT", -6, -4)
   Label(copy, "UI_JOURNAL_COPY")
   copy:SetScript("OnClick", function() KT.ShowReport() end)
@@ -269,10 +286,17 @@ local function BuildJournal(parent)
     fs:SetJustifyH("LEFT")
     fs:SetJustifyV("TOP")
     flag:SetScript("OnClick", function()
-      if row.entry then
-        row.entry.flagged = not row.entry.flagged or nil
+      local e = row.entry
+      if not e then return end
+      if e.flagged then -- already reported: click again to take it back
+        e.flagged, e.flagNote = nil, nil
         KT.RefreshPanel()
+        if KT.Homework then KT.Homework.Refresh() end
+        return
       end
+      local dlg = StaticPopupDialogs.WAYFARERSTALES_FLAG_LINE
+      dlg.text, dlg.button1 = L.UI_FLAG_POPUP, L.UI_FLAG_OK
+      StaticPopup_Show("WAYFARERSTALES_FLAG_LINE", StripCodes(e.text or ""), nil, e)
     end)
     flag:SetScript("OnEnter", function(self)
       GameTooltip:SetOwner(self, "ANCHOR_LEFT")
@@ -385,63 +409,6 @@ local function ModelBox(parent, w, h)
   return box
 end
 
----------------------------------------------------------------------------
--- Body page (Elements module): your character, five gauges, where you are
----------------------------------------------------------------------------
-
-local function BuildBody(parent)
-  local p = CreateFrame("Frame", nil, parent)
-  p:SetAllPoints()
-  p.modelBox = ModelBox(p, 160, 236)
-  p.modelBox:SetPoint("TOPLEFT", 6, -6)
-
-  local x = 182
-  p.intro = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-  p.intro:SetPoint("TOPLEFT", x, -10)
-  p.intro:SetWidth(CONTENT_WIDTH - 140)
-  p.intro:SetJustifyH("LEFT")
-  p.bars = {}
-  for i = 1, 5 do
-    local bar = StyledBar(p, CONTENT_WIDTH - 150, 18)
-    bar:SetPoint("TOPLEFT", x + 4, -52 - (i - 1) * 38)
-    p.bars[i] = bar
-  end
-  p.here = p:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-  p.here:SetPoint("TOPLEFT", 10, -260)
-  p.here:SetWidth(CONTENT_WIDTH + 40)
-  p.here:SetJustifyH("LEFT")
-  p.tips = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-  p.tips:SetPoint("TOPLEFT", 10, -290)
-  p.tips:SetWidth(CONTENT_WIDTH + 40)
-  p.tips:SetJustifyH("LEFT")
-  p.tips:SetSpacing(3)
-  return p
-end
-
-local function RefreshBody(p)
-  local E = KT.Elements
-  local st = E and E.GetState()
-  local on = KT.ModuleOn("elements") and st ~= nil
-  p.modelBox:ShowUnit("player")
-  local rows = on and E.Rows() or {}
-  for i, bar in ipairs(p.bars) do
-    local r = rows[i]
-    bar:SetShown(r ~= nil)
-    if r then
-      bar.text:SetText(r[1])
-      E.ApplyBar(bar, r)
-    end
-  end
-  p.here:SetShown(on)
-  p.tips:SetShown(on)
-  if not on then
-    p.intro:SetText(L.EL_OFF)
-    return
-  end
-  p.intro:SetText(L.EL_PAGE_INTRO)
-  p.here:SetText(E.HereText())
-  p.tips:SetText(L.EL_PAGE_TIPS)
-end
 
 -- Report box: flagged lines with their context, selected and ready to copy.
 local reportFrame
@@ -558,302 +525,286 @@ function KT.ShowReport()
   reportFrame.edit:HighlightText()
 end
 
-local function BuildOptions(parent)
-  -- The options page scrolls: page > scroll frame > content (p)
+---------------------------------------------------------------------------
+-- The window's pages (0.55). Each module has its tab with, from top to bottom:
+-- a header with its on/off box, what it shows, its settings, a short guide.
+-- Blocks are stacked by page:Layout(), which skips hidden ones.
+---------------------------------------------------------------------------
+
+local PAGE_W = 566
+local segmented = {} -- button rows, relabelled when the language changes
+
+local BOX_BACKDROP = { bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+  edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 16, edgeSize = 12,
+  insets = { left = 3, right = 3, top = 3, bottom = 3 } }
+
+local function Box(parent, h)
+  local f = CreateFrame("Frame", nil, parent, BACKDROP_TEMPLATE)
+  f:SetSize(PAGE_W, h or 40)
+  if f.SetBackdrop then
+    f:SetBackdrop(BOX_BACKDROP)
+    f:SetBackdropColor(0.13, 0.1, 0.07, 0.85)
+    f:SetBackdropBorderColor(0.5, 0.4, 0.22)
+  end
+  return f
+end
+
+local function ScrollPage(parent)
   local page = CreateFrame("Frame", nil, parent)
   page:SetAllPoints()
   local scroll = CreateFrame("ScrollFrame", nil, page, "UIPanelScrollFrameTemplate")
-  scroll:SetPoint("TOPLEFT", 0, -2)
-  scroll:SetPoint("BOTTOMRIGHT", -26, 2)
+  scroll:SetPoint("TOPLEFT", 0, -4)
+  scroll:SetPoint("BOTTOMRIGHT", -26, 4)
   local p = CreateFrame("Frame", nil, scroll)
-  p:SetSize(CONTENT_WIDTH + 70, 900)
+  p:SetSize(PAGE_W + 8, 10)
   scroll:SetScrollChild(p)
-  local y = -12
-  p.checks = {}
-
-  -- Modules
-  local modLabel = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  modLabel:SetPoint("TOPLEFT", 12, y)
-  Label(modLabel, "UI_MODULES")
-  y = y - 20
-  local MODULES = {
-    { "kindred", "UI_MOD_KINDRED", function(on) api.UpdateHeart(); if on then api.Rescan() end end },
-    { "elements", "UI_MOD_ELEMENTS", function() if KT.Elements then KT.Elements.UpdateIcons(); KT.Elements.UpdateThermo() end end },
-    { "senses", "UI_MOD_SENSES" },
-  }
-  for _, m in ipairs(MODULES) do
-    local cb = CreateFrame("CheckButton", nil, p, "UICheckButtonTemplate")
-    cb:SetPoint("TOPLEFT", 8, y)
-    if cb.Text then cb.Text:SetText("") end
-    if cb.text then cb.text:SetText("") end
-    local t = cb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    t:SetPoint("LEFT", cb, "RIGHT", 2, 0)
-    Label(t, m[2])
-    cb.module = m[1]
-    cb:SetScript("OnClick", function(self)
-      local on = self:GetChecked() and true or false
-      api.GetDB().modules[m[1]] = on
-      if m[3] then m[3](on) end
-      KT.RefreshPanel()
-    end)
-    p.checks[#p.checks + 1] = cb
-    y = y - 26
+  page.p, page.blocks = p, {}
+  function page:Add(block, gap)
+    self.blocks[#self.blocks + 1] = { block, gap or 10 }
+    return block
   end
-  y = y - 6
-
-  -- Ambiance rhythm
-  local rLabel = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  rLabel:SetPoint("TOPLEFT", 12, y)
-  Label(rLabel, "UI_OPT_RHYTHM")
-  y = y - 24
-  p.rhythmButtons = {}
-  for n = 0, 3 do
-    local b = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-    b:SetSize(114, 24)
-    b:SetPoint("TOPLEFT", 10 + n * 118, y)
-    b:SetText(L.UI_RHYTHM[n])
-    b:SetScript("OnClick", function()
-      api.GetDB().settings.sensesRhythm = n
-      KT.RefreshPanel()
-    end)
-    p.rhythmButtons[n] = b
+  function page:Layout()
+    local y = 6
+    for _, b in ipairs(self.blocks) do
+      local w = b[1]
+      if w:IsShown() then
+        w:ClearAllPoints()
+        w:SetPoint("TOPLEFT", p, "TOPLEFT", 4, -y)
+        local h
+        if w.Fit then h = w:Fit()
+        elseif w.GetStringHeight then h = w:GetStringHeight()
+        else h = w:GetHeight() end
+        y = y + (h or 0) + b[2]
+      end
+    end
+    p:SetHeight(y + 10)
   end
-  y = y - 32
-
-  -- Ambiance line length
-  local sLabel = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  sLabel:SetPoint("TOPLEFT", 12, y)
-  Label(sLabel, "UI_OPT_STYLE")
-  y = y - 24
-  p.styleButtons = {}
-  for i, st in ipairs({ "short", "mixed", "rich" }) do
-    local b = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-    b:SetSize(114, 24)
-    b:SetPoint("TOPLEFT", 10 + (i - 1) * 118, y)
-    b:SetText(L.UI_STYLE[st])
-    b:SetScript("OnClick", function()
-      api.GetDB().settings.sensesStyle = st
-      KT.RefreshPanel()
-    end)
-    p.styleButtons[st] = b
-  end
-  y = y - 32
-
-  -- How body comfort shows next to your character frame
-  local bLabel = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  bLabel:SetPoint("TOPLEFT", 12, y)
-  Label(bLabel, "UI_OPT_BODYSTYLE")
-  y = y - 24
-  p.bodyStyleButtons = {}
-  for i, bs in ipairs({ "none", "icons", "bars" }) do
-    local b = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-    b:SetSize(114, 24)
-    b:SetPoint("TOPLEFT", 10 + (i - 1) * 118, y)
-    b:SetText(L.UI_BODYSTYLE[bs])
-    b:SetScript("OnClick", function()
-      api.GetDB().settings.bodyStyle = bs
-      if KT.Elements then KT.Elements.UpdateIcons() end
-      KT.RefreshPanel()
-    end)
-    p.bodyStyleButtons[bs] = b
-  end
-  y = y - 36
-
-  local label = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  label:SetPoint("TOPLEFT", 12, y)
-  Label(label, "UI_OPT_CHATTY")
-  y = y - 24
-
-  p.chattyButtons = {}
-  for n = 0, 3 do
-    local b = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-    b:SetSize(114, 24)
-    b:SetPoint("TOPLEFT", 10 + n * 118, y)
-    b:SetText(L.UI_CHATTY[n])
-    b:SetScript("OnClick", function()
-      api.GetDB().settings.chatty = n
-      KT.RefreshPanel()
-    end)
-    p.chattyButtons[n] = b
-  end
-  y = y - 28
-
-  p.chattyDesc = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-  p.chattyDesc:SetPoint("TOPLEFT", 14, y)
-  p.chattyDesc:SetWidth(CONTENT_WIDTH)
-  p.chattyDesc:SetJustifyH("LEFT")
-  y = y - 44
-
-  local function Check(key, textKey, onChange)
-    local cb = CreateFrame("CheckButton", nil, p, "UICheckButtonTemplate")
-    cb:SetPoint("TOPLEFT", 8, y)
-    if cb.Text then cb.Text:SetText("") end
-    if cb.text then cb.text:SetText("") end
-    local t = cb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    t:SetPoint("LEFT", cb, "RIGHT", 2, 0)
-    Label(t, textKey)
-    cb.key = key
-    cb:SetScript("OnClick", function(self)
-      api.GetDB().settings[key] = self:GetChecked() and true or false
-      if onChange then onChange() end
-    end)
-    p.checks[#p.checks + 1] = cb
-    y = y - 30
-  end
-  Check("minimap", "UI_OPT_MINIMAP", function() KT.UpdateMinimapButton() end)
-  Check("showHeart", "UI_OPT_HEART", function() api.UpdateHeart() end)
-  Check("showThermo", "UI_OPT_THERMO", function() if KT.Elements then KT.Elements.UpdateThermo() end end)
-  Check("label", "UI_OPT_LABEL")
-  Check("sound", "UI_OPT_SOUND")
-  if KT.IsDev() then Check("debug", "UI_OPT_DEBUG") end
-
-  -- Language
-  y = y - 8
-  local langLabel = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  langLabel:SetPoint("TOPLEFT", 12, y)
-  Label(langLabel, "UI_OPT_LANGUAGE")
-  y = y - 24
-  p.langButtons = {}
-  for i, lang in ipairs(LANGUAGES) do
-    local b = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-    b:SetSize(114, 24)
-    b:SetPoint("TOPLEFT", 10 + (i - 1) * 118, y)
-    b:SetText(lang[2])
-    b:SetScript("OnClick", function()
-      api.GetDB().settings.language = lang[1]
-      KT.ApplyLanguage()
-      KT.RelabelPanel()
-      api.UpdateHeart() -- also refreshes this window
-    end)
-    p.langButtons[lang[1]] = b
-  end
-  y = y - 32
-
-  -- Your character's gender, for grammar (French)
-  local gLabel = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  gLabel:SetPoint("TOPLEFT", 12, y)
-  Label(gLabel, "UI_OPT_GENDER")
-  y = y - 24
-  p.genderButtons = {}
-  for i, g in ipairs({ { "auto", "UI_GENDER_AUTO" }, { "m", "UI_GENDER_M" }, { "f", "UI_GENDER_F" },
-    { "n", "UI_GENDER_N" } }) do
-    local b = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-    b:SetSize(114, 24)
-    b:SetPoint("TOPLEFT", 10 + (i - 1) * 118, y)
-    Label(b, g[2])
-    b:SetScript("OnClick", function()
-      api.GetDB().settings.gender = g[1]
-      KT.RefreshPanel()
-    end)
-    p.genderButtons[g[1]] = b
-  end
-  y = y - 32
-
-  local note = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-  note:SetPoint("TOPLEFT", 14, y)
-  note:SetWidth(CONTENT_WIDTH)
-  note:SetJustifyH("LEFT")
-  Label(note, "UI_OPT_NOTE")
-  p:SetHeight(-y + 80)
-
-  -- the refresh code reads these from the page
-  page.checks, page.chattyButtons, page.chattyDesc = p.checks, p.chattyButtons, p.chattyDesc
-  page.langButtons, page.genderButtons, page.rhythmButtons = p.langButtons, p.genderButtons, p.rhythmButtons
-  page.styleButtons, page.bodyStyleButtons = p.styleButtons, p.bodyStyleButtons
   return page
 end
 
-local function Build()
-  local ok, f = pcall(CreateFrame, "Frame", "WayfarersTalesFrame", UIParent, "BasicFrameTemplateWithInset")
-  if not ok or not f then
-    f = CreateFrame("Frame", "WayfarersTalesFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate" or nil)
-    if f.SetBackdrop then
-      f:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 32, edgeSize = 32,
-        insets = { left = 11, right = 12, top = 12, bottom = 11 },
-      })
+-- A paragraph of text in a page
+local function Para(page, font, gap)
+  local fs = page.p:CreateFontString(nil, "OVERLAY", font or "GameFontHighlight")
+  fs:SetWidth(PAGE_W - 8)
+  fs:SetJustifyH("LEFT")
+  fs:SetJustifyV("TOP")
+  fs:SetSpacing(2)
+  return page:Add(fs, gap)
+end
+
+-- Title of the tab, with the module's on/off box on the right
+local function ModuleHeader(page, titleKey, module, onToggle)
+  local h = CreateFrame("Frame", nil, page.p)
+  h:SetSize(PAGE_W, 28)
+  local t = h:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+  t:SetPoint("LEFT", 2, 0)
+  Label(t, titleKey)
+  if module then
+    local lt = h:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    lt:SetPoint("RIGHT", -4, 0)
+    Label(lt, "UI_MODULE_ON")
+    local cb = CreateFrame("CheckButton", nil, h, "UICheckButtonTemplate")
+    cb:SetPoint("RIGHT", lt, "LEFT", 0, 0)
+    if cb.Text then cb.Text:SetText("") end
+    if cb.text then cb.text:SetText("") end
+    cb:SetScript("OnClick", function(self)
+      local on = self:GetChecked() and true or false
+      api.GetDB().modules[module] = on
+      if onToggle then onToggle(on) end
+      KT.RefreshPanel()
+    end)
+    h.check, h.module = cb, module
+  end
+  local line = h:CreateTexture(nil, "ARTWORK")
+  line:SetColorTexture(0.5, 0.4, 0.22, 0.8)
+  line:SetHeight(1)
+  line:SetPoint("BOTTOMLEFT", 0, -3)
+  line:SetPoint("BOTTOMRIGHT", 0, -3)
+  function h:Refresh()
+    if self.check then self.check:SetChecked(api.GetDB().modules[self.module] ~= false) end
+  end
+  return page:Add(h, 12)
+end
+
+-- A row of buttons, one lit (like the old options)
+local function Segmented(parent, x, y, items, onPick, width)
+  local row = { buttons = {} }
+  width = width or 130
+  for i, it in ipairs(items) do
+    local b = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+    b:SetSize(width, 24)
+    b:SetPoint("TOPLEFT", x + (i - 1) * (width + 4), y)
+    b.value, b.textOf = it[1], it[2]
+    b:SetText(it[2]())
+    b:SetScript("OnClick", function()
+      onPick(it[1])
+      KT.RefreshPanel()
+    end)
+    row.buttons[i] = b
+  end
+  function row:Select(v)
+    for _, b in ipairs(self.buttons) do
+      if b.value == v then b:LockHighlight() else b:UnlockHighlight() end
     end
-    local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", -4, -4)
   end
-  f:SetSize(620, 640)
-  f:SetPoint("CENTER")
-  f:SetFrameStrata("DIALOG")
-  f:SetClampedToScreen(true)
-  f:SetMovable(true)
-  f:EnableMouse(true)
-  f:RegisterForDrag("LeftButton")
-  f:SetScript("OnDragStart", f.StartMoving)
-  f:SetScript("OnDragStop", f.StopMovingOrSizing)
-  f:Hide()
-  tinsert(UISpecialFrames, "WayfarersTalesFrame") -- Escape closes it
-
-  if f.TitleText then
-    f.TitleText:SetText("Wayfarer's Tales")
-  else
-    local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    title:SetPoint("TOP", 0, -8)
-    title:SetText("Wayfarer's Tales")
+  function row:Relabel()
+    for _, b in ipairs(self.buttons) do b:SetText(b.textOf()) end
   end
+  segmented[#segmented + 1] = row
+  return row
+end
 
-  local list = { { "companion", "UI_TAB_COMPANION" }, { "body", "UI_TAB_BODY" },
-    { "travels", "UI_TAB_TRAVELS" }, { "journal", "UI_TAB_JOURNAL" }, { "guide", "UI_TAB_GUIDE" },
-    { "options", "UI_TAB_OPTIONS" } }
-  -- the Ambiance tab (situation, possible lines) is for us only
-  if KT.IsDev() then table.insert(list, 3, { "senses", "UI_TAB_SENSES" }) end
-  for i, t in ipairs(list) do
-    local b = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    b:SetSize(82, 26)
-    b:SetPoint("TOPLEFT", 12 + (i - 1) * 85, -30)
-    Label(b, t[2])
-    b:SetScript("OnClick", function() KT.ShowTab(t[1]) end)
-    tabs[t[1]] = b
+local function CheckBox(parent, x, y, key, textKey, onChange)
+  local cb = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
+  cb:SetPoint("TOPLEFT", x, y)
+  if cb.Text then cb.Text:SetText("") end
+  if cb.text then cb.text:SetText("") end
+  local t = cb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+  t:SetPoint("LEFT", cb, "RIGHT", 2, 0)
+  Label(t, textKey)
+  cb.key = key
+  cb:SetScript("OnClick", function(self)
+    api.GetDB().settings[key] = self:GetChecked() and true or false
+    if onChange then onChange() end
+  end)
+  function cb:Refresh() self:SetChecked(api.GetDB().settings[key] and true or false) end
+  return cb
+end
+
+local function BoxLabel(box, x, y, key)
+  local fs = box:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  fs:SetPoint("TOPLEFT", x, y)
+  Label(fs, key)
+  return fs
+end
+
+-- "How it works", at the bottom of a tab
+local function GuideBox(page)
+  local box = Box(page.p, 40)
+  if box.SetBackdropColor then box:SetBackdropColor(0.1, 0.08, 0.06, 0.9) end
+  local head = box:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  head:SetPoint("TOPLEFT", 10, -9)
+  Label(head, "UI_GUIDE_HEAD")
+  local t = box:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  t:SetPoint("TOPLEFT", 10, -28)
+  t:SetWidth(PAGE_W - 22)
+  t:SetJustifyH("LEFT")
+  t:SetSpacing(3)
+  box.text = t
+  function box:Fit()
+    local h = 38 + t:GetStringHeight()
+    self:SetHeight(h)
+    return h
   end
+  return page:Add(box, 10)
+end
 
-  local content = CreateFrame("Frame", nil, f)
-  content:SetPoint("TOPLEFT", 10, -62)
-  content:SetPoint("BOTTOMRIGHT", -10, 10)
+local function Ago(t)
+  local d = time() - (t or time())
+  if d < 60 then return L.UI_AGO_NOW end
+  if d < 3600 then return string.format(L.UI_AGO_MIN, math.floor(d / 60)) end
+  if d < 86400 then return string.format(L.UI_AGO_HOURS, math.floor(d / 3600)) end
+  return string.format(L.UI_AGO_DAYS, math.floor(d / 86400))
+end
 
-  -- Companion page: the pet's model and header, then details and memories
-  local comp = CreateFrame("Frame", nil, content)
-  comp:SetAllPoints()
-  comp.modelBox = ModelBox(comp, 160, 170)
-  comp.modelBox:SetPoint("TOPLEFT", 6, -6)
-  local hx = 184
-  comp.name = comp:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-  comp.name:SetPoint("TOPLEFT", hx, -14)
-  comp.sub = comp:CreateFontString(nil, "OVERLAY", "GameFontDisable")
-  comp.sub:SetPoint("TOPLEFT", comp.name, "BOTTOMLEFT", 0, -4)
-  comp.tier = comp:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  comp.tier:SetPoint("TOPLEFT", comp.sub, "BOTTOMLEFT", 0, -12)
-  comp.tier:SetTextColor(1, 0.56, 0.69)
-  comp.desc = comp:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-  comp.desc:SetPoint("TOPLEFT", comp.tier, "BOTTOMLEFT", 0, -6)
-  comp.desc:SetWidth(CONTENT_WIDTH - 150)
-  comp.desc:SetJustifyH("LEFT")
-  comp.bar = StyledBar(comp, CONTENT_WIDTH - 150, 18)
-  comp.bar:SetPoint("TOPLEFT", hx + 3, -140)
-  comp.bar:SetStatusBarColor(1, 0.45, 0.62)
-  comp.text = CreateTextPage(comp)
-  comp.text:ClearAllPoints()
-  comp.text:SetPoint("TOPLEFT", 0, -184)
-  comp.text:SetPoint("BOTTOMRIGHT")
-  pages.companion = comp
-
-  pages.guide = CreateTextPage(content)
-  pages.travels = CreateTextPage(content)
-  pages.journal = BuildJournal(content)
-  pages.body = BuildBody(content)
-  pages.senses = BuildSenses(content)
-  pages.options = BuildOptions(content)
-
-  frame = f
+local function Hex(c)
+  return string.format("|cff%02x%02x%02x", math.floor(c[1] * 255), math.floor(c[2] * 255), math.floor(c[3] * 255))
 end
 
 ---------------------------------------------------------------------------
--- Page contents
+-- Body (Elements): your character, five gauges, where you are
+---------------------------------------------------------------------------
+
+-- The tips, each label in the color of its gauge
+local function TipsText()
+  local E = KT.Elements
+  local C = {}
+  if E then
+    C = { E.TEMP_COLORS.hot, E.TEMP_COLORS.cold, E.BAR_COLORS.wet, E.BAR_COLORS.thirst,
+      E.BAR_COLORS.hunger, E.BAR_COLORS.energy, E.BAR_COLORS.wet }
+  end
+  local out, i = {}, 0
+  for line in (KT.G(L.EL_PAGE_TIPS) .. "\n"):gmatch("(.-)\n") do
+    i = i + 1
+    local label, rest = line:match("^(.-)( ?: .*)$")
+    if label and C[i] then line = Hex(C[i]) .. label .. "|r" .. rest end
+    out[#out + 1] = line
+  end
+  return table.concat(out, "\n")
+end
+
+local function BuildBody(parent)
+  local page = ScrollPage(parent)
+  page.header = ModuleHeader(page, "EL_TITLE", "elements", function()
+    if KT.Elements then KT.Elements.UpdateIcons(); KT.Elements.UpdateThermo() end
+  end)
+  local top = CreateFrame("Frame", nil, page.p)
+  top:SetSize(PAGE_W, 232)
+  page.modelBox = ModelBox(top, 150, 228)
+  page.modelBox:SetPoint("TOPLEFT", 0, 0)
+  local x = 166
+  page.intro = top:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  page.intro:SetPoint("TOPLEFT", x, -4)
+  page.intro:SetWidth(PAGE_W - x - 6)
+  page.intro:SetJustifyH("LEFT")
+  page.bars = {}
+  for i = 1, 5 do
+    local bar = StyledBar(top, PAGE_W - x - 16, 18)
+    bar:SetPoint("TOPLEFT", x + 4, -50 - (i - 1) * 36)
+    page.bars[i] = bar
+  end
+  page:Add(top, 8)
+  page.here = Para(page, "GameFontHighlight", 10)
+
+  local set = Box(page.p, 92)
+  BoxLabel(set, 10, -10, "UI_OPT_BODYSTYLE")
+  page.bodyStyle = Segmented(set, 10, -30, {
+    { "none", function() return L.UI_BODYSTYLE.none end },
+    { "icons", function() return L.UI_BODYSTYLE.icons end },
+    { "bars", function() return L.UI_BODYSTYLE.bars end },
+  }, function(v)
+    api.GetDB().settings.bodyStyle = v
+    if KT.Elements then KT.Elements.UpdateIcons() end
+  end)
+  page.thermo = CheckBox(set, 6, -58, "showThermo", "UI_OPT_THERMO", function()
+    if KT.Elements then KT.Elements.UpdateThermo() end
+  end)
+  page.settings = page:Add(set, 10)
+  page.guide = GuideBox(page)
+  return page
+end
+
+local function RefreshBody(page)
+  local db = api.GetDB()
+  local E = KT.Elements
+  local st = E and E.GetState()
+  local on = KT.ModuleOn("elements") and st ~= nil
+  page.header:Refresh()
+  page.modelBox:ShowUnit("player")
+  local rows = on and E.Rows() or {}
+  for i, bar in ipairs(page.bars) do
+    local r = rows[i]
+    bar:SetShown(r ~= nil)
+    if r then
+      bar.text:SetText(r[1])
+      E.ApplyBar(bar, r)
+    end
+  end
+  page.intro:SetText(on and L.EL_PAGE_INTRO or L.EL_OFF)
+  page.here:SetShown(on)
+  page.settings:SetShown(on)
+  page.guide:SetShown(on)
+  if on then
+    page.here:SetText(E.HereText())
+    page.guide.text:SetText(TipsText())
+    page.bodyStyle:Select(db.settings.bodyStyle or "none")
+    page.thermo:Refresh()
+  end
+  page:Layout()
+end
+
+---------------------------------------------------------------------------
+-- Companion (Kindred, hunters): your pet, its story, how often it speaks up
 ---------------------------------------------------------------------------
 
 local function CompanionText(pet)
@@ -862,7 +813,6 @@ local function CompanionText(pet)
   local function add(s) lines[#lines + 1] = s or "" end
 
   if pet then
-    -- (name, bond stage and its description are in the header above the text)
     local idx = api.TierIndex(math.floor(pet.affection))
     if D.TIERS[idx + 1] then
       add(Grey(string.format(L.TT_NEXT, L.TIERS[idx + 1], D.TIERS[idx + 1])))
@@ -914,82 +864,449 @@ local function CompanionText(pet)
   return table.concat(lines, "\n")
 end
 
+local function BuildCompanion(parent)
+  local page = ScrollPage(parent)
+  page.header = ModuleHeader(page, "UI_COMPANION_TITLE", "kindred", function(on)
+    api.UpdateHeart()
+    if on then api.Rescan() end
+  end)
+  local top = CreateFrame("Frame", nil, page.p)
+  top:SetSize(PAGE_W, 172)
+  page.modelBox = ModelBox(top, 160, 170)
+  page.modelBox:SetPoint("TOPLEFT", 0, 0)
+  local hx = 178
+  page.name = top:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+  page.name:SetPoint("TOPLEFT", hx, -8)
+  page.sub = top:CreateFontString(nil, "OVERLAY", "GameFontDisable")
+  page.sub:SetPoint("TOPLEFT", page.name, "BOTTOMLEFT", 0, -4)
+  page.tier = top:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  page.tier:SetPoint("TOPLEFT", page.sub, "BOTTOMLEFT", 0, -12)
+  page.tier:SetTextColor(1, 0.56, 0.69)
+  page.desc = top:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  page.desc:SetPoint("TOPLEFT", page.tier, "BOTTOMLEFT", 0, -6)
+  page.desc:SetWidth(PAGE_W - hx - 10)
+  page.desc:SetJustifyH("LEFT")
+  page.bar = StyledBar(top, PAGE_W - hx - 16, 18)
+  page.bar:SetPoint("TOPLEFT", hx + 3, -136)
+  page.bar:SetStatusBarColor(1, 0.45, 0.62)
+  page.top = page:Add(top, 10)
+  page.text = Para(page, "GameFontHighlight", 12)
+
+  local set = Box(page.p, 120)
+  BoxLabel(set, 10, -10, "UI_OPT_CHATTY")
+  page.chatty = Segmented(set, 10, -30, {
+    { 0, function() return L.UI_CHATTY[0] end }, { 1, function() return L.UI_CHATTY[1] end },
+    { 2, function() return L.UI_CHATTY[2] end }, { 3, function() return L.UI_CHATTY[3] end },
+  }, function(v) api.GetDB().settings.chatty = v end)
+  page.chattyDesc = set:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  page.chattyDesc:SetPoint("TOPLEFT", 12, -60)
+  page.chattyDesc:SetWidth(PAGE_W - 24)
+  page.chattyDesc:SetJustifyH("LEFT")
+  page.sound = CheckBox(set, 6, -86, "sound", "UI_OPT_SOUND")
+  page.settings = page:Add(set, 10)
+  page.guide = GuideBox(page)
+  return page
+end
+
+local function RefreshCompanion(page)
+  local db = api.GetDB()
+  page.header:Refresh()
+  local on = db.modules.kindred ~= false
+  local pet = on and api.GetPet() or nil
+  page.top:SetShown(pet ~= nil)
+  page.settings:SetShown(on)
+  page.guide:SetShown(on)
+  if not on then
+    page.text:SetText(L.UI_KINDRED_OFF)
+  else
+    if pet then
+      local idx = api.TierIndex(math.floor(pet.affection))
+      page.modelBox:ShowUnit("pet")
+      page.name:SetText(pet.name)
+      local sub = pet.family or "?"
+      if pet.level then sub = sub .. ", " .. L.UI_LEVEL .. " " .. pet.level end
+      page.sub:SetText(sub)
+      page.tier:SetText(L.TIERS[idx])
+      page.desc:SetText(L.TIER_DESC[idx])
+      page.bar:SetValue(pet.affection)
+      page.bar.text:SetText(string.format(L.TT_SCORE, math.floor(pet.affection)))
+    end
+    page.text:SetText(CompanionText(pet))
+    local chatty = db.settings.chatty or 2
+    page.chatty:Select(chatty)
+    page.chattyDesc:SetText(L.UI_CHATTY_DESC[chatty] or "")
+    page.sound:Refresh()
+    page.guide.text:SetText(L.UI_KINDRED_GUIDE)
+  end
+  page:Layout()
+end
+
+---------------------------------------------------------------------------
+-- Ambiance (Senses): the last line, how often lines come
+---------------------------------------------------------------------------
+
+local devSenses -- the dev window with the situation and every possible line
+
+function KT.ToggleSensesDev()
+  if not KT.IsDev() then return end
+  if not devSenses then
+    local ok, f = pcall(CreateFrame, "Frame", "WayfarersTalesSensesDev", UIParent, "BasicFrameTemplateWithInset")
+    if not ok or not f then
+      f = CreateFrame("Frame", "WayfarersTalesSensesDev", UIParent, BACKDROP_TEMPLATE)
+      if f.SetBackdrop then
+        f:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+          edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32,
+          insets = { left = 11, right = 12, top = 12, bottom = 11 } })
+      end
+      local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+      close:SetPoint("TOPRIGHT", -4, -4)
+    end
+    if f.TitleText then f.TitleText:SetText(L.SN_DEV_BUTTON .. " (dev)") end
+    f:SetSize(580, 640)
+    f:SetPoint("CENTER", 120, 0)
+    f:SetFrameStrata("DIALOG")
+    f:SetClampedToScreen(true)
+    f:SetMovable(true)
+    f:EnableMouse(true)
+    f:RegisterForDrag("LeftButton")
+    f:SetScript("OnDragStart", f.StartMoving)
+    f:SetScript("OnDragStop", f.StopMovingOrSizing)
+    tinsert(UISpecialFrames, "WayfarersTalesSensesDev")
+    local holder = CreateFrame("Frame", nil, f)
+    holder:SetPoint("TOPLEFT", 10, -30)
+    holder:SetPoint("BOTTOMRIGHT", -10, 10)
+    f.page = BuildSenses(holder)
+    -- what's around you changes: refresh every few seconds while it's open
+    local acc = 0
+    f:SetScript("OnUpdate", function(_, dt)
+      acc = acc + dt
+      if acc >= 3 then
+        acc = 0
+        pcall(RefreshSenses, f.page)
+      end
+    end)
+    devSenses = f
+    f:Hide()
+  end
+  devSenses:SetShown(not devSenses:IsShown())
+  if devSenses:IsShown() then pcall(RefreshSenses, devSenses.page) end
+end
+
+local function BuildAmbiance(parent)
+  local page = ScrollPage(parent)
+  page.header = ModuleHeader(page, "UI_TAB_SENSES", "senses")
+  page.intro = Para(page, "GameFontHighlight", 10)
+
+  local last = Box(page.p, 60)
+  if last.SetBackdropColor then last:SetBackdropColor(0.06, 0.05, 0.04, 0.9) end
+  last.meta = last:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+  last.meta:SetPoint("TOPLEFT", 10, -9)
+  last.text = last:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+  last.text:SetPoint("TOPLEFT", 10, -26)
+  last.text:SetWidth(PAGE_W - 22)
+  last.text:SetJustifyH("LEFT")
+  last.text:SetSpacing(2)
+  last.text:SetTextColor(1, 0.82, 0.63)
+  function last:Fit()
+    local h = 36 + self.text:GetStringHeight()
+    self:SetHeight(h)
+    return h
+  end
+  page.last = page:Add(last, 10)
+
+  local set = Box(page.p, 62)
+  BoxLabel(set, 10, -10, "UI_OPT_RHYTHM")
+  page.rhythm = Segmented(set, 10, -30, {
+    { 0, function() return L.UI_RHYTHM[0] end }, { 1, function() return L.UI_RHYTHM[1] end },
+    { 2, function() return L.UI_RHYTHM[2] end }, { 3, function() return L.UI_RHYTHM[3] end },
+  }, function(v) api.GetDB().settings.sensesRhythm = v end)
+  page.settings = page:Add(set, 12)
+
+  if KT.IsDev() then
+    local dev = CreateFrame("Button", nil, page.p, "UIPanelButtonTemplate")
+    dev:SetSize(180, 24)
+    Label(dev, "SN_DEV_BUTTON")
+    dev:SetScript("OnClick", function() KT.ToggleSensesDev() end)
+    page:Add(dev, 10)
+  end
+  return page
+end
+
+local function RefreshAmbiance(page)
+  local db = api.GetDB()
+  page.header:Refresh()
+  local on = KT.ModuleOn("senses")
+  page.intro:SetText(on and L.SN_PAGE_INTRO or L.SN_OFF)
+  page.last:SetShown(on)
+  page.settings:SetShown(on)
+  if on then
+    local e
+    for i = #db.journal, 1, -1 do
+      local j = db.journal[i]
+      if j.module == "senses" and j.key ~= "newTitle" then e = j break end
+    end
+    if e then
+      local where = tostring(e.zone or "?")
+      if e.sub and e.sub ~= "" then where = e.sub end
+      page.last.meta:SetText(string.format(L.SN_LAST, where, Ago(e.t)))
+      page.last.text:SetText(StripCodes(e.text or ""))
+    else
+      page.last.meta:SetText("")
+      page.last.text:SetText(L.SN_LAST_NONE)
+    end
+    page.rhythm:Select(db.settings.sensesRhythm or 2)
+  end
+  page:Layout()
+end
+
+---------------------------------------------------------------------------
+-- Carnet (discoveries): your title, then the travel log
+---------------------------------------------------------------------------
+
+local function BuildTravels(parent)
+  local page = ScrollPage(parent)
+  local box = Box(page.p, 72)
+  local small = box:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+  small:SetPoint("TOPLEFT", 12, -10)
+  Label(small, "DISC_YOUR_TITLE")
+  page.title = box:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+  page.title:SetPoint("TOPLEFT", 12, -28)
+  page.title:SetTextColor(1, 0.56, 0.69)
+  page.bar = StyledBar(box, 300, 14)
+  page.bar:SetPoint("TOPRIGHT", -16, -16)
+  page.bar:SetStatusBarColor(0.95, 0.75, 0.2)
+  page.next = box:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+  page.next:SetPoint("TOPLEFT", page.bar, "BOTTOMLEFT", 0, -8)
+  page:Add(box, 12)
+  page.text = Para(page, "GameFontHighlight", 10)
+  return page
+end
+
+local function RefreshTravels(page)
+  local Di = KT.Discovery
+  if Di then
+    local score = Di.Score()
+    local name, at, nextName, nextAt = Di.Title(score)
+    page.title:SetText(name)
+    page.bar:SetMinMaxValues(at or 0, nextAt or ((at or 0) + 1))
+    page.bar:SetValue(nextAt and score or ((at or 0) + 1))
+    page.bar.text:SetText(nextAt and (score .. " / " .. nextAt) or tostring(score))
+    page.next:SetText(nextName and string.format(L.DISC_NEXT, nextName, nextAt) or L.DISC_TOP)
+  end
+  page.text:SetText(Di and Di.PageText() or "")
+  page:Layout()
+end
+
+---------------------------------------------------------------------------
+-- Options: what's left once each module has its own settings
+---------------------------------------------------------------------------
+
+local function BuildOptions(parent)
+  local page = ScrollPage(parent)
+  page.header = ModuleHeader(page, "UI_TAB_OPTIONS")
+  local box = CreateFrame("Frame", nil, page.p)
+  box:SetSize(PAGE_W, 190)
+  page.minimap = CheckBox(box, 0, 0, "minimap", "UI_OPT_MINIMAP", function() KT.UpdateMinimapButton() end)
+  BoxLabel(box, 4, -40, "UI_OPT_LANGUAGE")
+  page.lang = Segmented(box, 2, -60, {
+    { "auto", function() return "Auto" end }, { "en", function() return "English" end },
+    { "fr", function() return "Français" end },
+  }, function(v)
+    api.GetDB().settings.language = v
+    KT.ApplyLanguage()
+    KT.RelabelPanel()
+    api.UpdateHeart() -- also refreshes this window
+  end)
+  BoxLabel(box, 4, -100, "UI_OPT_GENDER")
+  page.gender = Segmented(box, 2, -120, {
+    { "auto", function() return L.UI_GENDER_AUTO end }, { "m", function() return L.UI_GENDER_M end },
+    { "f", function() return L.UI_GENDER_F end }, { "n", function() return L.UI_GENDER_N end },
+  }, function(v) api.GetDB().settings.gender = v end)
+  if KT.IsDev() then
+    page.debug = CheckBox(box, 0, -156, "debug", "UI_OPT_DEBUG")
+  end
+  page:Add(box, 10)
+  page.note = Para(page, "GameFontDisableSmall", 10)
+  return page
+end
+
+local function RefreshOptions(page)
+  local s = api.GetDB().settings
+  page.minimap:Refresh()
+  if page.debug then page.debug:Refresh() end
+  page.lang:Select(s.language or "auto")
+  page.gender:Select(s.gender or "auto")
+  page.note:SetText(L.UI_OPT_NOTE)
+  page:Layout()
+end
+
+---------------------------------------------------------------------------
+-- The window: a header with your title, tabs on top, the pages
+---------------------------------------------------------------------------
+
+local header, tabTemplate
+
+local function SelectTabButton(b, on)
+  if tabTemplate ~= "plain" then
+    local fn = on and PanelTemplates_SelectTab or PanelTemplates_DeselectTab
+    if fn and pcall(fn, b) then return end
+  end
+  if on then b:LockHighlight() else b:UnlockHighlight() end
+end
+
+local function MakeTab(f, i, prev, key)
+  local name = "WayfarersTalesFrameTab" .. i
+  local ok, b = pcall(CreateFrame, "Button", name, f, "PanelTopTabButtonTemplate")
+  if ok and b then
+    tabTemplate = tabTemplate or "top"
+  else
+    ok, b = pcall(CreateFrame, "Button", name .. "Old", f, "TabButtonTemplate")
+    if ok and b then
+      tabTemplate = tabTemplate or "old"
+    else
+      b = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+      b:SetSize(92, 24)
+      tabTemplate = "plain"
+    end
+  end
+  Label(b, key)
+  if tabTemplate ~= "plain" then pcall(PanelTemplates_TabResize, b, 0) end
+  if prev then
+    b:SetPoint("LEFT", prev, "RIGHT", tabTemplate == "old" and -12 or 4, 0)
+  else
+    b:SetPoint("TOPLEFT", 14, -84)
+  end
+  return b
+end
+
+local function RefreshHeader()
+  if not header or not KT.Discovery then return end
+  local score = KT.Discovery.Score()
+  local name, at, _, nextAt = KT.Discovery.Title(score)
+  header.line:SetText(string.format(L.DISC_TITLE_LINE, Pink(name), score))
+  header.bar:SetMinMaxValues(at or 0, nextAt or ((at or 0) + 1))
+  header.bar:SetValue(nextAt and score or ((at or 0) + 1))
+end
+
+local function Build()
+  local ok, f = pcall(CreateFrame, "Frame", "WayfarersTalesFrame", UIParent, "BasicFrameTemplateWithInset")
+  if not ok or not f then
+    f = CreateFrame("Frame", "WayfarersTalesFrame", UIParent, BACKDROP_TEMPLATE)
+    if f.SetBackdrop then
+      f:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true, tileSize = 32, edgeSize = 32,
+        insets = { left = 11, right = 12, top = 12, bottom = 11 },
+      })
+    end
+    local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+    close:SetPoint("TOPRIGHT", -4, -4)
+  end
+  f:SetSize(630, 680)
+  f:SetPoint("CENTER")
+  f:SetFrameStrata("DIALOG")
+  f:SetClampedToScreen(true)
+  f:SetMovable(true)
+  f:EnableMouse(true)
+  f:RegisterForDrag("LeftButton")
+  f:SetScript("OnDragStart", f.StartMoving)
+  f:SetScript("OnDragStop", f.StopMovingOrSizing)
+  f:Hide()
+  tinsert(UISpecialFrames, "WayfarersTalesFrame") -- Escape closes it
+  if f.TitleText then f.TitleText:SetText("") end -- the big title is in the header
+
+  -- Header: icon, name, your title and discoveries (click: the Carnet)
+  local icon = f:CreateTexture(nil, "ARTWORK")
+  icon:SetSize(40, 40)
+  icon:SetPoint("TOPLEFT", 16, -30)
+  icon:SetTexture(Icon())
+  local name = f:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+  name:SetPoint("TOPLEFT", icon, "TOPRIGHT", 10, 0)
+  name:SetText("Wayfarer's Tales")
+  local tb = CreateFrame("Button", nil, f)
+  tb:SetSize(320, 24)
+  tb:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -3)
+  tb.line = tb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+  tb.line:SetPoint("TOPLEFT", 0, 0)
+  tb.line:SetTextColor(0.72, 0.68, 0.6)
+  tb.bar = CreateFrame("StatusBar", nil, tb)
+  tb.bar:SetSize(220, 4)
+  tb.bar:SetPoint("TOPLEFT", tb.line, "BOTTOMLEFT", 0, -4)
+  tb.bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+  tb.bar:SetStatusBarColor(0.95, 0.75, 0.2)
+  local bbg = tb.bar:CreateTexture(nil, "BACKGROUND")
+  bbg:SetAllPoints()
+  bbg:SetColorTexture(0, 0, 0, 0.6)
+  tb:SetScript("OnClick", function() KT.ShowTab("travels") end)
+  tb:SetScript("OnEnter", function(self)
+    if not KT.Discovery then return end
+    local score = KT.Discovery.Score()
+    local _, _, nextName, nextAt = KT.Discovery.Title(score)
+    GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+    GameTooltip:AddLine(nextName and string.format(L.DISC_NEXT, nextName, nextAt) or L.DISC_TOP, 1, 1, 1, true)
+    GameTooltip:Show()
+  end)
+  tb:SetScript("OnLeave", function() GameTooltip:Hide() end)
+  header = tb
+
+  -- Tabs (Companion only for hunters)
+  local list = { { "body", "UI_TAB_BODY" } }
+  if select(2, UnitClass("player")) == "HUNTER" then list[#list + 1] = { "companion", "UI_TAB_COMPANION" } end
+  for _, t in ipairs({ { "senses", "UI_TAB_SENSES" }, { "travels", "UI_TAB_TRAVELS" },
+    { "journal", "UI_TAB_JOURNAL" }, { "options", "UI_TAB_OPTIONS" } }) do list[#list + 1] = t end
+  local prev
+  for i, t in ipairs(list) do
+    local b = MakeTab(f, i, prev, t[2])
+    b:SetScript("OnClick", function() KT.ShowTab(t[1]) end)
+    tabs[t[1]] = b
+    prev = b
+  end
+
+  local content = CreateFrame("Frame", nil, f)
+  content:SetPoint("TOPLEFT", 12, -116)
+  content:SetPoint("BOTTOMRIGHT", -10, 10)
+  local line = content:CreateTexture(nil, "ARTWORK")
+  line:SetColorTexture(0.5, 0.4, 0.22, 0.6)
+  line:SetHeight(1)
+  line:SetPoint("TOPLEFT", 0, 2)
+  line:SetPoint("TOPRIGHT", 0, 2)
+
+  pages.body = BuildBody(content)
+  if tabs.companion then pages.companion = BuildCompanion(content) end
+  pages.senses = BuildAmbiance(content)
+  pages.travels = BuildTravels(content)
+  pages.journal = BuildJournal(content)
+  pages.options = BuildOptions(content)
+
+  frame = f
+end
+
+function KT.RelabelPanel()
+  for _, w in ipairs(labelled) do w:SetText(L[w.labelKey] or w.labelKey) end
+  for _, row in ipairs(segmented) do row:Relabel() end
+  if tabTemplate and tabTemplate ~= "plain" then
+    for _, b in pairs(tabs) do pcall(PanelTemplates_TabResize, b, 0) end
+  end
+  if KT.Homework then KT.Homework.Refresh() end
+end
+
 function KT.RefreshPanel()
+  if devSenses and devSenses:IsShown() then pcall(RefreshSenses, devSenses.page) end
   if not frame or not frame:IsShown() then return end
   local db = api.GetDB()
-  if currentTab == "journal" then
-    RefreshJournal(pages.journal, db)
-  elseif currentTab == "body" then
-    RefreshBody(pages.body)
-  elseif currentTab == "senses" then
-    RefreshSenses(pages.senses)
-  elseif currentTab == "companion" then
-    local c = pages.companion
-    local pet = db.modules.kindred ~= false and api.GetPet() or nil
-    local header = { c.modelBox, c.name, c.sub, c.tier, c.desc, c.bar }
-    for _, w in ipairs(header) do w:SetShown(pet ~= nil) end
-    c.text:ClearAllPoints()
-    c.text:SetPoint("TOPLEFT", 0, pet and -184 or 0)
-    c.text:SetPoint("BOTTOMRIGHT")
-    if db.modules.kindred == false then
-      c.text:SetContent(L.UI_KINDRED_OFF)
-    else
-      if pet then
-        local idx = api.TierIndex(math.floor(pet.affection))
-        c.modelBox:ShowUnit("pet")
-        c.name:SetText(pet.name)
-        local sub = pet.family or "?"
-        if pet.level then sub = sub .. ", " .. L.UI_LEVEL .. " " .. pet.level end
-        c.sub:SetText(sub)
-        c.tier:SetText(L.TIERS[idx])
-        c.desc:SetText(L.TIER_DESC[idx])
-        c.bar:SetValue(pet.affection)
-        c.bar.text:SetText(string.format(L.TT_SCORE, math.floor(pet.affection)))
-      end
-      c.text:SetContent(CompanionText(pet))
-    end
-  elseif currentTab == "travels" then
-    pages.travels:SetContent(KT.Discovery and KT.Discovery.PageText() or "")
-  elseif currentTab == "guide" then
-    pages.guide:SetContent(L.GUIDE .. "\n\n" .. (L.EL_GUIDE or "") .. "\n\n" .. (L.SN_GUIDE or ""))
-  elseif currentTab == "options" then
-    local p = pages.options
-    local chatty = db.settings.chatty or 2
-    for n, b in pairs(p.chattyButtons) do
-      if n == chatty then b:LockHighlight() else b:UnlockHighlight() end
-    end
-    p.chattyDesc:SetText(L.UI_CHATTY_DESC[chatty] or "")
-    for _, cb in ipairs(p.checks) do
-      if cb.module then
-        cb:SetChecked(db.modules[cb.module] ~= false)
-      else
-        cb:SetChecked(db.settings[cb.key] and true or false)
-      end
-    end
-    local lang = db.settings.language or "auto"
-    for code, b in pairs(p.langButtons) do
-      if code == lang then b:LockHighlight() else b:UnlockHighlight() end
-    end
-    local gender = db.settings.gender or "auto"
-    for code, b in pairs(p.genderButtons) do
-      if code == gender then b:LockHighlight() else b:UnlockHighlight() end
-    end
-    local rhythm = db.settings.sensesRhythm or 2
-    for n, b in pairs(p.rhythmButtons) do
-      if n == rhythm then b:LockHighlight() else b:UnlockHighlight() end
-    end
-    local style = db.settings.sensesStyle or "mixed"
-    for st, b in pairs(p.styleButtons) do
-      if st == style then b:LockHighlight() else b:UnlockHighlight() end
-    end
-    local bstyle = db.settings.bodyStyle or "none"
-    for bs, b in pairs(p.bodyStyleButtons) do
-      if bs == bstyle then b:LockHighlight() else b:UnlockHighlight() end
-    end
+  RefreshHeader()
+  if currentTab == "journal" then RefreshJournal(pages.journal, db)
+  elseif currentTab == "body" then RefreshBody(pages.body)
+  elseif currentTab == "companion" and pages.companion then RefreshCompanion(pages.companion)
+  elseif currentTab == "senses" then RefreshAmbiance(pages.senses)
+  elseif currentTab == "travels" then RefreshTravels(pages.travels)
+  elseif currentTab == "options" then RefreshOptions(pages.options)
   end
 end
 
 function KT.ShowTab(name)
+  if not pages[name] then name = "body" end
   currentTab = name
   for k, p in pairs(pages) do p:SetShown(k == name) end
   -- 3D models must be reloaded after being hidden; bars start at their current value
@@ -997,15 +1314,14 @@ function KT.ShowTab(name)
     if p.modelBox then p.modelBox.guid = nil end
     for _, bar in ipairs(p.bars or {}) do bar.shown = nil end
   end
-  for k, b in pairs(tabs) do
-    if k == name then b:LockHighlight() else b:UnlockHighlight() end
-  end
+  for k, b in pairs(tabs) do SelectTabButton(b, k == name) end
   KT.RefreshPanel()
 end
 
 function KT.TogglePanel(tab)
   api = KT.api
   if not frame then Build() end
+  if tab and not pages[tab] then tab = nil end -- (old tabs like the guide)
   if frame:IsShown() and (not tab or tab == currentTab) then
     frame:Hide()
     return
@@ -1013,6 +1329,7 @@ function KT.TogglePanel(tab)
   frame:Show()
   KT.ShowTab(tab or currentTab)
 end
+
 
 ---------------------------------------------------------------------------
 -- Minimap button (drag it around the minimap)

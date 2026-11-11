@@ -1098,6 +1098,34 @@ L.HW_FLAGGED = "line flagged, with your comment. It will be in your report."
 L.UI_REPORT_NOTES = "--- Homework notes ---"
 L.UI_REPORT_QUESTS = "--- Quests turned in (latest) ---"
 
+-- New window (0.55): tabs, a header with your title, settings in each module's tab
+L.UI_MODULE_ON       = "Module on"
+L.UI_COMPANION_TITLE = "Your pet"
+L.UI_GUIDE_HEAD      = "How it works"
+L.UI_KINDRED_GUIDE   = "Pet your companion (/pet), feed it, share your meals, rest by a campfire and go on adventures together: its affection grows. It drops a little with rude emotes or long stays in the stable, but never below a bond stage you've reached.\nAnd when your pet asks you for something, a cuddle or a bite of your meal, making it happy without too much delay warms its heart even more."
+L.UI_KINDRED_OFF     = "The pet module is turned off. Turn it back on with the box at the top of this tab."
+L.EL_OFF             = "The body comfort module is turned off. Turn it back on with the box at the top of this tab."
+L.SN_OFF             = "The ambiance module is turned off. Turn it back on with the box at the top of this tab."
+L.SN_PAGE_INTRO      = "Now and then, a short line describes the world around you: a smell, a sound, the wind, the weather. And the little moments of your life on the road have theirs too."
+L.SN_LAST            = "Last line · %s, %s"
+L.SN_LAST_NONE       = "No ambiance line yet. Go for a walk!"
+L.SN_DEV_BUTTON      = "Situation here"
+L.UI_AGO_NOW         = "just now"
+L.UI_AGO_MIN         = "%d min ago"
+L.UI_AGO_HOURS       = "%d h ago"
+L.UI_AGO_DAYS        = "%d days ago"
+L.UI_JOURNAL_COPY    = "Send the report"
+L.UI_JOURNAL_COPY_HELP = "Add your ideas at the bottom if you like, then Ctrl+A and Ctrl+C to copy, and paste it all on the addon's Discord."
+L.UI_FLAG_POPUP      = "Report this line:\n\n|cffffd0a0%s|r\n\nWhat's wrong with it? (optional)"
+L.UI_FLAG_OK         = "Report"
+-- Titles: one for each discovery milestone (D.DISCOVERY_TITLES)
+L.DISC_TITLES = { "Greenhorn", "Stroller", "Traveler", "Roamer", "Globetrotter", "Explorer", "Wayfarer", "Legend of the Road" }
+L.DISC_TITLE_LINE = "%s · %d discoveries"
+L.DISC_YOUR_TITLE = "Your title"
+L.DISC_NEXT       = "Next title: %s, at %d"
+L.DISC_TOP        = "The highest title there is!"
+L.DISC_NEW_TITLE  = "New title: %s"
+
 -- Keep an untouched copy of the English texts, so the language can be switched
 -- back and forth (other languages are laid over these, see Locale_frFR.lua).
 local function copy(t)

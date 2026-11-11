@@ -53,6 +53,21 @@ function Di.Score(c)
   return total
 end
 
+-- Your title for a score: one per milestone (0, then D.DISCOVERY_MILESTONES).
+-- Returns the title, the points it started at, and the next title and its points
+-- (nil at the top). Titles agree with your character (French: {m|f|n} forms).
+function Di.Title(score)
+  score = score or Di.Score()
+  local steps = { 0 }
+  for _, m in ipairs(D.DISCOVERY_MILESTONES) do steps[#steps + 1] = m end
+  local i = 1
+  for n, at in ipairs(steps) do if score >= at then i = n end end
+  local names = L.DISC_TITLES or {}
+  local name = KT.G(names[i] or names[#names] or "?")
+  local nextName = steps[i + 1] and names[i + 1] and KT.G(names[i + 1]) or nil
+  return name, steps[i], nextName, steps[i + 1]
+end
+
 ---------------------------------------------------------------------------
 -- New things to record: dungeons, flight destinations, inns
 ---------------------------------------------------------------------------
@@ -115,6 +130,12 @@ local function CheckMilestone()
   if reached > st.discoveryMilestone then
     if KT.Moments and KT.Moments.Play("discoveryMilestone") then
       st.discoveryMilestone = reached
+      -- each milestone brings a new title
+      local title = Di.Title(score)
+      C_Timer.After(2, function()
+        KT.NarrateText("senses", "newTitle", "|cffff8fb1" .. string.format(L.DISC_NEW_TITLE, title) .. "|r", nil, true)
+        if KT.RefreshPanel then KT.RefreshPanel() end
+      end)
     end
   end
 end

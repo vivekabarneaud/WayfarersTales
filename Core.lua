@@ -1362,6 +1362,8 @@ function H.ADDON_LOADED(name)
   s.drops, s.showBody, s.bodyPos, s.bodyPos2, s.bodyPos3 = nil, nil, nil, nil, nil
   -- 0.32: the heart is now off by default; turn it off once for older saves too
   if not s.heartOffOnce then s.showHeart, s.heartOffOnce = false, true end
+  -- 0.55: the new window drops these options: back to their defaults once
+  if not s.panel055 then s.label, s.showHeart, s.sensesStyle, s.panel055 = false, false, "mixed", true end
   db.probes = nil
   -- 0.54: modes. Saves that already hold tester data (our testers) start in tester mode.
   if s.tester == nil then s.tester = HasTesterData() end

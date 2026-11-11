@@ -1088,3 +1088,33 @@ L.HW_BTN_FLAG = "Bizarre"
 L.HW_FLAGGED = "ligne signalée, avec votre commentaire. Ce sera dans votre rapport."
 L.UI_REPORT_NOTES = "--- Notes de devoirs ---"
 L.UI_REPORT_QUESTS = "--- Quêtes rendues (dernières) ---"
+
+-- Nouvelle fenêtre (0.55) : onglets, un en-tête avec votre titre, les réglages dans l'onglet de chaque module
+L.UI_MODULE_ON       = "Module activé"
+L.UI_COMPANION_TITLE = "Votre familier"
+L.UI_GUIDE_HEAD      = "Comment ça marche"
+L.UI_KINDRED_GUIDE   = "Caressez votre familier (/pet), nourrissez-le, partagez vos repas, reposez-vous au coin du feu et vivez des aventures ensemble : son affection grandit. Elle baisse un peu avec les emotes grossières ou les longs séjours à l'écurie, mais jamais sous un palier déjà atteint.\nEt quand votre familier vous réclame quelque chose, une caresse ou une bouchée de votre repas, lui faire plaisir sans trop tarder lui fait encore plus chaud au cœur."
+L.UI_KINDRED_OFF     = "Le module du familier est désactivé. Réactivez-le avec la case en haut de cet onglet."
+L.EL_OFF             = "Le module de confort du corps est désactivé. Réactivez-le avec la case en haut de cet onglet."
+L.SN_OFF             = "Le module d'ambiance est désactivé. Réactivez-le avec la case en haut de cet onglet."
+L.SN_PAGE_INTRO      = "De temps en temps, une courte ligne décrit le monde autour de vous : une odeur, un bruit, le vent, la météo. Et les petits moments de votre vie sur les routes ont aussi les leurs."
+L.SN_LAST            = "Dernière ligne · %s, %s"
+L.SN_LAST_NONE       = "Aucune ligne d'ambiance pour l'instant. Allez donc vous promener !"
+L.SN_DEV_BUTTON      = "Situation ici"
+L.UI_AGO_NOW         = "à l'instant"
+L.UI_AGO_MIN         = "il y a %d min"
+L.UI_AGO_HOURS       = "il y a %d h"
+L.UI_AGO_DAYS        = "il y a %d jours"
+L.UI_JOURNAL_COPY    = "Envoyer le rapport"
+L.UI_JOURNAL_COPY_HELP = "Ajoutez vos idées en bas si vous voulez, puis Ctrl+A et Ctrl+C pour copier, et collez le tout sur le Discord de l'addon."
+L.UI_FLAG_POPUP      = "Signaler cette ligne :\n\n|cffffd0a0%s|r\n\nQu'est-ce qui ne va pas ? (facultatif)"
+L.UI_FLAG_OK         = "Signaler"
+-- Titres : un par palier de découvertes (D.DISCOVERY_TITLES), accordés selon votre personnage
+L.DISC_TITLES = { "Pied-tendre", "{Flâneur|Flâneuse|Flâneur·se}", "{Voyageur|Voyageuse|Voyageur·se}",
+  "{Arpenteur|Arpenteuse|Arpenteur·se}", "{Bourlingueur|Bourlingueuse|Bourlingueur·se}",
+  "{Explorateur|Exploratrice|Explorateur·rice}", "{Baroudeur|Baroudeuse|Baroudeur·se}", "Légende des chemins" }
+L.DISC_TITLE_LINE = "%s · %d découvertes"
+L.DISC_YOUR_TITLE = "Votre titre"
+L.DISC_NEXT       = "Prochain titre : %s, à %d"
+L.DISC_TOP        = "Le plus haut titre qui soit !"
+L.DISC_NEW_TITLE  = "Nouveau titre : %s"
