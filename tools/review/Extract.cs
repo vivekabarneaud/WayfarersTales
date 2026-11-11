@@ -290,6 +290,9 @@ public static class Extractor {
   }
 
   static string PlaceZone = null, PlaceBiome = null;
+  static Dictionary<string, string> SubZone = new Dictionary<string, string>(), SpotMap = new Dictionary<string, string>();
+  static bool ForceDraft = false;
+  static Dictionary<string, string> GroupName = new Dictionary<string, string>();
   static void Lines(string idPrefix, string section, string group, string kind, object list, string note) {
     var t = Resolve(list); if (t == null) return;
     int i = 0;
@@ -299,7 +302,7 @@ public static class Extractor {
       var ex = new StringBuilder();
       if (PlaceZone != null) ex.Append(",\"zone\":").Append(J(PlaceZone));
       if (PlaceBiome != null) ex.Append(",\"biome\":").Append(J(PlaceBiome));
-      if (line.Get("draft") is bool && (bool)line.Get("draft")) ex.Append(",\"draft\":true");
+      if (ForceDraft || (line.Get("draft") is bool && (bool)line.Get("draft"))) ex.Append(",\"draft\":true");
       if (Str(line.Get("check")) != null) ex.Append(",\"check\":").Append(J(Str(line.Get("check"))));
       var rw = Resolve(line.Get("rewrite"));
       if (rw != null) {
@@ -379,6 +382,8 @@ public static class Extractor {
         var sp = Resolve(item); if (sp == null) continue;
         var names = Resolve(sp.Get("names"));
         string nm = names != null ? (Str(names.Get("fr")) ?? Str(names.Get("en"))) : Str(sp.Get("id"));
+        SpotMap[Str(sp.Get("id"))] = Num(sp.Get("map"));
+        GroupName["spot:" + Str(sp.Get("id"))] = "Spot: " + nm;
         PlaceZone = Num(sp.Get("map")); PlaceKinds("senses:spot:" + Str(sp.Get("id")), "Spot: " + nm, sp, "Spot conditions: " + When(sp.Get("when"))); PlaceZone = null;
       }
     if (G.ContainsKey("S.subzones"))
@@ -386,6 +391,8 @@ public static class Extractor {
         var sz = Resolve(item); if (sz == null) continue;
         var names = Resolve(sz.Get("names"));
         string nm = names != null && names.Arr.Count > 0 ? ListStr(names) : Str(sz.Get("id"));
+        if (sz.Get("zone") != null) SubZone[Str(sz.Get("id"))] = Num(sz.Get("zone"));
+        GroupName["sub:" + Str(sz.Get("id"))] = "Place: " + nm;
         PlaceZone = sz.Get("zone") != null ? Num(sz.Get("zone")) : null; PlaceKinds("senses:sub:" + Str(sz.Get("id")), "Place: " + nm, sz, sz.Comment); PlaceZone = null;
       }
 
@@ -432,7 +439,7 @@ public static class Extractor {
       foreach (var name in order) {
         LTable line; if (!Cur.Locals.TryGetValue(name, out line)) continue;
         var ex = new StringBuilder();
-        if (line.Get("draft") is bool && (bool)line.Get("draft")) ex.Append(",\"draft\":true");
+        if (ForceDraft || (line.Get("draft") is bool && (bool)line.Get("draft"))) ex.Append(",\"draft\":true");
         ExtraJson = ex.ToString();
         Emit("bodyline:" + name, "Body", "Gear, forms, needs and naps", "used for: " + string.Join(", ", used[name].ToArray()),
           Str(line.Get("en")), Str(line.Get("fr")), When(line.Get("when")), false,
@@ -475,6 +482,60 @@ public static class Extractor {
       }
     }
 
+    // More.lua: extra lines (audit), all drafts
+    if (File.Exists(Path.Combine(dir, "More.lua"))) {
+      Cur = new LuaFile(Path.Combine(dir, "More.lua"));
+      var MG = Cur.Globals;
+      if (MG.ContainsKey("D.SENSES_MORE")) {
+        var SM = MG["D.SENSES_MORE"];
+        var wc = Resolve(SM.Get("weatherChange"));
+        if (wc != null) foreach (var kv in wc.Map) Lines("senses:weatherChange:" + kv.Key + ":more", "Places", "Weather changes", kv.Key as string, kv.Value, null);
+        var bi = Resolve(SM.Get("biomes"));
+        if (bi != null) foreach (var kv in bi.Map) {
+          var b = Resolve(kv.Value); if (b == null) continue;
+          PlaceBiome = kv.Key as string;
+          foreach (var k2 in b.Map) Lines("senses:biome:" + kv.Key + ":" + k2.Key + ":more", "Places", "Landscape: " + kv.Key, KindLabel(k2.Key as string), k2.Value, null);
+          PlaceBiome = null;
+        }
+        var zo = Resolve(SM.Get("zones"));
+        if (zo != null) foreach (var kv in zo.Map) {
+          var z = Resolve(kv.Value); if (z == null) continue;
+          string id = kv.Key is double ? Num(kv.Key) : (kv.Key as string);
+          PlaceZone = id;
+          foreach (var k2 in z.Map) Lines("senses:zone:" + id + ":" + k2.Key + ":more", "Places", "Zone: " + (z.Comment ?? id), KindLabel(k2.Key as string), k2.Value, null);
+          PlaceZone = null;
+        }
+        foreach (var pair in new[] { new[] { "subzones", "sub", "Place: " }, new[] { "spots", "spot", "Spot: " } }) {
+          var t = Resolve(SM.Get(pair[0])); if (t == null) continue;
+          foreach (var kv in t.Map) {
+            var e = Resolve(kv.Value); if (e == null) continue;
+            string id = kv.Key as string, z;
+            PlaceZone = (pair[1] == "sub" ? (SubZone.TryGetValue(id, out z) ? z : null) : (SpotMap.TryGetValue(id, out z) ? z : null));
+            string gname; if (!GroupName.TryGetValue(pair[1] + ":" + id, out gname)) gname = pair[2] + id;
+            foreach (var k2 in e.Map) Lines("senses:" + pair[1] + ":" + id + ":" + k2.Key + ":more", "Places", gname, KindLabel(k2.Key as string), k2.Value, null);
+            PlaceZone = null;
+          }
+        }
+      }
+      if (MG.ContainsKey("D.MOMENTS_MORE"))
+        foreach (var kv in MG["D.MOMENTS_MORE"].Map) {
+          string k = kv.Key as string; if (k == null) continue;
+          Lines("moment:" + k + ":more", "Moments", MomentGroup(k), k, kv.Value, null);
+        }
+      if (MG.ContainsKey("D.BODY_MORE"))
+        foreach (var kv in MG["D.BODY_MORE"].Map)
+          Lines("bodyline:more:" + kv.Key, "Body", "Gear, forms, needs and naps", "used for: " + kv.Key, kv.Value, null);
+      if (MG.ContainsKey("D.POOL_DRAFTS")) {
+        ForceDraft = true;
+        foreach (var kv in MG["D.POOL_DRAFTS"].Map) {
+          string key = kv.Key as string; if (key == null) continue;
+          string section = BodyKeys.Contains(key) || key.StartsWith("body_") ? "Body" : (key.StartsWith("danger") ? "Places" : "Pet");
+          string group = section == "Places" ? "Danger feelings" : key;
+          Lines("pool:" + key + ":more", section, group, section == "Places" ? key : "", kv.Value, null);
+        }
+        ForceDraft = false;
+      }
+    }
     Out.Append("\n]");
     var w = new LuaFile(Path.Combine(dir, "World.lua"));
     var zs = new StringBuilder("[");

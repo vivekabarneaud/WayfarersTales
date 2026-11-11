@@ -78,3 +78,4 @@ in-game report at the next login.
 | — | NPC | Aubergiste Allison (6740), Gilded Rose (from the NPC log) | done | `D.NPCS` human innkeeper + line (draft) |
 | — | NPC | Meri Ironweave (3613), Dolanaar: female night elf, mail armor and repairs | done | `D.NPCS` armorer + line (draft) |
 | — | Error | Old secret value errors (v0.30) | done | Fixed in v0.31; old errors are cleared at login |
+| — | Idea | Audit: add diversity where a situation has only one line | done | `More.lua`: 78 new drafts (weather changes, landscapes, Stormwind places, spots, danger feelings, first tastes and sips, falls, fishing junk, herbs, crafts, naps, pet moods and reactions). Repeating single-line situations: from about 80 down to 6 (snow and sand still asleep, Mulgore and Tirisfal native lines) |

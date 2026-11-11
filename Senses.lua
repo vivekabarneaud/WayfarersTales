@@ -766,9 +766,13 @@ local function OnWeatherChanged()
   if not prev or not name or name == prev or not CanSpeak() then return end
   if IsIndoors and IsIndoors() then return end
   local key = (name ~= "clear" and (name .. "Start")) or (prev .. "Stop")
-  local lines = D.SENSES.weatherChange[key]
-  if lines and lines[1] then
-    local i = math.random(#lines)
+  local lines = D.SENSES.weatherChange[key] or {}
+  local ok = {}
+  for i, line in ipairs(lines) do
+    if not line.draft or S.Testing() then ok[#ok + 1] = i end
+  end
+  if #ok > 0 then
+    local i = ok[math.random(#ok)]
     S.Show({ line = S.Effective(lines[i], "weatherChange:" .. key .. ":" .. i), id = "weatherChange:" .. key .. ":" .. i })
   end
 end

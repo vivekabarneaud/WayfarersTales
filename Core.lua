@@ -267,11 +267,25 @@ function KT.ModuleOn(name)
 end
 
 -- important = shown even when chattiness is 0
+-- Draft lines for message pools (More.lua: D.POOL_DRAFTS = { key = { { en, fr }, ... } }),
+-- added to the pool while the option "Try new lines" is on. Not for banded pools.
+local function WithDrafts(key, pool)
+  local drafts = D.POOL_DRAFTS and D.POOL_DRAFTS[key]
+  if not drafts or not (KT.Senses and KT.Senses.Testing and KT.Senses.Testing()) then return pool end
+  if pool and type(pool[1]) == "table" then return pool end
+  local fr = KT.CurrentLanguage and KT.CurrentLanguage() == "fr"
+  local out = {}
+  for _, l in ipairs(pool or {}) do out[#out + 1] = l end
+  for _, d in ipairs(drafts) do out[#out + 1] = fr and d.fr or d.en end
+  return out
+end
+
 local function Say(poolKey, vars, delta, important)
   if not KT.ModuleOn("kindred") then return end
   if not important and db.settings.chatty == 0 then return end
   -- body-type version of the pool if there is one (birds, scaly, chitin)
-  local pool = (pet and pet.archetype and M[poolKey .. "_" .. pet.archetype]) or M[poolKey]
+  local key = (pet and pet.archetype and M[poolKey .. "_" .. pet.archetype]) and (poolKey .. "_" .. pet.archetype) or poolKey
+  local pool = WithDrafts(key, M[key])
   if not pool then return end
   if type(pool[1]) == "table" then pool = pool[Band()] or pool[1] end -- banded pool
   vars = vars or {}
@@ -1710,7 +1724,7 @@ function KT.NarrateText(module, key, text, vars, important)
 end
 
 function KT.Narrate(module, poolKey, vars, important)
-  local pool = M[poolKey]
+  local pool = WithDrafts(poolKey, M[poolKey])
   if not pool then Debug("missing pool", poolKey) return end
   if not KT.ModuleOn(module) then return end
   KT.NarrateText(module, poolKey, PickLine(poolKey, pool), vars, important)
@@ -1737,7 +1751,7 @@ end
 
 -- A line from a message pool, as text (to combine it with another line)
 function KT.PoolText(poolKey)
-  local pool = M[poolKey]
+  local pool = WithDrafts(poolKey, M[poolKey])
   if not pool then return nil end
   return Fill(PickLine(poolKey, pool), {})
 end
