@@ -198,6 +198,8 @@ local function Check(when, ctx)
   if when.npcRole and not InList(when.npcRole, ctx.npcRole) then return false, "npc" end
   if when.npcSex and when.npcSex ~= ctx.npcSex then return false, "npc" end
   if when.npcID and not InList(when.npcID, ctx.npcID) then return false, "npc" end
+  -- fishing: just settling in (first cast in a while, or you moved since the last one)
+  if when.fishFresh ~= nil and when.fishFresh ~= (ctx.fishFresh == true) then return false, "fish" end
   -- body needs (filled in by the Elements module): below a value from 0 to 100
   for _, need in ipairs({ "hunger", "thirst", "energy" }) do
     local below = when[need .. "Below"]
@@ -489,6 +491,7 @@ function S.Tags(c, ctx)
     if w.notRace then add(string.format(T.notRace, type(w.notRace) == "table" and table.concat(w.notRace, "/") or w.notRace), not InList(w.notRace, ctx.race)) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
     if w.alone then add(T.alone, ctx.alone) end
+    if w.fishFresh then add(T.fishFresh) end
     local inten = ctx.weather and tonumber(ctx.weather.intensity)
     if w.intensityAbove then add(string.format(T.intensityAbove, w.intensityAbove), inten and inten > w.intensityAbove or false) end
     if w.intensityBelow then add(string.format(T.intensityBelow, w.intensityBelow), inten and inten < w.intensityBelow or false) end

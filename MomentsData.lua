@@ -954,13 +954,15 @@ D.MOMENTS.petRain = {
 -- Fishing: casting, waiting (instead of "you stop to look around"), the catch.
 -- {item} = what you pulled out. fishFirst = the first catch of a kind of fish.
 ---------------------------------------------------------------------------
+D.FISH_FRESH = 300 -- "settling in" lines: no fishing for 5 minutes, or you moved since
 D.MOMENTS.fishCast = {
   { draft = true,
     en = "You cast your line. The float lands on the water with a little plop, and you wonder what's going to bite this time.",
     fr = "Vous lancez votre ligne. Le bouchon se pose sur l'eau avec un petit « plop », et vous vous demandez ce qui va bien pouvoir mordre cette fois-ci." },
   { draft = true,
     en = "You settle at the water's edge, rod firmly in hand. No hurry: here, patience is king.",
-    fr = "Vous vous installez au bord de l'eau, la canne bien en main. Rien ne presse : ici, la patience est reine." },
+    fr = "Vous vous installez au bord de l'eau, la canne bien en main. Rien ne presse : ici, la patience est reine.",
+    when = { fishFresh = true } },
 }
 D.MOMENTS.fishWait = {
   { draft = true,

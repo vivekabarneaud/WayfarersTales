@@ -256,6 +256,7 @@ public static class Extractor {
       else if (k == "moving") parts.Add("walking");
       else if (k == "calm") parts.Add("no crowd around");
       else if (k == "alone") parts.Add("nobody in sight");
+      else if (k == "fishFresh") parts.Add("just starting to fish");
       else if (k == "still") parts.Add("standing still");
       else if (k == "shifted") parts.Add((v is bool && (bool)v) ? "animal form" : "normal shape");
       else if (k == "form") parts.Add("form: " + Str(v) + (Str(v) == "furry" ? " (bear, cat, travel, ghost wolf)" : ""));

@@ -940,7 +940,7 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", alone = "personne en vue", sky = "ciel ouvert", draft = "brouillon", rewrite = "réécriture (test)", still = "immobile", form = "forme : %s", shifted = "forme animale", unshifted = "forme normale",
+  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", alone = "personne en vue", fishFresh = "début de pêche", sky = "ciel ouvert", draft = "brouillon", rewrite = "réécriture (test)", still = "immobile", form = "forme : %s", shifted = "forme animale", unshifted = "forme normale",
   cloak = "avec une cape", no_cloak = "sans cape", boots = "avec des bottes", no_boots = "sans bottes", gloves = "avec des gants", no_gloves = "sans gants", helm = "avec un casque", no_helm = "sans casque", intensityAbove = "plus fort que %s", intensityBelow = "plus faible que %s", armor = "armure : %s", race = "race : %s", notRace = "sauf : %s",
 }
 L.SN_POS = "Position : %s   Endroit : %s"
@@ -1017,7 +1017,7 @@ L.SN_REASONS = {
   weatherWait = "en attente des données météo", weather = "pas avec cette météo",
   crowdUnknown = "a besoin de savoir qui est là", crowd = "pas avec ce monde-là",
   cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule", alone = "seulement quand personne n'est en vue (joueur ou créature)", sky = "seulement à ciel ouvert", draft = "brouillon, en attente de validation", still = "seulement sans bouger",
-  form = "pas sous cette forme", cloak = "dépend de votre cape", boots = "dépend de vos bottes", gloves = "dépend de vos gants", armor = "dépend de votre armure", helm = "dépend de votre casque", intensity = "dépend de la force de la pluie", race = "raconté autrement pour votre race", npc = "dépend du PNJ", need = "dépend de votre faim, soif ou fatigue",
+  form = "pas sous cette forme", cloak = "dépend de votre cape", boots = "dépend de vos bottes", gloves = "dépend de vos gants", armor = "dépend de votre armure", helm = "dépend de votre casque", intensity = "dépend de la force de la pluie", race = "raconté autrement pour votre race", npc = "dépend du PNJ", fish = "seulement en début de pêche", need = "dépend de votre faim, soif ou fatigue",
 }
 L.SN_BIOMES = {
   forest = "forêt", plains = "plaines", farmland = "terres agricoles sèches", hills = "collines", mountain = "montagnes", snow = "neige",

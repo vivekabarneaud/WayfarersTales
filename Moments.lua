@@ -305,6 +305,7 @@ local spellByName = {}
 local hearthAt
 local herbAt -- when you last gathered an herb (waiting for its loot message)
 local fishingSince, fishEndAt -- your line is in the water since... / it just came out (for the catch)
+local lastFishEnd, movedSinceFish -- for "settling in" lines: first cast in a while, or after moving
 local fishingName -- "Fishing" in your language
 local function IsFishing(spellID)
   fishingName = fishingName or SpellName(7620)
@@ -594,6 +595,7 @@ local function Tick()
   -- standing still for a while (not AFK, not fighting, not swimming)
   -- fishing: no "you stop to look around" (you're busy), a fishing line instead after a while
   if fishingSince and now - fishingSince > 12 then Play("fishWait") end
+  if not fishingSince and S.Moving() then movedSinceFish = true end
   local busy = onTaxi or UnitAffectingCombat("player") or UnitIsAFK("player") or IsSwimming() or fishingSince
   if busy or S.Moving() then
     stillSince, quietDone = nil, nil
@@ -725,10 +727,12 @@ f:SetScript("OnEvent", function(_, event, ...)
       elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
         if IsFishing(select(3, ...)) then
           fishingSince = GetTime()
-          After(1, function() Play("fishCast") end, "fish")
+          local fresh = not lastFishEnd or GetTime() - lastFishEnd > D.FISH_FRESH or movedSinceFish
+          movedSinceFish = false
+          After(1, function() Play("fishCast", nil, { fishFresh = fresh }) end, "fish")
         end
       elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" then
-        if fishingSince then fishingSince, fishEndAt = nil, GetTime() end
+        if fishingSince then fishingSince, fishEndAt, lastFishEnd = nil, GetTime(), GetTime() end
       elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
         OnSpell(select(3, ...))
       end
