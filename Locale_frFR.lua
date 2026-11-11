@@ -51,6 +51,7 @@ L.MEMORY = {
   dislike       = "{pet} n'aime pas trop ça : {food}.",
   days          = "{days} jours ensemble.",
   anniversary   = "{years} an(s) ensemble !",
+  petSolo       = "{pet} a remporté un combat sans vous pour la première fois.",
 }
 
 L.TT_SCORE      = "Affection : %d / 100"

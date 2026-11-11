@@ -663,6 +663,15 @@ S.zones = {
         en = "Stormwind was rebuilt by these stonemasons, and the city never paid them. Thinking of the Defias Brotherhood, you feel a mix of anger and shame.",
         fr = "Hurlevent a été rebâtie par ces tailleurs de pierre, et la ville ne les a jamais payés. En pensant à la Confrérie Défias, vous ressentez un mélange de colère et de honte.",
         when = { indoors = false, race = "Human" } },
+      -- flies (heard by day near the farms; not known at night yet)
+      { draft = true,
+        en = "A fly comes buzzing right by your ear. You shoo it away; it's back at once.",
+        fr = "Une mouche vient bourdonner tout près de votre oreille. Vous la chassez ; elle revient aussitôt.",
+        when = { indoors = false, night = false } },
+      { draft = true,
+        en = "In the smell of dry earth and hay, the buzzing of the flies won't leave you alone.",
+        fr = "Dans l'odeur de terre sèche et de foin, le bourdonnement des mouches ne vous lâche pas.",
+        when = { indoors = false, night = false } },
     },
   },
   [1426] = { -- Dun Morogh
@@ -913,6 +922,19 @@ S.spots = {
       { en = "Through the broken roof, a few stars are showing.", fr = "Par le toit éventré, on aperçoit quelques étoiles.",
         when = { night = true, weather = "clear" } },
       { en = "Here, people make do with what little they have.", fr = "Ici, on fait avec le peu qu'on a." },
+    } },
+  -- Saldean farm kitchen (Westfall): a fire in the chimney, Salma making her pie (noted 2026-11-11)
+  { id = "wf_saldean_kitchen", map = 1436, x = 56.3, y = 30.7, r = 0.3, when = { indoors = true },
+    names = { en = "the Saldeans' kitchen", fr = "la cuisine des Saldean" },
+    arrive = {
+      { draft = true, long = true,
+        en = "In the Saldeans' kitchen, a fire crackles in the chimney. Salma is busy with her liver pie, and the warm smell of pastry and meat makes your mouth water.",
+        fr = "Dans la cuisine des Saldean, un feu crépite dans la cheminée. Salma s'affaire autour de sa tourte au foie, et l'odeur chaude de pâte et de viande vous met l'eau à la bouche." },
+    },
+    ambient = {
+      { draft = true,
+        en = "The fire crackles in the chimney, and the smell of pie fills the little kitchen. For a moment, you forget the dust of the fields.",
+        fr = "Le feu crépite dans la cheminée, et l'odeur de tourte emplit la petite cuisine. Un instant, vous oubliez la poussière des champs." },
     } },
 }
 

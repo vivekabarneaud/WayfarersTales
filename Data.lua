@@ -51,6 +51,8 @@ D.CELEBRATE_WINDOW = 120
 D.CELEBRATE = { CHEER = true, CLAP = true, APPLAUD = true, BRAVO = true, WOOT = true,
   CONGRATULATE = true, CONGRATS = true }
 D.GAIN.anniversary = { amount = 3 }
+D.GAIN.petSolo     = { amount = 1, cap = 2 } -- won a fight you didn't take part in
+D.PET_SOLO_COOLDOWN = 600
 
 -- Food types a pet can have as secret favorite / dislike.
 D.FOOD_KINDS = { "meat", "fish", "cheese", "bread", "fungus", "fruit" }

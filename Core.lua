@@ -1392,6 +1392,7 @@ local function Pack(...) return { n = select("#", ...), ... } end
 
 local lastWeather
 local function RecordWeather(reason, extra)
+  if not KT.IsDev() then return end -- weather log: dev only
   if not (C_Weather and C_Weather.GetCurrentWeather) then return end
   local r = Pack(pcall(C_Weather.GetCurrentWeather))
   local parts = {}
@@ -1515,6 +1516,8 @@ end
 
 function H.UNIT_SPELLCAST_SUCCEEDED(unit, _, spellID)
   if unit ~= "player" then return end
+  -- a spell while an enemy is targeted: you're taking part in the fight
+  if UnitExists("target") and UnitCanAttack("player", "target") then state.actedAt = GetTime() end
   if spellID == D.SPELL_FEED_PET then
     Debug("Feed Pet cast succeeded, waiting for the food to leave the bags")
     state.feedPendingAt = GetTime()
@@ -1566,9 +1569,47 @@ function H.CHAT_MSG_LOOT(msg)
   if msg then OnLoot(msg) end
 end
 
-function H.CHAT_MSG_COMBAT_XP_GAIN()
-  if PetAlive() then OnKill() end
+-- Your pet won a fight without you: the pet was fighting (its combat flag) and you
+-- got the kill's experience, while you didn't attack, shoot or cast at an enemy since
+-- the fight began (you were mining, turning in a quest, away...). Draft lines for now:
+-- only in dev mode until they're approved.
+local function CheckSoloWin()
+  if not (M.petSolo or KT.IsDev()) then return end
+  local start = state.petFightAt
+  if not start or state.meleeOn or state.shooting then return end
+  if state.actedAt and state.actedAt >= start - 2 then return end
+  if not Ready("petSolo", D.PET_SOLO_COOLDOWN) then return end
+  Mark("petSolo")
+  local afk = UnitIsAFK("player") and true or false
+  local got = Gain("petSolo")
+  FirstMemory("petSolo")
+  After(1, function() if pet then Say(afk and "petSoloAfk" or "petSolo", nil, got) end end)
 end
+
+function H.CHAT_MSG_COMBAT_XP_GAIN()
+  if PetAlive() then
+    OnKill()
+    CheckSoloWin()
+  end
+end
+
+function H.UNIT_FLAGS(unit)
+  if unit ~= "pet" or not pet then return end
+  if UnitAffectingCombat("pet") then
+    state.petFightAt = state.petFightAt or GetTime()
+  elseif state.petFightAt then
+    -- the kill's experience can arrive just after the fight: forget it a little later
+    local t = state.petFightAt
+    After(3, function()
+      if state.petFightAt == t and not UnitAffectingCombat("pet") then state.petFightAt = nil end
+    end)
+  end
+end
+-- what you do in a fight (melee swings, auto shot)
+function H.PLAYER_ENTER_COMBAT() state.meleeOn = true; state.actedAt = GetTime() end
+function H.PLAYER_LEAVE_COMBAT() state.meleeOn = false end
+function H.START_AUTOREPEAT_SPELL() state.shooting = true; state.actedAt = GetTime() end
+function H.STOP_AUTOREPEAT_SPELL() state.shooting = false; state.actedAt = GetTime() end
 
 function H.PLAYER_REGEN_DISABLED()
   state.killsThisFight = 0

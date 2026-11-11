@@ -50,6 +50,7 @@ D.MOMENT_RULES = {
   fishJunk        = { cd = 600,  chance = 1,   gap = 0 },
   npc             = { cd = 120,  chance = 1,   gap = 20 },
   questAccept_2159 = { cd = 0,   chance = 1,   gap = 0 },
+  questDone_22     = { cd = 0,   chance = 1,   gap = 0 },
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -1103,3 +1104,26 @@ local NPC_TELDRASSIL = {
     when = { npcRace = "NightElf", npcRole = "campfire_teacher" } },
 }
 for _, line in ipairs(NPC_TELDRASSIL) do table.insert(D.MOMENTS.npc, line) end
+
+D.NPCS[5483] = { race = "Human", role = "vendor_cooking" } -- Erika Tate, Old Town: "if you want to haggle, go find a goblin"
+D.NPCS[352]  = { race = "Human", role = "flight_master" }  -- Dungar Longdrink, Trade District: big pilot goggles, business is good
+
+local NPC_STORMWIND_2 = {
+  { draft = true,
+    en = "\"If you want to haggle, go find a goblin.\" {npc} doesn't joke about her prices, and says so plainly.",
+    fr = "« Si vous voulez marchander, allez donc voir un gobelin. » {npc} ne plaisante pas avec ses prix, et le dit sans détour.",
+    when = { npcID = 5483 } },
+  { draft = true,
+    en = "{npc} greets you from behind his big pilot goggles, clearly delighted: his gryphon business is doing well.",
+    fr = "{npc} vous accueille derrière ses grosses lunettes d'aviateur, visiblement ravi : ses affaires de griffons marchent bien.",
+    when = { npcID = 352 } },
+}
+for _, line in ipairs(NPC_STORMWIND_2) do table.insert(D.MOMENTS.npc, line) end
+
+-- Quest 22, La tourte au foie de Broche-tripes (Westfall, Saldean farm): Salma gives you
+-- the pie, still hot, and its recipe.
+D.MOMENTS.questDone_22 = {
+  { draft = true,
+    en = "Salma hands you a pie that's still hot, along with its recipe. The smell of golden pastry and meat warms your heart.",
+    fr = "Salma vous tend une tourte encore chaude, avec sa recette. L'odeur de pâte dorée et de viande vous réchauffe le cœur." },
+}

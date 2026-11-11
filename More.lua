@@ -352,6 +352,17 @@ D.BODY_MORE = {
 -- Message pools (pet, body, danger feelings): extra lines while testing
 ---------------------------------------------------------------------------
 D.POOL_DRAFTS = {
+  -- your pet won a fight you didn't take part in (no attack, spell or shot from you)
+  petSolo = {
+    { en = "{pet} handled that fight without your help, and holds their head high.",
+      fr = "{pet} a réglé ce combat sans votre aide, et garde la tête haute." },
+    { en = "While you were busy elsewhere, {pet} took the fight in hand. Nice work.",
+      fr = "Pendant que vous aviez à faire ailleurs, {pet} a pris le combat en main. Du beau travail." },
+  },
+  petSoloAfk = { -- same, while you're away (/afk)
+    { en = "While you were away, {pet} had to fight, and did it without you. The fight is over, and {pet} holds their head high.",
+      fr = "Pendant votre absence, {pet} a dû se battre, et l'a fait sans vous. Le combat est fini, et {pet} garde la tête haute." },
+  },
   dry = {
     { en = "You finally feel dry, and what a relief.", fr = "Vous vous sentez enfin au sec, et quel soulagement." },
     { en = "Your clothes have finished drying. You feel comfortable again.", fr = "Vos vêtements ont fini de sécher. Vous vous sentez de nouveau à l'aise." },

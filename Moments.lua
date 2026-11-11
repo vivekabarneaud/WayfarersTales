@@ -669,7 +669,7 @@ end
 local f = CreateFrame("Frame")
 for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED",
-  "QUEST_ACCEPTED" }) do
+  "QUEST_ACCEPTED", "QUEST_TURNED_IN" }) do
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
@@ -730,6 +730,10 @@ f:SetScript("OnEvent", function(_, event, ...)
       local id = b or a
       local key = id and ("questAccept_" .. tostring(id))
       if key and D.MOMENTS[key] then After(1, function() Play(key) end, "quest") end
+    elseif event == "QUEST_TURNED_IN" then
+      local id = ...
+      local key = id and ("questDone_" .. tostring(id))
+      if key and D.MOMENTS[key] then After(1.5, function() Play(key) end, "quest") end
     else
       local unit = ...
       if unit ~= "player" then return end

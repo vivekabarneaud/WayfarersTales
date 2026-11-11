@@ -52,6 +52,7 @@ L.MEMORY = {
   dislike       = "Learned that {pet} isn't a fan of {food}.",
   days          = "{days} days together.",
   anniversary   = "{years} year(s) together!",
+  petSolo       = "{pet} won a fight without you for the first time.",
 }
 
 -- Tooltip / command texts
