@@ -1,0 +1,16 @@
+# CurseForge packager: builds the release zip when a tag is pushed (v0.61.0-beta...).
+# Keep it in sync with .gitattributes (export-ignore): nothing for us goes to players.
+package-as: WayfarersTales
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - Dev.lua
+  - docs
+  - tools
+  - TODO.md
+  - .gitattributes
+  - .gitignore
+  - .pkgmeta
