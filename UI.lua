@@ -309,7 +309,7 @@ local function BuildJournal(parent)
 
   local copy = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
   copy:SetSize(150, 20)
-  copy:SetPoint("TOPRIGHT", -24, -10)
+  copy:SetPoint("TOPRIGHT", -56, -40) -- (same line as the Tout / Grands moments buttons, right edge with the ! buttons)
   Label(copy, "UI_JOURNAL_COPY")
   copy:SetScript("OnClick", function() KT.ShowReport() end)
   p.copy = copy -- testers only (see RefreshJournal)
