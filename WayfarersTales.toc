@@ -21,5 +21,6 @@ More.lua
 Senses.lua
 Moments.lua
 Discovery.lua
+Mascot.lua
 UI.lua
 Homework.lua

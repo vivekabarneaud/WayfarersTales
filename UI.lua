@@ -553,6 +553,14 @@ local function ModelBox(parent, w, h)
     end)
     box.model = model
   end
+  -- show a creature by its display (a mascot: it isn't a unit you can point to)
+  function box:ShowDisplay(id)
+    if not self.model or not id then return end
+    if id ~= self.disp then
+      self.disp = id
+      pcall(self.model.SetDisplayInfo, self.model, id)
+    end
+  end
   -- show a unit (only reloads the model when it's a different creature)
   function box:ShowUnit(unit)
     if not self.model then return end
@@ -1177,6 +1185,113 @@ local function RefreshCompanion(page)
 end
 
 ---------------------------------------------------------------------------
+-- Mascot (every class): the mascot that's out, your bond, what you shared
+---------------------------------------------------------------------------
+
+local function BuildMascot(parent)
+  local page = ScrollPage(parent)
+  page.header = ModuleHeader(page, "UI_MASCOT_TITLE", "mascot")
+  local top = CreateFrame("Frame", nil, page.p)
+  top:SetSize(PAGE_W, 172)
+  page.modelBox = ModelBox(top, 160, 170)
+  page.modelBox:SetPoint("TOPLEFT", 0, 0)
+  local hx = 178
+  page.name = top:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+  page.name:SetPoint("TOPLEFT", hx, -8)
+  page.sub = top:CreateFontString(nil, "OVERLAY", "GameFontDisable")
+  page.sub:SetPoint("TOPLEFT", page.name, "BOTTOMLEFT", 0, -4)
+  page.tier = top:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  page.tier:SetPoint("TOPLEFT", page.sub, "BOTTOMLEFT", 0, -12)
+  page.tier:SetTextColor(1, 0.56, 0.69)
+  page.desc = top:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  page.desc:SetPoint("TOPLEFT", page.tier, "BOTTOMLEFT", 0, -6)
+  page.desc:SetWidth(PAGE_W - hx - 10)
+  page.desc:SetJustifyH("LEFT")
+  page.bar = StyledBar(top, PAGE_W - hx - 16, 18)
+  page.bar:SetPoint("TOPLEFT", hx + 3, -136)
+  page.bar:SetStatusBarColor(0.55, 0.8, 0.45)
+  page.top = page:Add(top, 10)
+  page.text = Para(page, "GameFontHighlight", 12)
+
+  -- memories, in their own scrolling box (like the pet's)
+  local mem = Box(page.p, 180)
+  local mh = mem:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  mh:SetPoint("TOPLEFT", 10, -9)
+  Label(mh, "UI_MEMORIES")
+  local sc = CreateFrame("ScrollFrame", nil, mem, "UIPanelScrollFrameTemplate")
+  sc:SetPoint("TOPLEFT", 8, -28)
+  sc:SetPoint("BOTTOMRIGHT", -28, 8)
+  local child = CreateFrame("Frame", nil, sc)
+  child:SetSize(PAGE_W - 44, 10)
+  sc:SetScrollChild(child)
+  local mfs = child:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+  mfs:SetPoint("TOPLEFT", 2, 0)
+  mfs:SetWidth(PAGE_W - 48)
+  mfs:SetJustifyH("LEFT")
+  mfs:SetSpacing(2)
+  function mem:SetMemories(rec)
+    local lines = {}
+    if #rec.memories == 0 then lines[1] = Grey(L.CMD_NO_MEMORY) end
+    for i = #rec.memories, 1, -1 do
+      local m = rec.memories[i]
+      lines[#lines + 1] = Grey(date("%Y-%m-%d", m.t)) .. "  " .. KT.Mascot.MemoryText(m, rec)
+    end
+    mfs:SetText(table.concat(lines, "\n"))
+    child:SetHeight(mfs:GetStringHeight() + 6)
+  end
+  page.memories = page:Add(mem, 12)
+  page.others = Para(page, "GameFontHighlight", 12)
+  page.guide = GuideBox(page)
+  return page
+end
+
+local function RefreshMascot(page)
+  local Ma = KT.Mascot
+  page.header:Refresh()
+  local on = api.GetDB().modules.mascot ~= false
+  local rec = on and Ma and Ma.Current() or nil
+  page.top:SetShown(rec ~= nil)
+  page.memories:SetShown(rec ~= nil)
+  page.guide:SetShown(on)
+  if not on then
+    page.text:SetText(L.UI_MASCOT_OFF)
+  elseif rec then
+    local idx = Ma.TierIndex(math.floor(rec.affection))
+    page.modelBox:ShowDisplay(rec.displayID)
+    page.name:SetText(Ma.Name(rec))
+    local sub = rec.name or "?"
+    if rec.level then sub = sub .. ", " .. L.UI_LEVEL .. " " .. rec.level end
+    page.sub:SetText(sub)
+    page.tier:SetText(Ma.TierName(idx))
+    page.desc:SetText(KT.G(Ma.TierDesc(idx)))
+    page.bar:SetValue(rec.affection)
+    page.bar.text:SetText(string.format(L.UI_MASCOT_SCORE, math.floor(rec.affection)))
+    local s = rec.stats
+    local lines = {}
+    if D.TIERS[idx + 1] then lines[#lines + 1] = Grey(string.format(L.TT_NEXT, Ma.TierName(idx + 1), D.TIERS[idx + 1])) .. "\n" end
+    lines[#lines + 1] = Head(L.UI_TOGETHER)
+    lines[#lines + 1] = string.format(L.UI_MASCOT_STATS, api.FormatDuration(s.minutes or 0), s.outings or 0,
+      s.places or 0, s.cuddles or 0, s.campfires or 0, s.naps or 0)
+    page.text:SetText(table.concat(lines, "\n"))
+    page.memories:SetMemories(rec)
+  else
+    page.text:SetText(L.UI_MASCOT_NONE)
+  end
+  -- this character's other mascots
+  local others = {}
+  for _, r in ipairs(Ma and Ma.Records() or {}) do
+    if r ~= rec then
+      others[#others + 1] = Ma.Name(r) .. Grey(" (" .. (r.name or "?") .. ")") .. " - "
+        .. Pink(Ma.TierName(Ma.TierIndex(math.floor(r.affection)))) .. " " .. math.floor(r.affection)
+    end
+  end
+  page.others:SetShown(on and #others > 0)
+  if #others > 0 then page.others:SetText(Head(L.UI_MASCOT_OTHERS) .. "\n" .. table.concat(others, "\n")) end
+  page.guide.text:SetText(L.UI_MASCOT_GUIDE)
+  page:Layout()
+end
+
+---------------------------------------------------------------------------
 -- Ambiance (Senses): the last line, how often lines come
 ---------------------------------------------------------------------------
 
@@ -1554,6 +1669,7 @@ local function Build()
   local class = select(2, UnitClass("player"))
   if class == "HUNTER" then list[#list + 1] = { "companion", "UI_TAB_COMPANION" } end
   if class == "WARLOCK" then list[#list + 1] = { "companion", "UI_TAB_DEMON" } end
+  list[#list + 1] = { "mascot", "UI_TAB_MASCOT" } -- (every class)
   for _, t in ipairs({ { "senses", "UI_TAB_SENSES" }, { "travels", "UI_TAB_TRAVELS" },
     { "journal", "UI_TAB_JOURNAL" }, { "options", "UI_TAB_OPTIONS" } }) do list[#list + 1] = t end
   local prev
@@ -1575,6 +1691,7 @@ local function Build()
 
   pages.body = BuildBody(content)
   if tabs.companion then pages.companion = BuildCompanion(content) end
+  pages.mascot = BuildMascot(content)
   pages.senses = BuildAmbiance(content)
   pages.travels = BuildTravels(content)
   pages.journal = BuildJournal(content)
@@ -1600,6 +1717,7 @@ function KT.RefreshPanel()
   if currentTab == "journal" then RefreshJournal(pages.journal, db)
   elseif currentTab == "body" then RefreshBody(pages.body)
   elseif currentTab == "companion" and pages.companion then RefreshCompanion(pages.companion)
+  elseif currentTab == "mascot" and pages.mascot then RefreshMascot(pages.mascot)
   elseif currentTab == "senses" then RefreshAmbiance(pages.senses)
   elseif currentTab == "travels" then RefreshTravels(pages.travels)
   elseif currentTab == "options" then RefreshOptions(pages.options)
@@ -1612,7 +1730,7 @@ function KT.ShowTab(name)
   for k, p in pairs(pages) do p:SetShown(k == name) end
   -- 3D models must be reloaded after being hidden; bars start at their current value
   for _, p in pairs(pages) do
-    if p.modelBox then p.modelBox.guid = nil end
+    if p.modelBox then p.modelBox.guid, p.modelBox.disp = nil, nil end
     for _, bar in ipairs(p.bars or {}) do bar.shown = nil end
   end
   for k, b in pairs(tabs) do SelectTabButton(b, k == name) end

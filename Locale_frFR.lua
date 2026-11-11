@@ -1197,3 +1197,31 @@ M.affection_imp = {
 }
 M.death_imp = { "{pet} disparaît dans un dernier crépitement de flammes. Un silence étrange s'installe, et son absence vous surprend." }
 M.tierUp_imp = { "Quelque chose a changé dans le regard de {pet}. Votre lien : {tier}." }
+
+-- Mascottes (le codex des mascottes)
+L.UI_TAB_MASCOT    = "Mascotte"
+L.UI_MASCOT_TITLE  = "Votre mascotte"
+L.UI_MASCOT_NONE   = "Aucune mascotte ne vous accompagne pour le moment. Invoquez-en une depuis votre codex des mascottes."
+L.UI_MASCOT_OFF    = "Le module des mascottes est désactivé. Réactivez-le avec la case en haut de cet onglet."
+L.UI_MASCOT_SCORE  = "Lien : %d / 100"
+L.UI_MASCOT_STATS  = "Temps passé ensemble : %s\nSorties : %d\nLieux découverts ensemble : %d\nCâlins : %d\nVeillées au coin du feu : %d\nSiestes ensemble : %d"
+L.UI_MASCOT_OTHERS = "Vos autres mascottes"
+L.UI_MASCOT_GUIDE  = "Votre mascotte ne réclame rien : elle vous tient simplement compagnie. Votre lien grandit avec ce que vous partagez : le temps passé ensemble, les lieux découverts ensemble, les câlins (/pet, /love...), les veillées au coin du feu, les siestes (/sleep), votre première pluie ensemble.\nChacun de vos personnages construit son propre lien avec chaque mascotte."
+L.MASCOT_TIERS = { "Nouvelle rencontre", "Petite habitude", "Compagnon de route", "Complicité", "Inséparables", "Âmes sœurs" }
+L.MASCOT_TIER_DESC = {
+  "Vous apprenez à vous connaître.",
+  "Sortir ensemble devient une habitude.",
+  "La route semble moins solitaire à deux.",
+  "Un regard suffit pour se comprendre.",
+  "Difficile d'imaginer partir {seul|seule|seul·e} désormais.",
+  "Deux cœurs sur le même chemin.",
+}
+L.MASCOT_MEMORY = {
+  met           = "Première sortie ensemble : {zone}.",
+  firstCuddle   = "Premier câlin.",
+  firstCampfire = "Première veillée au coin du feu ensemble.",
+  firstNap      = "Première sieste ensemble.",
+  firstRain     = "Première pluie ensemble.",
+  places        = "{count} lieux découverts ensemble.",
+  tier          = "Votre lien a grandi : {tier}.",
+}

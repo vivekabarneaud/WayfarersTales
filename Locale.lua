@@ -1205,6 +1205,34 @@ M.affection_imp = {
 M.death_imp = { "{pet} vanishes in a last crackle of flames. A strange silence settles, and its absence surprises you." }
 M.tierUp_imp = { "Something has changed in the way {pet} looks at you. Your bond: {tier}." }
 
+-- Mascots (companion pets from the mascot codex)
+L.UI_TAB_MASCOT    = "Mascot"
+L.UI_MASCOT_TITLE  = "Your mascot"
+L.UI_MASCOT_NONE   = "No mascot is with you right now. Summon one from your mascot collection."
+L.UI_MASCOT_OFF    = "The mascot module is turned off. Turn it back on with the box at the top of this tab."
+L.UI_MASCOT_SCORE  = "Bond: %d / 100"
+L.UI_MASCOT_STATS  = "Time together: %s\nOutings: %d\nPlaces discovered together: %d\nCuddles: %d\nEvenings by the fire: %d\nNaps together: %d"
+L.UI_MASCOT_OTHERS = "Your other mascots"
+L.UI_MASCOT_GUIDE  = "Your mascot doesn't ask for anything: it just keeps you company. Your bond grows with what you share: time together, places discovered together, cuddles (/pet, /love...), evenings by a campfire, naps (/sleep), your first rain together.\nEach of your characters builds its own bond with each mascot."
+L.MASCOT_TIERS = { "New Acquaintance", "Little Habit", "Road Companion", "Complicity", "Inseparable", "Kindred Spirits" }
+L.MASCOT_TIER_DESC = {
+  "You're getting to know each other.",
+  "Going out together is becoming a habit.",
+  "The road feels less lonely with company.",
+  "A glance is enough to understand each other.",
+  "Hard to imagine setting out alone now.",
+  "Two hearts on the same road.",
+}
+L.MASCOT_MEMORY = {
+  met           = "First outing together: {zone}.",
+  firstCuddle   = "First cuddle.",
+  firstCampfire = "First evening by the fire together.",
+  firstNap      = "First nap together.",
+  firstRain     = "First rain together.",
+  places        = "{count} places discovered together.",
+  tier          = "Your bond grew: {tier}.",
+}
+
 -- Keep an untouched copy of the English texts, so the language can be switched
 -- back and forth (other languages are laid over these, see Locale_frFR.lua).
 local function copy(t)

@@ -60,6 +60,9 @@ end
 
 -- Sitting down and napping. The game doesn't tell addons whether you're sitting,
 -- so we follow the sit key (X), /sit, /sleep and /stand, and moving gets you up.
+-- napping right now? (/sleep, until you move: the mascot naps with you)
+function E.Napping() return napping == true end
+
 function E.StandUp()
   if napping and state then
     -- the wake-up line depends on how rested you are

@@ -175,3 +175,4 @@ in-game report at the next login.
 | — | Idea | A boar has a "groin", not a "museau" | done | Pet lines use {snout}: "museau"/"nose" by default, "groin"/"snout" for boars (D.SNOUT) |
 | — | Idea | Warlock demons: the imp first | done | Respect instead of affection (Mépris → Loyauté troublante), the imp's lines in three steps (idle, taunts with an item from your bags, summoned, summoned after you died, attack, fights, solo wins, Health Funnel, /pet, death), a "Démon" tab for warlocks. Other demons: respect only for now |
 | — | Bug | Homework says "0 notes" while the report has the comments | done | Comments added with the Journal's ! (or Bizarre) are flagged lines, not notes: the window now counts both |
+| — | Idea | Mascots: a tab, a bond, lines with personality (rabbit first), sounds | done | Mascot codex detection (C_PetJournal), one bond per character and mascot, "Mascotte" tab with model, stages, stats, memories; the rabbit's lines. Sounds still to do |
