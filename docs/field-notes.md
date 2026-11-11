@@ -16,7 +16,7 @@ in-game report at the next login.
 | 20:12 | NPC | Mardant Strongoak (3597), Aldrassil: male night elf, druid trainer | done | `D.NPCS` trainer_druid + 1 line (draft) |
 | 20:12 | NPC | Ayanna Everstride (3596), Aldrassil: female night elf, hunter trainer | done | `D.NPCS` trainer_hunter + 1 line (draft) |
 | — | NPC | Keldamyr (6736), Dolanaar innkeeper (from the NPC log) | done | `D.NPCS` innkeeper + 1 line (draft) |
-| — | NPC | Lyreena Lamebrune (265811), seen in the NPC log | todo | Who is she? Race and role needed |
+| — | NPC | Lyreena Lamebrune (265811): female night elf, campfire teacher | done | `D.NPCS` campfire_teacher + line (draft) |
 | 20:13 | Idea | Fall damage could have a line | done | Falls: health lost on landing, small / hard / fur versions (draft) |
 | 20:17 | Quest | Livraison à Dolanaar (2159): a line when taking it, leaving Shadowglen for Teldrassil | done | First quest line, on accept (draft) |
 | 20:15 | Flag | "Vous mangeriez bien quelque chose" while below 25% hunger: should be more pressing | done | Pressing hunger / thirst / fatigue lines below 25% (draft) |
@@ -76,5 +76,5 @@ in-game report at the next login.
 | 09:58 | NPC | Olivia Burnside (2455), human banker, red hair and bangs | done | `D.NPCS` + her own line (draft) |
 | 09:58 | NPC | John Burnside (2457), balding human banker, proud of the security | done | `D.NPCS` + banker lines, proud line (draft) |
 | — | NPC | Aubergiste Allison (6740), Gilded Rose (from the NPC log) | done | `D.NPCS` human innkeeper + line (draft) |
-| — | NPC | Meri Ironweave (3613), Dolanaar, vendor (from the NPC log) | todo | Race and what she sells? |
+| — | NPC | Meri Ironweave (3613), Dolanaar: female night elf, mail armor and repairs | done | `D.NPCS` armorer + line (draft) |
 | — | Error | Old secret value errors (v0.30) | done | Fixed in v0.31; old errors are cleared at login |

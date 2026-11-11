@@ -1070,3 +1070,18 @@ local NPC_MORE = {
     when = { npcRace = "Human", npcRole = "innkeeper", npcSex = 3 } },
 }
 for _, line in ipairs(NPC_MORE) do table.insert(D.MOMENTS.npc, line) end
+
+D.NPCS[3613]   = { race = "NightElf", role = "armorer" }          -- Meri Ironweave, Dolanaar: mail armor, repairs
+D.NPCS[265811] = { race = "NightElf", role = "campfire_teacher" } -- Lyreena Lamebrune, Teldrassil: teaches campfires
+
+local NPC_TELDRASSIL = {
+  { draft = true,
+    en = "{npc} runs a hand over a coat of mail, checking each ring with care. It smells of oil and cold metal.",
+    fr = "{npc} passe la main sur une cotte de mailles, en vérifiant chaque anneau avec soin. Ça sent l'huile et le métal froid.",
+    when = { npcRace = "NightElf", npcRole = "armorer" } },
+  { draft = true,
+    en = "{npc} talks about fire like an old friend: how to feed it, how to respect it. Just listening, you can almost feel its warmth.",
+    fr = "{npc} vous parle du feu comme d'un vieil ami : comment le nourrir, comment le respecter. Rien qu'à l'écouter, vous sentez déjà sa chaleur.",
+    when = { npcRace = "NightElf", npcRole = "campfire_teacher" } },
+}
+for _, line in ipairs(NPC_TELDRASSIL) do table.insert(D.MOMENTS.npc, line) end

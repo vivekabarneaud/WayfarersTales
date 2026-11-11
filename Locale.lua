@@ -567,7 +567,7 @@ M.mealShared = {
   "{pet} happily eats the {item} you shared. What a feast!",
 }
 M.mealExpiredMoving = {
-  "{pet} gives up on your meal and trots after you, head a little low.",
+  "{pet} gives up begging for a bite and trots after you, head a little low.",
 }
 M.mealOther = {
   "{pet} was hoping for {item}, but this is good too!",
