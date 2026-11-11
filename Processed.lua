@@ -20,7 +20,9 @@ D.PROCESSED = {
     ["2026-11-11 09:17"] = true, ["2026-11-11 09:19"] = true, ["2026-11-11 09:24"] = true, -- Dane, Kaita, pet +0.9
     ["2026-11-11 09:27"] = true, ["2026-11-11 09:31"] = true, ["2026-11-11 09:36"] = true, -- Jaxon, rain/sun, Lilliam
     ["2026-11-11 09:55"] = true, ["2026-11-11 09:57"] = true, ["2026-11-11 09:58"] = true, -- rain on roof, bankers
-    ["2026-11-11 12:40"] = true, -- two lines at once
+    ["2026-11-11 10:19"] = true, ["2026-11-11 12:09"] = true, ["2026-11-11 12:16"] = true, -- Erika, Dungar, eating
+    ["2026-11-11 12:17"] = true, ["2026-11-11 12:29"] = true, ["2026-11-11 12:33"] = true, -- eating, flies, Saldean
+    ["2026-11-11 12:34"] = true, ["2026-11-11 12:40"] = true, ["2026-11-11 12:45"] = true, -- quest 22, two lines, pet solo
   },
   flagsAt = {
     ["2026-11-11 08:45"] = true, ["2026-11-11 09:15"] = true, ["2026-11-11 09:21"] = true, -- mail, bomb, canals

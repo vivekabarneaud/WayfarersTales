@@ -85,12 +85,13 @@ in-game report at the next login.
 | When | Kind | Note | Status | What we did |
 |---|---|---|---|---|
 | 10:04 | Flag | Poppo "lèche les dernières miettes" of a raw fish | done | Line now fits any food: "jusqu'à la toute dernière bouchée" |
-| 10:19 | NPC | Erika Tate (5483), female human, cooking supplies, "go find a goblin" to haggle | todo | Lines to discuss |
-| 12:09 | NPC | Dungar Longdrink (352), male human, flight master, big pilot goggles, proud of his gryphons | todo | Lines to discuss |
-| 12:16 | Idea | Eating and drinking fill up over time while you eat (like napping) | todo | To discuss |
-| 12:17 | Idea | ...and depend on the food (apple +3%/s, cooked fish +5%/s) | todo | To discuss |
-| 12:29 | Idea | Flies buzzing around your face in Westfall | todo | Lines to discuss |
-| 12:33 | Place | Saldean farm (56.2, 31.0), kitchen (56.3, 30.7): fire in the chimney, Salma making boar liver pie | todo | Lines to discuss |
-| 12:34 | Quest | Quest 22 "La tourte au foie de Broche-tripes": hot fresh pie, smells comforting, gives the recipe | todo | Turn-in line to discuss |
+| 10:19 | NPC | Erika Tate (5483), female human, cooking supplies, "go find a goblin" to haggle | done | `D.NPCS` + a line quoting her (draft) |
+| 12:09 | NPC | Dungar Longdrink (352), male human, flight master, big pilot goggles, proud of his gryphons | done | `D.NPCS` + his line (draft); an ambient line near him waits for details (gryphons around?) |
+| 12:16 | Idea | Eating and drinking fill up over time while you eat (like napping) | todo | In TODO.md: fill rate from how much the food heals |
+| 12:17 | Idea | ...and depend on the food (apple +3%/s, cooked fish +5%/s) | todo | Same, in TODO.md |
+| 12:29 | Idea | Flies buzzing around your face in Westfall | done | Two Westfall lines, outdoors by day (draft) |
+| 12:33 | Place | Saldean farm (56.2, 31.0), kitchen (56.3, 30.7): fire in the chimney, Salma making boar liver pie | done | Kitchen spot: arrival + ambient lines (draft) |
+| 12:34 | Quest | Quest 22 "La tourte au foie de Broche-tripes": hot fresh pie, smells comforting, gives the recipe | done | First quest turn-in line (draft); quest turn-ins can now have lines |
 | 12:40 | Bug | Two lines can show up at the very same moment | done | Lines on a timer wait 30 s after any line (any module) |
-| 12:45 | Idea | Pet fought alone while you were AFK: a line for it | todo | To discuss |
+| 12:45 | Idea | Pet fought alone while you were AFK: a line for it | done | Pet wins a fight you didn't take part in (no attack, shot or spell from you): line, +1 affection, first-time memory (draft); AFK version |
+| — | Flag | "Poppo vous frôle affectueusement la jambe en marchant" while standing still | done | Walking pet lines only while you walk; still versions in their place |
