@@ -10,7 +10,14 @@ local tabs, pages = {}, {}
 local currentTab = "body"
 local CONTENT_WIDTH = 470
 
-local function Icon() return D.CUSTOM_ICON or "Interface\\Icons\\INV_ValentinesCandy" end
+-- The addon's icon: the one tried with /wt icons (dev), else the chosen default
+local iconTextures = {} -- every texture showing it (header, minimap), updated by /wt icons
+local function Icon()
+  local db = KT.GetDB and KT.GetDB()
+  local tried = db and db.settings.iconTry
+  if tried and KT.IsDev() then return "Interface\\Icons\\" .. tried end
+  return D.CUSTOM_ICON or "Interface\\Icons\\INV_ValentinesCandy"
+end
 local function Head(text) return "|cffffd100" .. text .. "|r" end
 local function Pink(text) return "|cffff8fb1" .. text .. "|r" end
 local function Grey(text) return "|cffaaaaaa" .. text .. "|r" end
@@ -1242,6 +1249,7 @@ local function Build()
   icon:SetSize(40, 40)
   icon:SetPoint("TOPLEFT", 16, -30)
   icon:SetTexture(Icon())
+  iconTextures[#iconTextures + 1] = icon
   local name = f:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
   name:SetPoint("TOPLEFT", icon, "TOPRIGHT", 10, 0)
   name:SetText("Wayfarer's Tales")
@@ -1379,6 +1387,7 @@ function KT.CreateMinimapButton()
   icon:SetSize(17, 17)
   icon:SetTexture(Icon())
   icon:SetPoint("TOPLEFT", 7, -6)
+  iconTextures[#iconTextures + 1] = icon
   pcall(icon.SetMask, icon, "Interface\\CharacterFrame\\TempPortraitAlphaMask")
   local border = mm:CreateTexture(nil, "OVERLAY")
   border:SetSize(53, 53)
@@ -1408,4 +1417,116 @@ function KT.CreateMinimapButton()
 
   PositionMinimap()
   KT.UpdateMinimapButton()
+end
+
+---------------------------------------------------------------------------
+-- Icon picker (/wt icons, dev): game icons that could become the addon's icon.
+-- Click one to try it on the minimap button and the window header. Icons the
+-- client doesn't have simply show an empty slot.
+---------------------------------------------------------------------------
+
+local ICON_CANDIDATES = {
+  -- notes, letters and scrolls
+  "INV_Misc_Note_01", "INV_Misc_Note_02", "INV_Misc_Note_03", "INV_Misc_Note_04", "INV_Misc_Note_05", "INV_Misc_Note_06",
+  "INV_Letter_01", "INV_Letter_02", "INV_Letter_03", "INV_Letter_04", "INV_Letter_05", "INV_Letter_06",
+  "INV_Letter_07", "INV_Letter_08", "INV_Letter_09", "INV_Letter_15", "INV_Letter_16", "INV_Letter_17",
+  "INV_Scroll_01", "INV_Scroll_02", "INV_Scroll_03", "INV_Scroll_04", "INV_Scroll_05", "INV_Scroll_06",
+  "INV_Scroll_07", "INV_Scroll_08", "INV_Scroll_09", "INV_Scroll_10", "INV_Scroll_11", "INV_Scroll_15",
+  -- books
+  "INV_Misc_Book_01", "INV_Misc_Book_02", "INV_Misc_Book_03", "INV_Misc_Book_04", "INV_Misc_Book_05",
+  "INV_Misc_Book_06", "INV_Misc_Book_07", "INV_Misc_Book_08", "INV_Misc_Book_09", "INV_Misc_Book_10",
+  "INV_Misc_Book_11", "INV_Misc_Book_12", "INV_Misc_Book_13", "INV_Misc_Book_14", "INV_Misc_Book_15",
+  -- quills, ink, maps, travel
+  "INV_Feather_01", "INV_Feather_02", "INV_Feather_03", "INV_Feather_04", "INV_Feather_05", "INV_Feather_12",
+  "INV_Inscription_Tradeskill01", "INV_Inscription_Papyrus", "INV_Inscription_Scroll", "INV_Inscription_InkBlack01",
+  "INV_Misc_Map_01", "INV_Misc_Map02", "INV_Misc_Map03", "INV_Misc_Spyglass_02", "INV_Misc_Spyglass_03",
+  "INV_ValentinesCandy",
+}
+
+local iconPicker
+local function ApplyIcon()
+  local tex = Icon()
+  for _, t in ipairs(iconTextures) do t:SetTexture(tex) end
+end
+
+function KT.ToggleIconPicker()
+  if not KT.IsDev() then return end
+  api = KT.api
+  if not iconPicker then
+    local ok, f = pcall(CreateFrame, "Frame", "WayfarersTalesIcons", UIParent, "BasicFrameTemplateWithInset")
+    if not ok or not f then
+      f = CreateFrame("Frame", "WayfarersTalesIcons", UIParent, BACKDROP_TEMPLATE)
+      if f.SetBackdrop then
+        f:SetBackdrop({ bgFile = "Interface\DialogFrame\UI-DialogBox-Background",
+          edgeFile = "Interface\DialogFrame\UI-DialogBox-Border", tile = true, tileSize = 32, edgeSize = 32,
+          insets = { left = 11, right = 12, top = 12, bottom = 11 } })
+      end
+      local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+      close:SetPoint("TOPRIGHT", -4, -4)
+    end
+    if f.TitleText then f.TitleText:SetText("Wayfarer's Tales - icons (dev)") end
+    local COLS, SIZE, GAP = 10, 40, 6
+    local rows = math.ceil(#ICON_CANDIDATES / COLS)
+    f:SetSize(COLS * (SIZE + GAP) + 30, rows * (SIZE + GAP) + 110)
+    f:SetPoint("CENTER")
+    f:SetFrameStrata("DIALOG")
+    f:SetClampedToScreen(true)
+    f:SetMovable(true)
+    f:EnableMouse(true)
+    f:RegisterForDrag("LeftButton")
+    f:SetScript("OnDragStart", f.StartMoving)
+    f:SetScript("OnDragStop", f.StopMovingOrSizing)
+    tinsert(UISpecialFrames, "WayfarersTalesIcons")
+    f.current = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    f.current:SetPoint("BOTTOMLEFT", 16, 16)
+    f.buttons = {}
+    for i, name in ipairs(ICON_CANDIDATES) do
+      local b = CreateFrame("Button", nil, f)
+      b:SetSize(SIZE, SIZE)
+      b:SetPoint("TOPLEFT", 15 + ((i - 1) % COLS) * (SIZE + GAP), -34 - math.floor((i - 1) / COLS) * (SIZE + GAP))
+      local sel = b:CreateTexture(nil, "BACKGROUND")
+      sel:SetPoint("TOPLEFT", -3, 3)
+      sel:SetPoint("BOTTOMRIGHT", 3, -3)
+      sel:SetColorTexture(1, 0.82, 0, 1)
+      b.sel = sel
+      local slot = b:CreateTexture(nil, "BORDER")
+      slot:SetAllPoints()
+      slot:SetColorTexture(0.08, 0.08, 0.1, 1)
+      local t = b:CreateTexture(nil, "ARTWORK")
+      t:SetAllPoints()
+      t:SetTexture("Interface\Icons\\" .. name)
+      b:SetHighlightTexture("Interface\Buttons\ButtonHilight-Square", "ADD")
+      b.name = name
+      b:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(self.name, 1, 1, 1)
+        GameTooltip:Show()
+      end)
+      b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+      b:SetScript("OnClick", function(self)
+        api.GetDB().settings.iconTry = self.name
+        ApplyIcon()
+        f:Refresh()
+      end)
+      f.buttons[i] = b
+    end
+    local reset = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+    reset:SetSize(120, 22)
+    reset:SetPoint("BOTTOMRIGHT", -14, 12)
+    reset:SetText(DEFAULT or "Default")
+    reset:SetScript("OnClick", function()
+      api.GetDB().settings.iconTry = nil
+      ApplyIcon()
+      f:Refresh()
+    end)
+    function f:Refresh()
+      local tried = api.GetDB().settings.iconTry
+      for _, b in ipairs(self.buttons) do b.sel:SetShown(b.name == tried) end
+      self.current:SetText(tried and ("|cffffd100" .. tried .. "|r") or "(default)")
+    end
+    f:Hide()
+    iconPicker = f
+  end
+  iconPicker:SetShown(not iconPicker:IsShown())
+  if iconPicker:IsShown() then iconPicker:Refresh() end
 end
