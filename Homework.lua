@@ -194,8 +194,11 @@ function H.Refresh()
   frame.lastButton:SetText(L.HW_BTN_FLAG)
   frame.inputLabel:SetText(L.HW_INPUT)
   frame.report:SetText(L.HW_REPORT)
-  local n = #(KT.GetDB().fieldNotes or {})
-  frame.footer:SetText(string.format(L.HW_COUNT, n))
+  -- notes from this window, and lines flagged with a comment (Journal ! or Bizarre)
+  local db = KT.GetDB()
+  local n, flagged = #(db.fieldNotes or {}), 0
+  for _, e in ipairs(db.journal or {}) do if e.flagged then flagged = flagged + 1 end end
+  frame.footer:SetText(string.format(L.HW_COUNT, n, flagged))
 end
 
 function H.Toggle(show)

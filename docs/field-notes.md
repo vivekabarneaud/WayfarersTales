@@ -174,3 +174,4 @@ in-game report at the next login.
 | — | Idea | Allison: lines that change with the number of visits (she recognizes you, a loyal customer...) | done | Visits counted per NPC (a new visit after 30 min away); Allison gets lines at 2, 5 and 15 visits (draft). Works for any NPC from now on |
 | — | Idea | A boar has a "groin", not a "museau" | done | Pet lines use {snout}: "museau"/"nose" by default, "groin"/"snout" for boars (D.SNOUT) |
 | — | Idea | Warlock demons: the imp first | done | Respect instead of affection (Mépris → Loyauté troublante), the imp's lines in three steps (idle, taunts with an item from your bags, summoned, summoned after you died, attack, fights, solo wins, Health Funnel, /pet, death), a "Démon" tab for warlocks. Other demons: respect only for now |
+| — | Bug | Homework says "0 notes" while the report has the comments | done | Comments added with the Journal's ! (or Bizarre) are flagged lines, not notes: the window now counts both |
