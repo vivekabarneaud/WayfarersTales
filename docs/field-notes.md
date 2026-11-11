@@ -40,3 +40,10 @@ in-game report at the next login.
 | Teldrassil lore "On murmure…" | tweak: a night elf knows | done | Night elf version + visitor version |
 | Twig "personne en vue" with boars around | flag | done | New "alone" condition counts creatures too |
 | Moonwell "Vous n'osez pas y toucher" | tweak: quests make other races fill vials | done | Reworded for visitors |
+
+## 2026-11-11 — Stormwind (Kitty, hunter)
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 09:31 | Weather | It rains, the Ambiance tab shows "type 1, intensity 0.88" | done | Rain confirmed as weather type 1: rain lines switched on |
+| 09:31 | Question | The minimap still shows a sun while it rains | info | That's the game's own day/night clock icon, not the addon's; it never shows weather |
