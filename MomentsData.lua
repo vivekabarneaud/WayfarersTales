@@ -385,6 +385,11 @@ D.MOMENTS = {
     { en = "You squint a little in the daylight.", fr = "Vous plissez un peu les yeux à la lumière du jour.",
       when = { sky = true, night = false, notBiomes = NO_DARK } },
     { en = "The night air greets you as you step outside.", fr = "L'air de la nuit vous accueille dehors.", when = { night = true } },
+    -- (review 2026-11-11: stepping back from the forge heat fits when you come out of a building there)
+    { draft = true,
+      en = "You step outside, and the heat of the forges hits you at once. The smell of hot iron fills your nose, and instinctively, you take a step back.",
+      fr = "Vous sortez, et la chaleur des forges vous saute aussitôt au visage. L'odeur de fer chaud vous emplit le nez, et par instinct, vous reculez d'un pas.",
+      when = { subMatch = { "dwarven district", "quartier des nains" } } },
   },
 
   -- City errands

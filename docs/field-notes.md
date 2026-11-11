@@ -95,3 +95,16 @@ in-game report at the next login.
 | 12:40 | Bug | Two lines can show up at the very same moment | done | Lines on a timer wait 30 s after any line (any module) |
 | 12:45 | Idea | Pet fought alone while you were AFK: a line for it | done | Pet wins a fight you didn't take part in (no attack, shot or spell from you): line, +1 affection, first-time memory (draft); AFK version |
 | — | Flag | "Poppo vous frôle affectueusement la jambe en marchant" while standing still | done | Walking pet lines only while you walk; still versions in their place |
+
+## 2026-11-11 — Review page, second round
+
+| Line | Review | Status | What we did |
+|---|---|---|---|
+| Rain ambient rewrite (weather 1) | tweak: "l'air prend soudain" fits the start, "ruisselle" only after a while | done | Split: rain-start line (smell + first drops) and an ongoing-rain rewrite (drums, trickles) |
+| Elwynn: red-masked bandits "on raconte" | tweak: known lore, no "on raconte" | done | Stated plainly, tied to the woods and a snapping twig |
+| Westfall: Defias "on raconte" | tweak: mix lore with what you sense | done | Dust of the abandoned fields → the Defias' story and anger |
+| Redridge: Blackrock "on dit" | tweak: fits arriving, not after a while | done | Moved into the arrival line; new ambient line: red ridges on the sky, the orcs watching |
+| Dwarven forge "vous reculez d'un pas" | tweak: plays any time | done | Rewrite without it; the step back moved to a new "stepping outside in the Dwarven District" line (draft) |
+| Dwarven forge embers | note: only right by the fire (63.9, 37.0) | done | New small spot by the fire |
+| Dwarven District "Avant même de voir les forges" | tweak: sounds like arriving | done | Rewrite that fits any time |
+| Writing rule | "on raconte" only for what's not fully known | info | Saved as a rule for all lines |

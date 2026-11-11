@@ -497,8 +497,8 @@ S.zones = {
                     fr = "La forêt d'Elwynn respire le calme : une odeur d'herbe tiède et de feuilles, la lumière qui joue entre les chênes. On en oublierait presque les loups.",
                     when = { indoors = false, night = false } } },
       { draft = true,
-        en = "They say bandits in red masks roam right up to Stormwind's gates. Without thinking, you tighten your grip on your purse.",
-        fr = "On raconte que des bandits au foulard rouge rôdent jusqu'aux portes de Hurlevent. Sans y penser, vous resserrez la main sur votre bourse.",
+        en = "Bandits in red masks roam these woods, a stone's throw from Stormwind. At every snapping twig, your hand tightens on your purse.",
+        fr = "Des bandits au foulard rouge rôdent dans ces bois, à deux pas de Hurlevent. Au moindre craquement de branche, votre main se resserre sur votre bourse.",
         when = OUT },
       { draft = true,
         en = "At night, Elwynn changes face. The shadows stretch between the oaks, and you walk a little faster than usual.",
@@ -652,8 +652,8 @@ S.zones = {
   [1436] = { -- Westfall (the farmland landscape already has its own lines)
     ambient = {
       { draft = true, check = "Confrérie Défias",
-        en = "They say the stonemasons who rebuilt Stormwind were never paid. Since then, the Defias Brotherhood has roamed these hills, red masks over their faces.",
-        fr = "On raconte que les tailleurs de pierre qui ont rebâti Hurlevent n'ont jamais été payés. Depuis, la Confrérie Défias rôde dans ces collines, un foulard rouge sur le visage.",
+        en = "The wind lifts the dust of the abandoned fields. This is where the Defias Brotherhood found refuge: stonemasons who rebuilt Stormwind and were never paid. Looking at these empty farms, you can almost understand their anger.",
+        fr = "Le vent soulève la poussière des champs abandonnés. C'est ici que la Confrérie Défias a trouvé refuge : des tailleurs de pierre qui ont rebâti Hurlevent sans jamais être payés. Devant ces fermes vides, vous comprendriez presque leur colère.",
         when = { indoors = false, notRace = "Human" } },
       { draft = true,
         en = "The farms here were abandoned one by one. You can't help wondering what became of the people who lived in them.",
@@ -724,16 +724,16 @@ S.zones = {
   },
   [1433] = { -- Redridge Mountains
     arrive = {
-      { draft = true, long = true, check = "Les Carmines",
-        en = "The Redridge Mountains raise their red rocks all around. The air is mild, yet there's a tension in these valleys, as if everyone were watching for something.",
-        fr = "Les Carmines dressent leurs rochers rouges tout autour de vous. L'air est doux, et pourtant on sent une tension dans ces vallées, comme si chacun guettait quelque chose.",
+      { draft = true, long = true, check = "Les Carmines, Rochenoire, Comté-du-Lac",
+        en = "The Redridge Mountains raise their red rocks all around. The air is mild, yet there's a tension in these valleys: they say Blackrock orcs come down from the mountains to raid the farms, and in Lakeshire, people sleep with one eye open.",
+        fr = "Les Carmines dressent leurs rochers rouges tout autour de vous. L'air est doux, et pourtant on sent une tension dans ces vallées : on dit que les orcs Rochenoire descendent des montagnes pour piller les fermes, et à Comté-du-Lac, on dort d'un œil.",
         when = OUT },
     },
     ambient = {
-      { draft = true, check = "Rochenoire, Comté-du-Lac",
-        en = "They say Blackrock orcs come down from the mountains to raid the farms. In Lakeshire, people sleep with one eye open.",
-        fr = "On dit que les orcs Rochenoire descendent des montagnes pour piller les fermes. À Comté-du-Lac, on dort d'un œil.",
-        when = OUT },
+      { draft = true, check = "Rochenoire",
+        en = "In the distance, the red ridges stand out against the sky. Somewhere up there, the Blackrock orcs are watching, and you glance over your shoulder without quite knowing why.",
+        fr = "Au loin, les crêtes rouges se découpent sur le ciel. Quelque part là-haut, les orcs Rochenoire guettent, et vous jetez un coup d'œil derrière vous sans trop savoir pourquoi.",
+        when = { indoors = false, sky = true } },
       { draft = true,
         en = "The sun warms the red rock, and the air smells of hot dust and dry grass.",
         fr = "Le soleil chauffe la roche rouge, et l'air sent la poussière chaude et les herbes sèches.",
@@ -902,6 +902,11 @@ S.spots = {
     },
     ambient = {
       { en = "The heat of the forge stings your cheeks.", fr = "La chaleur de la forge vous pique les joues." },
+    } },
+  -- right next to the forge's fire (noted 2026-11-11: 63.9, 37.0)
+  { id = "sw_dwarven_forge_fire", map = 1453, x = 63.9, y = 37.0, r = 0.6, when = { indoors = false },
+    names = { en = "by the Dwarven District forge fire", fr = "près du feu de la forge du Quartier des Nains" },
+    ambient = {
       { en = "The coals glow red, and the air above them shimmers.", fr = "Les braises rougeoient, et l'air tremble au-dessus d'elles." },
     } },
   { id = "wf_sentinel_inn", map = 1436, x = 52.5, y = 53.1, r = 1.5, when = { resting = true },
@@ -991,7 +996,11 @@ S.subzones = {
       { long = true,
         en = "Even before you see the forges, you can smell them: coal smoke, hot iron, a hint of gunpowder. In the Dwarven District, a fire is never far.",
         fr = "Avant même de voir les forges, vous les sentez : fumée de charbon, fer chaud, une pointe de poudre. Dans le Quartier des Nains, le feu n'est jamais loin.",
-        when = OUT },
+        when = OUT,
+        -- (review 2026-11-11: "avant même de voir" sounds like arriving, but it plays any time)
+        rewrite = { en = "Coal smoke, hot iron, a hint of gunpowder: in the Dwarven District, the smell of the forges never really leaves you.",
+                    fr = "Fumée de charbon, fer chaud, une pointe de poudre : dans le Quartier des Nains, l'odeur des forges ne vous quitte jamais vraiment.",
+                    when = OUT } },
       { en = "A smell of coal smoke and hot iron hangs over the district.", fr = "Une odeur de fumée de charbon et de fer chaud flotte sur le quartier.", when = OUT },
       { en = "Thick smoke curls up from the forges.", fr = "Une épaisse fumée s'élève des forges.", when = OUT },
       { en = "A whiff of gunpowder mixes with the forge smoke.", fr = "Une pointe de poudre se mêle à la fumée des forges.", when = OUT },

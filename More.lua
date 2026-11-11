@@ -20,6 +20,11 @@ D.SENSES_MORE = {
       { draft = true,
         en = "The first drops fall, pattering all around you.",
         fr = "Les premières gouttes tombent en crépitant tout autour de vous." },
+      -- (review 2026-11-11: the "smell of rain" half of the old rain line, for when it starts)
+      { draft = true,
+        en = "The air suddenly smells fresh with rain, and the first drops start tapping on your shoulders.",
+        fr = "L'air prend soudain une odeur fraîche de pluie, et les premières gouttes viennent tapoter sur vos épaules.",
+        when = { indoors = false, sky = true } },
     },
     rainStop = {
       { draft = true,
