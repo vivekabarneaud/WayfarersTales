@@ -136,7 +136,7 @@ L.GUIDE = table.concat({
   "Your pet never spells it out: watch its reactions in the chat, they tell you when a moment is waiting for you.",
   "|cffff8fb1Cuddles|r  /pet /hug /love /cuddle /kiss /soothe /comfort /praise /pat /tickle on your pet: +1 (once every 15 min). After a hard fight, comfort it soon after reviving it!",
   "|cffff8fb1Feeding|r  +1 (once every 10 min). Your pet has a secret favorite food (+2) and a food it doesn't like (nothing). Feed it different things to find out!",
-  "|cffff8fb1Shared meals|r  Sometimes, when you sit down to eat, your pet asks for a bite. Feed it within 2 minutes: +4 for the same food, +2 for another.",
+  "|cffff8fb1Shared meals|r  Sometimes, when you sit down to eat, your pet asks for a bite. Feed it within 30 seconds, while you eat: +4 for the same food, +2 for another.",
   "|cffff8fb1Petting requests|r  Now and then your pet asks for attention. /pet within 2 minutes: +2",
   "|cffff8fb1Campfires|r  Sit down by a campfire with your pet: +2",
   "|cffff8fb1Treats|r  When your pet notices food you just looted, feed it that food within 2 minutes: +2",

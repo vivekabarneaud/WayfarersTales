@@ -133,7 +133,7 @@ L.GUIDE = table.concat({
   "Votre familier ne vous dira jamais rien en toutes lettres : observez ses réactions dans le chat, elles vous signalent quand un moment vous attend.",
   "|cffff8fb1Câlins|r  /pet /hug /love /cuddle /kiss /soothe /comfort /praise /pat /tickle sur votre familier : +1 (une fois toutes les 15 min). Après un combat difficile, réconfortez-le juste après l'avoir ressuscité !",
   "|cffff8fb1Nourriture|r  +1 (une fois toutes les 10 min). Votre familier a une nourriture préférée secrète (+2) et une qu'il n'aime pas (rien). Essayez différentes choses pour les découvrir !",
-  "|cffff8fb1Repas partagés|r  Parfois, quand vous vous asseyez pour manger, votre familier réclame une bouchée. Nourrissez-le dans les 2 minutes : +4 pour la même nourriture, +2 pour une autre.",
+  "|cffff8fb1Repas partagés|r  Parfois, quand vous vous asseyez pour manger, votre familier réclame une bouchée. Nourrissez-le dans les 30 secondes, pendant votre repas : +4 pour la même nourriture, +2 pour une autre.",
   "|cffff8fb1Demandes de câlins|r  De temps en temps, votre familier réclame de l'attention. /pet dans les 2 minutes : +2",
   "|cffff8fb1Feux de camp|r  Asseyez-vous au coin du feu avec votre familier : +2",
   "|cffff8fb1Friandises|r  Quand votre familier remarque de la nourriture que vous venez de ramasser, donnez-la-lui dans les 2 minutes : +2",

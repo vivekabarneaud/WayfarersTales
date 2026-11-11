@@ -105,7 +105,7 @@ D.LOSS = {
   stableWeek  = { amount = 1, max = 5 },  -- per full week spent in the stable
 }
 
-D.MEAL_WINDOW        = 120   -- seconds to answer a meal request
+D.MEAL_WINDOW        = 30    -- seconds to answer a meal request (you're still eating)
 D.ATTENTION_WINDOW   = 120   -- seconds to answer a petting request
 D.ATTENTION_COOLDOWN = 2400
 D.IDLE_COOLDOWN      = 600
