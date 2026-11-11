@@ -20,10 +20,12 @@ D.PROCESSED = {
     ["2026-11-11 09:17"] = true, ["2026-11-11 09:19"] = true, ["2026-11-11 09:24"] = true, -- Dane, Kaita, pet +0.9
     ["2026-11-11 09:27"] = true, ["2026-11-11 09:31"] = true, ["2026-11-11 09:36"] = true, -- Jaxon, rain/sun, Lilliam
     ["2026-11-11 09:55"] = true, ["2026-11-11 09:57"] = true, ["2026-11-11 09:58"] = true, -- rain on roof, bankers
+    ["2026-11-11 12:40"] = true, -- two lines at once
   },
   flagsAt = {
     ["2026-11-11 08:45"] = true, ["2026-11-11 09:15"] = true, ["2026-11-11 09:21"] = true, -- mail, bomb, canals
     ["2026-11-11 09:25"] = true, ["2026-11-11 09:42"] = true, ["2026-11-11 09:54"] = true, -- auction, drink, meal
+    ["2026-11-11 10:04"] = true, -- pet licks crumbs of a fish
   },
   -- errors logged by versions older than this were fixed (secret values, v0.31)
   errorsBefore = "0.31.0",

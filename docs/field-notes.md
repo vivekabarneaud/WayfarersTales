@@ -79,3 +79,18 @@ in-game report at the next login.
 | — | NPC | Meri Ironweave (3613), Dolanaar: female night elf, mail armor and repairs | done | `D.NPCS` armorer + line (draft) |
 | — | Error | Old secret value errors (v0.30) | done | Fixed in v0.31; old errors are cleared at login |
 | — | Idea | Audit: add diversity where a situation has only one line | done | `More.lua`: 78 new drafts (weather changes, landscapes, Stormwind places, spots, danger feelings, first tastes and sips, falls, fishing junk, herbs, crafts, naps, pet moods and reactions). Repeating single-line situations: from about 80 down to 6 (snow and sand still asleep, Mulgore and Tirisfal native lines) |
+
+## 2026-11-11 (afternoon) - Stormwind, Westfall
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 10:04 | Flag | Poppo "lèche les dernières miettes" of a raw fish | done | Line now fits any food: "jusqu'à la toute dernière bouchée" |
+| 10:19 | NPC | Erika Tate (5483), female human, cooking supplies, "go find a goblin" to haggle | todo | Lines to discuss |
+| 12:09 | NPC | Dungar Longdrink (352), male human, flight master, big pilot goggles, proud of his gryphons | todo | Lines to discuss |
+| 12:16 | Idea | Eating and drinking fill up over time while you eat (like napping) | todo | To discuss |
+| 12:17 | Idea | ...and depend on the food (apple +3%/s, cooked fish +5%/s) | todo | To discuss |
+| 12:29 | Idea | Flies buzzing around your face in Westfall | todo | Lines to discuss |
+| 12:33 | Place | Saldean farm (56.2, 31.0), kitchen (56.3, 30.7): fire in the chimney, Salma making boar liver pie | todo | Lines to discuss |
+| 12:34 | Quest | Quest 22 "La tourte au foie de Broche-tripes": hot fresh pie, smells comforting, gives the recipe | todo | Turn-in line to discuss |
+| 12:40 | Bug | Two lines can show up at the very same moment | done | Lines on a timer wait 30 s after any line (any module) |
+| 12:45 | Idea | Pet fought alone while you were AFK: a line for it | todo | To discuss |
