@@ -1376,6 +1376,7 @@ function H.ADDON_LOADED(name)
   if not s.heartOffOnce then s.showHeart, s.heartOffOnce = false, true end
   -- 0.55: the new window drops these options: back to their defaults once
   if not s.panel055 then s.label, s.showHeart, s.sensesStyle, s.panel055 = false, false, "mixed", true end
+  s.iconTry = nil -- (the icon picker is gone)
   db.probes = nil
   -- 0.54: modes. Saves that already hold tester data (our testers) start in tester mode.
   if s.tester == nil then s.tester = HasTesterData() end
@@ -1745,7 +1746,7 @@ SLASH_WAYFARERSTALES2 = "/kt" -- old Kindred Tales command, still works
 SlashCmdList.WAYFARERSTALES = function(msg)
   local cmd, arg = (msg or ""):lower():match("^(%S*)%s*(.-)$")
   local testerCmds = { nope = true, devoirs = true, homework = true, toit = true, roof = true }
-  local devCmds = { debug = true, resetvisits = true, icons = true }
+  local devCmds = { debug = true, resetvisits = true }
   if (testerCmds[cmd] and not KT.IsTester()) or (devCmds[cmd] and not KT.IsDev()) then
     Print(L.CMD_TESTER_ONLY)
     return
@@ -1808,8 +1809,6 @@ SlashCmdList.WAYFARERSTALES = function(msg)
     -- this spot has a roof even though the game says "outdoors": no open-sky lines here
     local res = KT.Senses and KT.Senses.ToggleRoof() or "nopos"
     Print(L.CMD_ROOF[res] or res)
-  elseif cmd == "icons" then
-    if KT.ToggleIconPicker then KT.ToggleIconPicker() end
   elseif cmd == "resetvisits" then
     -- testing: forget the places visited, so first-visit lines play again
     local s = db.senses and db.senses[CharKey()]

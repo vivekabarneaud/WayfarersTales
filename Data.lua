@@ -253,7 +253,7 @@ D.SOUND_GAP = 3 -- minimum seconds between two animal sounds (chimes ignore it)
 
 -- Your own icon art: set to a path like "Interface\\AddOns\\WayfarersTales\\Media\\heart"
 -- once the file exists (a missing file shows as a green square).
-D.CUSTOM_ICON = nil
+D.CUSTOM_ICON = "Interface\\Icons\\INV_Misc_Note_01" -- the addon's icon (chosen 2026-11-11)
 
 -- Foods not in the list above (many Forever foods): guess the type from words in
 -- the item name, French and English. Checked in this order, first match wins

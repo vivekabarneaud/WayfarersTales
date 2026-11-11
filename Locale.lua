@@ -186,7 +186,6 @@ L.CMD_HELP_DEV = {
   "|cffffd100Dev|r",
   "/wt debug - show technical info",
   "/wt resetvisits - forget visited places and line cooldowns",
-  "/wt icons - try game icons for the addon (minimap button, window)",
 }
 L.CMD_TESTER_ON   = "Tester mode on: thanks for helping! Type /wt homework for the notes window, /wt help for the commands."
 L.CMD_TESTER_OFF  = "Tester mode off."
