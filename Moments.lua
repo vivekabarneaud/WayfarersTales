@@ -227,13 +227,35 @@ end
 -- watches the bags): look a little later, and once more if it isn't known yet.
 -- Your food diary: how many times this character has eaten / drunk each item.
 -- Returns the new count.
-local function CountMeal(itemID)
+-- kind: "food", "drink" or "alcohol" (for the Carnet's three flavors)
+local function CountMeal(itemID, kind)
   local state = S.State()
   if not state or not itemID then return nil end
   state.diary = state.diary or {}
   local n = (state.diary[itemID] or 0) + 1
   state.diary[itemID] = n
+  if kind then
+    state.diaryKind = state.diaryKind or {}
+    state.diaryKind[itemID] = kind
+  end
   return n
+end
+
+-- Alcohol isn't a "drink" for the game (no Drink buff): it makes you tipsy instead.
+-- When the game says so, the item you just used goes into the diary as an alcohol.
+local drunkMessages
+local function OnDrunkMessage(msg)
+  if not drunkMessages then
+    drunkMessages = {}
+    for i = 1, 4 do
+      local m = _G["DRUNK_MESSAGE_SELF" .. i]
+      if type(m) == "string" then drunkMessages[m] = true end
+    end
+  end
+  if not msg or not drunkMessages[msg] then return end
+  local itemID
+  if KT.LastConsumable then itemID = KT.LastConsumable(5) end
+  if itemID then CountMeal(itemID, "alcohol") end
 end
 
 -- A diary line if this food/drink is new, an old favourite or a milestone.
@@ -259,12 +281,14 @@ end
 
 -- chained: you're still seated, starting the next item right after the last one
 local function MealLine(drink, tries, chained)
-  local itemID, link = KT.LastFood and KT.LastFood(6)
+  -- (not "KT.LastFood and KT.LastFood(6)": "and" would keep only the first value, the id)
+  local itemID, link
+  if KT.LastFood then itemID, link = KT.LastFood(6) end
   if not link and tries < 2 then
     After(1.5, function() MealLine(drink, tries + 1, chained) end, "meal")
     return
   end
-  if link and DiaryLine(drink, itemID, link, CountMeal(itemID)) then return end
+  if link and DiaryLine(drink, itemID, link, CountMeal(itemID, drink and "drink" or "food")) then return end
   -- the usual "you sit down and take a first bite" only for the first item of a meal
   if chained then return end
   if not drink then
@@ -394,6 +418,17 @@ local function ProfessionKey(name)
   return name and professionNames[name:lower()] or nil
 end
 local function IsProfession(name) return ProfessionKey(name) ~= nil end
+
+-- How many professions this character has right now (for the Carnet)
+function Mo.ProfessionCount()
+  local n = 0
+  local lines = GetNumSkillLines and GetSkillLineInfo and GetNumSkillLines() or 0
+  for i = 1, lines do
+    local ok, name = pcall(GetSkillLineInfo, i)
+    if ok and name and IsProfession(name) then n = n + 1 end
+  end
+  return n
+end
 
 -- Professions this character already had (so a new rank isn't taken for a new craft)
 local function KnownProfessions(state)
@@ -732,6 +767,7 @@ f:SetScript("OnEvent", function(_, event, ...)
     elseif event == "CHAT_MSG_SYSTEM" then
       local msg = ...
       After(0.5, function() OnSystemMessage(msg) end, "learn") -- after the game's own message
+      After(1, function() OnDrunkMessage(msg) end, "alcohol") -- tipsy: an alcohol for the diary (once the bottle has left the bags)
       if ERR_NEWTAXIPATH and msg == ERR_NEWTAXIPATH then After(1.5, function() Play("flightNew") end, "flight") end
     elseif ERRANDS[event] then
       -- the NPC's own line if we know them, else the errand's line (bank, mail...)

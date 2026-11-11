@@ -95,10 +95,10 @@ L.UI_TAB_TRAVELS  = "Carnet"
 
 L.DISC = {
   title = "Carnet de voyage de %s",
-  total = "Découvertes : %d",
-  intro = "Chaque nouvelle découverte rapporte des points : lieux, saveurs, savoir-faire et voyages.",
+  total = "Points de découverte : %d", pts = "%d pts",
+  intro = "Chaque nouvelle découverte rapporte des points : un donjon 15, une zone ou un métier 10, un endroit particulier 5, une saveur, une destination de vol ou une auberge 3, un lieu-dit ou une création 2.",
   places = "Lieux", placesLine = "Zones %d  ·  Lieux-dits %d  ·  Endroits particuliers %d  ·  Donjons %d",
-  tastes = "Saveurs", tastesLine = "Aliments et boissons %d",
+  tastes = "Saveurs", tastesLine = "Aliments %d  ·  Boissons %d  ·  Alcools %d",
   crafts = "Savoir-faire", craftsLine = "Métiers %d  ·  Créations %d",
   travels = "Voyages", travelsLine = "Destinations de vol %d  ·  Auberges %d",
   favTastes = "Vos saveurs préférées", dungeonList = "Donjons", flightList = "Destinations de vol", innList = "Auberges",
@@ -1120,7 +1120,7 @@ L.UI_FLAG_OK         = "Signaler"
 L.DISC_TITLES = { "Pied-tendre", "{Flâneur|Flâneuse|Flâneur·se}", "{Voyageur|Voyageuse|Voyageur·se}",
   "{Arpenteur|Arpenteuse|Arpenteur·se}", "{Bourlingueur|Bourlingueuse|Bourlingueur·se}",
   "{Explorateur|Exploratrice|Explorateur·rice}", "{Baroudeur|Baroudeuse|Baroudeur·se}", "Légende des chemins" }
-L.DISC_TITLE_LINE = "%s · %d découvertes"
+L.DISC_TITLE_LINE = "%s · %d points de découverte"
 L.DISC_YOUR_TITLE = "Votre titre"
 L.DISC_NEXT       = "Prochain titre : %s, à %d"
 L.DISC_TOP        = "Le plus haut titre qui soit !"

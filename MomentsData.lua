@@ -156,7 +156,7 @@ D.BIRTH_CLASS = {
 -- Discovery score ("Carnet" tab): points for each new thing discovered.
 D.DISCOVERY_POINTS = {
   zones = 10, subzones = 2, spots = 5, dungeons = 15,   -- places
-  tastes = 3,                                            -- foods and drinks
+  foods = 3, drinks = 3, alcohols = 3,                   -- flavors
   professions = 10, crafts = 2,                          -- know-how
   flights = 3, inns = 3,                                 -- travels
 }

@@ -156,3 +156,8 @@ in-game report at the next login.
 | — | Bug | Poppo asked for [Lait glacé] (a drink he can't eat) while you ate and drank together | done | A drink never counts as the meal to share |
 | — | Flag | "Vous vous asseyez et prenez une première bouchée" while already seated, eating several items in a row | done | Only the first item of a meal gets the sit-down line; the next ones only a first-taste or milestone line |
 | — | Idea | Tell testers about the Homework window on Discord | done | Tip added to the #rapports guide (docs/discord.md) |
+| — | Bug | Carnet: "Aliments et boissons 0" while eating and drinking | done | Bug: the meal line lost the item's name ("x and f()" keeps one value), so no food line named it and the diary stayed empty. Fixed; the diary fills from now on |
+| — | Bug | Carnet: "Métiers 0" with 2 professions | done | Professions were checked once (before any was learned) and never again; now counted from your skills each time |
+| — | Idea | Split flavors into foods, drinks and alcohols | done | Three counts; alcohol recognized from the game's "tipsy" messages |
+| — | Idea | The numbers (points vs counts) aren't clear | done | Categories show "· N pts"; the intro says what each kind of discovery is worth; header and total say "points de découverte" |
+| — | Info | Flight paths and inns low | info | They only count since the version that started tracking them |

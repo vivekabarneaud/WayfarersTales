@@ -29,7 +29,7 @@ end
 -- Number of discoveries in each category, from this character's saved data
 function Di.Counts()
   local st = S.State()
-  local c = { zones = 0, subzones = 0, spots = 0, dungeons = 0, tastes = 0,
+  local c = { zones = 0, subzones = 0, spots = 0, dungeons = 0, foods = 0, drinks = 0, alcohols = 0,
     professions = 0, crafts = 0, flights = 0, inns = 0 }
   if not st then return c end
   for key in pairs(st.visited or {}) do
@@ -38,8 +38,16 @@ function Di.Counts()
     elseif key:sub(1, 5) == "spot:" then c.spots = c.spots + 1 end
   end
   c.dungeons = Count(st.dungeons)
-  c.tastes = Count(st.diary)
-  c.professions = Count(st.professions)
+  -- flavors: food, drink or alcohol (noted when you have it; older entries are guessed)
+  local kinds = st.diaryKind or {}
+  for id in pairs(st.diary or {}) do
+    local k = kinds[id] or ((KT.IsDrink and KT.IsDrink(id)) and "drink") or "food"
+    local key = (k == "alcohol" and "alcohols") or (k == "drink" and "drinks") or "foods"
+    c[key] = c[key] + 1
+  end
+  -- professions: the ones you have now, or the ones noted (whichever is more)
+  local live = KT.Moments and KT.Moments.ProfessionCount and KT.Moments.ProfessionCount() or 0
+  c.professions = math.max(Count(st.professions), live)
   c.crafts = Count(st.crafted)
   c.flights = Count(st.flights)
   c.inns = Count(st.inns)
@@ -169,7 +177,7 @@ function Di.PageText()
   local function pts(...)
     local n = 0
     for _, k in ipairs({ ... }) do n = n + c[k] * P[k] end
-    return Grey(" (" .. n .. ")")
+    return Grey("  ·  " .. string.format(L.DISC.pts, n))
   end
   local T = L.DISC
 
@@ -179,8 +187,8 @@ function Di.PageText()
   add("")
   add(Pink(T.places) .. pts("zones", "subzones", "spots", "dungeons"))
   add("   " .. string.format(T.placesLine, c.zones, c.subzones, c.spots, c.dungeons))
-  add(Pink(T.tastes) .. pts("tastes"))
-  add("   " .. string.format(T.tastesLine, c.tastes))
+  add(Pink(T.tastes) .. pts("foods", "drinks", "alcohols"))
+  add("   " .. string.format(T.tastesLine, c.foods, c.drinks, c.alcohols))
   add(Pink(T.crafts) .. pts("professions", "crafts"))
   add("   " .. string.format(T.craftsLine, c.professions, c.crafts))
   add(Pink(T.travels) .. pts("flights", "inns"))
