@@ -257,6 +257,7 @@ D.SOUND_GAP = 3 -- minimum seconds between two animal sounds (chimes ignore it)
 D.CUSTOM_ICON = "Interface\\Icons\\INV_Misc_Note_01" -- the addon's icon (chosen 2026-11-11)
 D.DISCORD = "discord.gg/5bgAnccyHj" -- the addon's Discord (Options tab, report window)
 D.REPORT_PART = 1900 -- a report longer than this comes in parts (Discord: 2000 characters per message)
+D.DRAFTS_LIVE = true -- beta: new lines play for everyone, the community confirms or tweaks them
 
 -- Foods not in the list above (many Forever foods): guess the type from words in
 -- the item name, French and English. Checked in this order, first match wins

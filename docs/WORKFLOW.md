@@ -20,7 +20,7 @@ How we work on Wayfarer's Tales, so we're always on the same page.
 
 ## Lines
 - New ideas and lines: discussed first, then added as **drafts** (`draft = true`) so they can be reviewed on the review page and heard in game at the same time.
-- Drafts play only in dev mode with "Try new lines" on. Testers and players hear released lines only.
+- During the beta (`D.DRAFTS_LIVE = true` in Data.lua), drafts and rewrite proposals play for everyone: the community hears them and flags what feels wrong. They keep their `draft` mark until confirmed. With `D.DRAFTS_LIVE` off, they play in dev mode only.
 - Approved: the draft flag is removed. Rejected: the line is deleted. Tweaked: rewritten, stays a draft until approved.
 
 ## Who sees what

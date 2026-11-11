@@ -277,6 +277,9 @@ end
 -- Dev (us): only when Dev.lua is there (the repo); release zips leave it out.
 function KT.IsDev() return KT.DEV == true end
 function KT.IsTester() return KT.DEV == true or (db and db.settings.tester) == true end
+-- New lines not yet confirmed (drafts, rewrite proposals): they play for everyone while
+-- D.DRAFTS_LIVE is on (the beta: players hear them and flag what feels wrong), else in dev only.
+function KT.DraftsOn() return KT.DEV == true or D.DRAFTS_LIVE == true end
 
 -- What testers save, erased when they go back to player mode
 local TESTER_DATA = { "npcs", "questsDone", "errors", "fieldNotes", "proposals", "roofs", "weatherLog", "weatherApi" }
@@ -933,7 +936,7 @@ local function IdleMoment()
   if Flavor(pool, 0.08 * MoodMult("idle")) then
     Mark("idle")
     -- it brought you something: a thank-you (/thank) in the next minute makes it proud
-    if pool == "idleFind" and (M.thanked or KT.IsDev()) then state.found = { expires = GetTime() + D.FOUND_WINDOW } end
+    if pool == "idleFind" and (M.thanked or KT.DraftsOn()) then state.found = { expires = GetTime() + D.FOUND_WINDOW } end
   end
 end
 
@@ -1597,7 +1600,7 @@ end
 -- cast at an enemy since the fight began (you were mining, turning in a quest,
 -- away...). Draft lines for now: only in dev mode until they're approved.
 local function CheckSoloWin()
-  if not (M.petSolo or KT.IsDev()) or not PetAlive() then return end
+  if not (M.petSolo or KT.DraftsOn()) or not PetAlive() then return end
   local start = state.petFightAt
   if not start or state.meleeOn or state.shooting then return end
   if state.actedAt and state.actedAt >= start - 2 then return end

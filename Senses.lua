@@ -296,7 +296,7 @@ end
 -- play, and rewrite proposals replace the current text (line.rewrite in the data,
 -- or D.REWRITES[id] in Drafts.lua).
 function S.Testing()
-  return KT.IsDev()
+  return KT.DraftsOn()
 end
 
 function S.Effective(line, id)
