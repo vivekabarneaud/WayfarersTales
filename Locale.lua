@@ -621,7 +621,7 @@ M.idle = {
   {
     "{pet} sniffs around, exploring.",
     "{pet} keeps a little distance, watching you.",
-    "{pet} stops to scratch an ear, then hurries to catch up.",
+    "{pet} scratches an ear very thoroughly.",
     "{pet} investigates a suspicious bush.",
   },
   {
@@ -629,12 +629,25 @@ M.idle = {
     "{pet} yawns widely.",
     "{pet} watches a butterfly drift by.",
     "{pet} sticks close to your side.",
+    "{pet} has a long stretch, then looks up at you.",
+  },
+  {
+    "{pet} rubs against your leg affectionately.",
+    "{pet} looks up at you with total trust.",
+    "{pet} brings you a stick. Or maybe a bone. Best not to ask.",
+    "{pet} presses so close to you that you don't dare move. Worth it.",
+  },
+}
+-- while you're walking (the lines above work standing still too)
+M.idleWalking = {
+  {
+    "{pet} stops to scratch an ear, then hurries to catch up.",
+  },
+  {
     "{pet} trots ahead, then looks back to check you're following.",
   },
   {
     "{pet} bumps against your leg affectionately while walking.",
-    "{pet} looks up at you with total trust.",
-    "{pet} brings you a stick. Or maybe a bone. Best not to ask.",
     "{pet} walks so close to you that you almost trip. Worth it.",
   },
 }

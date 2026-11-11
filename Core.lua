@@ -915,8 +915,10 @@ local function IdleMoment()
     pool = "idleSwimming"
   elseif IsResting() and math.random() < 0.5 then
     pool = "idleResting"
-  elseif hour and (hour >= 21 or hour < 6) and math.random() < 0.4 then
-    pool = "idleNight"
+  elseif not pet.archetype and IsPlayerMoving and IsPlayerMoving() and math.random() < 0.5 then
+    pool = "idleWalking" -- lines about walking only while you walk
+  elseif hour and (hour >= 21 or hour < 6) and not IsIndoors() and math.random() < 0.4 then
+    pool = "idleNight" -- (one looks up at the stars: not indoors)
   elseif pet.mood and math.random() < 0.4 then
     pool = "idleMood_" .. pet.mood.key
   end

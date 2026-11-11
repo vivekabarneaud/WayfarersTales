@@ -615,7 +615,7 @@ M.idle = {
   {
     "{pet} renifle les alentours, en pleine exploration.",
     "{pet} garde un peu ses distances et vous observe.",
-    "{pet} s'arrête pour se gratter l'oreille, puis se dépêche de vous rattraper.",
+    "{pet} se gratte l'oreille avec application.",
     "{pet} inspecte un buisson suspect.",
   },
   {
@@ -623,12 +623,25 @@ M.idle = {
     "{pet} bâille à s'en décrocher la mâchoire.",
     "{pet} regarde passer un papillon.",
     "{pet} reste tout près de vous.",
+    "{pet} s'étire longuement, puis lève les yeux vers vous.",
+  },
+  {
+    "{pet} vient se frotter affectueusement contre votre jambe.",
+    "{pet} lève vers vous un regard plein de confiance.",
+    "{pet} vous rapporte un bâton. Ou peut-être un os. Mieux vaut ne pas demander.",
+    "{pet} se serre si près de vous que vous n'osez plus bouger. Ça vaut le coup.",
+  },
+}
+-- en marchant (les lignes ci-dessus marchent aussi à l'arrêt)
+M.idleWalking = {
+  {
+    "{pet} s'arrête pour se gratter l'oreille, puis se dépêche de vous rattraper.",
+  },
+  {
     "{pet} trottine devant, puis se retourne pour vérifier que vous suivez.",
   },
   {
     "{pet} vous frôle affectueusement la jambe en marchant.",
-    "{pet} lève vers vous un regard plein de confiance.",
-    "{pet} vous rapporte un bâton. Ou peut-être un os. Mieux vaut ne pas demander.",
     "{pet} marche si près de vous que vous manquez de trébucher. Ça vaut le coup.",
   },
 }
