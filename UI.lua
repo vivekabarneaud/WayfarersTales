@@ -217,7 +217,7 @@ end
 -- Journal page: newest lines first, a flag button on each
 ---------------------------------------------------------------------------
 
-local JOURNAL_ROWS = 12
+local JOURNAL_ROWS = 10
 local JOURNAL_DATE_W = 78 -- width of the date column
 
 -- Reporting a line: a small window with the line and a "why?" box
@@ -257,7 +257,7 @@ local function BuildJournal(parent)
   -- over a parchment color (so the dark text always reads well)
   local paper = CreateFrame("Frame", nil, p, BackdropTemplateMixin and "BackdropTemplate" or nil)
   paper:SetPoint("TOPLEFT", 2, -4)
-  paper:SetPoint("BOTTOMRIGHT", -4, 4)
+  paper:SetPoint("BOTTOMRIGHT", -4, 36) -- (the page buttons sit below the paper)
   if paper.SetBackdrop then
     paper:SetBackdrop({ edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 12,
       insets = { left = 3, right = 3, top = 3, bottom = 3 } })
@@ -272,36 +272,45 @@ local function BuildJournal(parent)
   tex:SetPoint("BOTTOMRIGHT", -3, 3)
   -- (the spellbook page first: bigger, so less blurry once stretched; kept faint, the
   -- parchment color underneath does most of the work)
-  for _, path in ipairs({ "Interface\\Spellbook\\Spellbook-Page-1", "Interface\\Stationery\\StationeryTest1" }) do
-    local ok = tex:SetTexture(path)
-    if ok ~= false and tex:GetTexture() ~= nil then break end
+  -- the spellbook page has an empty strip at the bottom of its file (cropped here) and
+  -- its spine on the left (the text starts after it: p.leftPad)
+  p.leftPad = 16
+  local PAGES = {
+    { "Interface\\Spellbook\\Spellbook-Page-1", { 0, 1, 0, 0.94 }, 92 },
+    { "Interface\\Stationery\\StationeryTest1", { 0, 1, 0, 1 }, 16 },
+  }
+  for _, pg in ipairs(PAGES) do
+    local ok = tex:SetTexture(pg[1])
+    if ok ~= false and tex:GetTexture() ~= nil then
+      tex:SetTexCoord(unpack(pg[2]))
+      p.leftPad = pg[3]
+      break
+    end
     tex:SetTexture(nil)
   end
   tex:SetAlpha(0.45)
   p.paper = paper
 
   p.header = paper:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  p.header:SetPoint("TOPLEFT", 16, -14)
+  p.header:SetPoint("TOPLEFT", p.leftPad, -14)
   p.header:SetShadowOffset(0, 0)
 
   local copy = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
   copy:SetSize(150, 20)
-  copy:SetPoint("TOPRIGHT", -12, -10)
+  copy:SetPoint("TOPRIGHT", -24, -10)
   Label(copy, "UI_JOURNAL_COPY")
   copy:SetScript("OnClick", function() KT.ShowReport() end)
   p.copy = copy -- testers only (see RefreshJournal)
 
-  -- page buttons, centered at the bottom
-  p.pageText = paper:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  p.pageText:SetPoint("BOTTOM", 0, 14)
-  p.pageText:SetShadowOffset(0, 0)
-  p.pageText:SetTextColor(0.3, 0.2, 0.08)
-  local prev = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
+  -- page buttons, centered below the paper
+  p.pageText = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  p.pageText:SetPoint("BOTTOM", 0, 12)
+  local prev = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
   prev:SetSize(28, 20)
   prev:SetPoint("RIGHT", p.pageText, "LEFT", -12, 0)
   prev:SetText("<")
   prev:SetScript("OnClick", function() p.page = math.max(1, p.page - 1); KT.RefreshPanel() end)
-  local nxt = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
+  local nxt = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
   nxt:SetSize(28, 20)
   nxt:SetPoint("LEFT", p.pageText, "RIGHT", 12, 0)
   nxt:SetText(">")
@@ -378,15 +387,15 @@ local function RefreshJournal(p, db)
   p.nxt:SetShown(total > 0)
 
   -- lines stacked from the top, each as tall as its text
-  local width = p.paper:GetWidth() - 32
-  if width < 200 then width = 560 end
+  local width = p.paper:GetWidth() - p.leftPad - 30 -- (more room on the right too)
+  if width < 200 then width = 470 end
   local y = 40
   for i, row in ipairs(p.rows) do
     local e = j[total - (p.page - 1) * JOURNAL_ROWS - (i - 1)]
     row.entry = e
     if e then
       row:ClearAllPoints()
-      row:SetPoint("TOPLEFT", p.paper, "TOPLEFT", 16, -y)
+      row:SetPoint("TOPLEFT", p.paper, "TOPLEFT", p.leftPad, -y)
       row:SetWidth(width)
       row.fs:SetWidth(width - JOURNAL_DATE_W - (tester and 30 or 0))
       local color = e.flagged and INK_FLAG or INK
