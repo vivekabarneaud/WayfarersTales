@@ -468,8 +468,9 @@ function KT.ShowReport()
     .. (#proposals > 0 and ("\n\n" .. L.UI_REPORT_PROPOSALS .. "\n" .. table.concat(proposals, "\n")) or "")
     .. (#roofs > 0 and ("\n\n" .. L.UI_REPORT_ROOFS .. "\n" .. table.concat(roofs, "\n")) or "")
     .. (#notes > 0 and ("\n\n" .. L.UI_REPORT_NOTES .. "\n" .. table.concat(notes, "\n")) or "")
-    .. (#npcs > 0 and ("\n\n" .. L.UI_REPORT_NPCS .. "\n" .. table.concat(npcs, "\n")) or "")
-    .. (#quests > 0 and ("\n\n" .. L.UI_REPORT_QUESTS .. "\n" .. table.concat(quests, "\n")) or "")
+    -- (the NPCs and quests met along the way: for us only, testers share what they choose)
+    .. (KT.IsDev() and #npcs > 0 and ("\n\n" .. L.UI_REPORT_NPCS .. "\n" .. table.concat(npcs, "\n")) or "")
+    .. (KT.IsDev() and #quests > 0 and ("\n\n" .. L.UI_REPORT_QUESTS .. "\n" .. table.concat(quests, "\n")) or "")
     .. (function()
       local errs = {}
       for _, e in ipairs(api.GetDB().errors or {}) do

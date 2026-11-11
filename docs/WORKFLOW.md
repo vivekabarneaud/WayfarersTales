@@ -25,7 +25,7 @@ How we work on Wayfarer's Tales, so we're always on the same page.
 
 ## Who sees what
 - **Players**: no dev windows, no dev data written to the saved file.
-- **Testers** (`/wt tester`): Homework window, Bizarre button, report, NPC / quest / error logging.
+- **Testers** (`/wt tester`): Homework window, Bizarre button, report with what they choose to share (flagged lines, notes, proposals, roofs) plus errors.
 - **Us (dev)**: on automatically when the addon runs from the repo; not possible to switch on in game. Drafts play, plus the "possible lines" window and the weather log.
 
 ## Playtest notes

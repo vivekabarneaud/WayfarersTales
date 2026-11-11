@@ -152,3 +152,5 @@ in-game report at the next login.
 | 15:16 | Flag | "Aubergiste Allison vous accueille": should read "L'aubergiste Allison" | done | French NPC names starting with a job read "l'aubergiste X", "le magistrat X"... |
 | 15:04 | Quest | Le retour chez Verner (from Argus): "vous repartez avec la caisse de fers à cheval et le sentiment de vous être fait gronder" | done | Quest accept line, quest 119 (draft; to check that 119 is the right ID) |
 | 15:05 | NPC | Argus le forgeron (514), male human, blacksmith master, busy and not very patient | done | `D.NPCS` + line (draft) |
+| — | Idea | The report shouldn't list every NPC and quest: only what the player chooses to share | done | Testers' report: flagged lines, notes, proposals, roofs, errors. NPC and quest lists only in dev mode |
+| — | Bug | Poppo asked for [Lait glacé] (a drink he can't eat) while you ate and drank together | done | A drink never counts as the meal to share |

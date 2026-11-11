@@ -1254,7 +1254,8 @@ local function OnItemDecreased(id, link)
       return
     end
   end
-  if IsFoodItem(id) then state.lastFoodDrop = { id = id, link = link, t = GetTime() } end
+  -- (a drink isn't a meal to share: eating and drinking together, the drink must not count)
+  if IsFoodItem(id) and not IsDrink(id) then state.lastFoodDrop = { id = id, link = link, t = GetTime() } end
 end
 
 -- The food or drink that just left your bags (for the Senses eating line), or nil.
