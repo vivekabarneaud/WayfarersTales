@@ -51,7 +51,7 @@ Every line depends on what the game can tell: the zone and the exact place, day 
 - Type **/wt** to open the window
 
 **Help us make it better**
-Something felt wrong, or you have an idea? Type **/wt tester** to switch on tester mode: you can flag any line with a comment and send us a report. Come and talk with us on Discord: https://discord.gg/WGNnhQrRr
+Something felt wrong, or you have an idea? Type **/wt tester** to switch on tester mode: you can flag any line with a comment and send us a report. Come and talk with us on Discord: https://discord.gg/5bgAnccyHj
 
 ---
 
@@ -91,4 +91,4 @@ Chaque ligne dépend de ce que le jeu peut savoir : la zone et le lieu précis, 
 - Tapez **/wt** pour ouvrir la fenêtre
 
 **Aidez-nous à l'améliorer**
-Une ligne vous a semblé fausse, ou vous avez une idée ? Tapez **/wt tester** pour passer en mode testeur : vous pourrez signaler n'importe quelle ligne avec un commentaire et nous envoyer un rapport. Venez en discuter avec nous sur Discord : https://discord.gg/WGNnhQrRr
+Une ligne vous a semblé fausse, ou vous avez une idée ? Tapez **/wt tester** pour passer en mode testeur : vous pourrez signaler n'importe quelle ligne avec un commentaire et nous envoyer un rapport. Venez en discuter avec nous sur Discord : https://discord.gg/5bgAnccyHj

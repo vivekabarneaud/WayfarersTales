@@ -1,10 +1,10 @@
 # Discord — Wayfarer's Tales
 
-How the server is set up, and the messages to paste. Invite: https://discord.gg/WGNnhQrRr
+How the server is set up, and the messages to paste. Invite: https://discord.gg/5bgAnccyHj
 
 ## 1. Setup (once)
 
-1. **Make the invite permanent.** Invites expire after 7 days by default. Server name > *Invite People* > *Edit invite link* > *Expire after: Never*, *Max uses: No limit*. If the link changes, tell Claude (it's in the addon and on the CurseForge page).
+1. **The invite is permanent** (never expires, no use limit): https://discord.gg/5bgAnccyHj. If it ever changes, tell Claude (it's in the addon and on the CurseForge page).
 2. **Channels:**
    - `#bienvenue` (welcome): read-only, the welcome message below.
    - `#annonces` (announcements): read-only, new versions.
