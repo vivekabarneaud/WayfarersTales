@@ -1123,6 +1123,8 @@ L.UI_JOURNAL_COPY    = "Send the report"
 L.UI_JOURNAL_COPY_HELP = "Add your ideas at the bottom if you like, then Ctrl+A and Ctrl+C to copy, and paste it all on the addon's Discord: %s"
 L.UI_DISCORD = "Join us on Discord (click, then Ctrl+C to copy):"
 L.UI_REPORT_PARTS = "%d parts, send them one by one:"
+L.UI_JOURNAL_ALL = "Everything"
+L.UI_JOURNAL_BIG = "Big moments"
 L.UI_FLAG_POPUP      = "Report this line:\n\n|cffffd0a0%s|r\n\nWhat's wrong with it? (optional)"
 L.UI_FLAG_OK         = "Report"
 -- Titles: one for each discovery milestone (D.DISCOVERY_TITLES)

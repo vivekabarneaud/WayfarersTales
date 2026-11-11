@@ -168,4 +168,4 @@ in-game report at the next login.
 | — | Idea | Journal: lines closer together, < > at the bottom and centered, a paper background like the mail | done | Lines as tall as their text, page buttons centered at the bottom, paper background (mail stationery, else a spellbook page, over a parchment color) with dark ink |
 | — | Bug | Eating and drinking together: a drink line named the food ("Vous sirotez votre [Lutjan à longue mâchoire]") | done | The last drink is tracked separately from the last food |
 | — | Idea | Journal: more padding left, right and top | done | Bigger margins, 8 lines per page |
-| — | Idea | Journal: highlight the big moments, fold the others | todo | Proposed: big moments in darker ink with a ✦, everyday lines softer, a "Tout / Grands moments" switch (waiting for OK) |
+| — | Idea | Journal: highlight the big moments, fold the others | done | Big moments: a star and darker ink; everyday lines softer; "Tout / Grands moments" switch at the top |

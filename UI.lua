@@ -291,8 +291,20 @@ local function BuildJournal(parent)
   tex:SetAlpha(0.45)
   p.paper = paper
 
+  -- Everything / big moments only
+  p.showAll = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
+  p.showAll:SetSize(110, 20)
+  p.showAll:SetPoint("TOPLEFT", p.leftPad, -40)
+  Label(p.showAll, "UI_JOURNAL_ALL")
+  p.showAll:SetScript("OnClick", function() api.GetDB().settings.journalBig = nil; p.page = 1; KT.RefreshPanel() end)
+  p.showBig = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
+  p.showBig:SetSize(140, 20)
+  p.showBig:SetPoint("LEFT", p.showAll, "RIGHT", 4, 0)
+  Label(p.showBig, "UI_JOURNAL_BIG")
+  p.showBig:SetScript("OnClick", function() api.GetDB().settings.journalBig = true; p.page = 1; KT.RefreshPanel() end)
+
   p.header = paper:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  p.header:SetPoint("TOPLEFT", p.leftPad, -46)
+  p.header:SetPoint("LEFT", p.showBig, "RIGHT", 12, 0)
   p.header:SetShadowOffset(0, 0)
 
   local copy = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
@@ -364,17 +376,40 @@ local function BuildJournal(parent)
   return p
 end
 
--- ink colors on the paper
-local INK, INK_FLAG = "|cff2e1d0c", "|cffa01818"
+-- ink colors on the paper: big moments darker, everyday lines softer
+local INK, INK_SOFT, INK_FLAG = "|cff24140a", "|cff6a5538", "|cffa01818"
+local STAR = "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:11:11:0:-1|t "
 
-local JOURNAL_TOP, JOURNAL_BOTTOM, JOURNAL_GAP = 76, 28, 9
+-- Big moments: firsts, milestones, things learned, titles, your pet's big steps.
+-- (journal keys: the pet's message pool, or a line id "moment:<key>:<n>",
+-- "senses:...:arrive:<n>" for a first visit)
+local BIG_PET = { tierUp = true, loyaltyUp = true, petLevel = true, newPet = true, newPetHistory = true,
+  favoriteRevealed = true, reunion = true, stableReunion = true, daysTogether = true, rename = true,
+  newZone = true, mealShared = true, celebrated = true, petSolo = true, petSoloAfk = true, death = true }
+local BIG_MOMENTS = { "firstTaste", "firstSip", "foodMilestone", "drinkMilestone", "learn", "rank_",
+  "craftFirst", "craftEpic", "craftRare", "craftRankUp", "loot", "fishFirst", "discoveryMilestone",
+  "quest", "flightNew" }
+local function IsBigMoment(e)
+  local k = tostring(e.key or "")
+  if e.module == "kindred" then return BIG_PET[k] == true end
+  if k == "newTitle" or k:find(":arrive:", 1, true) then return true end
+  local m = k:match("^moment:([^:]+):")
+  if not m then return false end
+  if m:match("^%u") then return true end -- a new character's first lines (class, race)
+  for _, prefix in ipairs(BIG_MOMENTS) do
+    if m:sub(1, #prefix) == prefix then return true end
+  end
+  return false
+end
+
+local JOURNAL_TOP, JOURNAL_BOTTOM, JOURNAL_GAP = 76, 64, 9
 
 -- Pages by height: each line is measured, and a page takes lines (newest first) until
 -- the sheet is full. Returns the index (from the newest) where each page starts.
-local function JournalPages(p, j, textWidth)
+local function JournalPages(p, j, textWidth, mode)
   local avail = p.paper:GetHeight() - JOURNAL_TOP - JOURNAL_BOTTOM
   if avail < 120 then avail = 380 end
-  local key = #j .. ":" .. textWidth .. ":" .. math.floor(avail)
+  local key = (mode or "") .. ":" .. #j .. ":" .. textWidth .. ":" .. math.floor(avail)
   if p.pagesKey == key then return p.pages end
   if not p.measure then
     p.measure = p.paper:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -385,7 +420,7 @@ local function JournalPages(p, j, textWidth)
   local pages, y, onPage = { 1 }, 0, 0
   for i = 1, #j do
     local e = j[#j - i + 1]
-    p.measure:SetText(StripCodes(e.text or ""))
+    p.measure:SetText((IsBigMoment(e) and STAR or "") .. StripCodes(e.text or ""))
     local h = math.max(p.measure:GetStringHeight(), 14) + JOURNAL_GAP
     if onPage > 0 and (y + h > avail or onPage >= JOURNAL_ROWS) then
       pages[#pages + 1] = i
@@ -399,19 +434,29 @@ end
 
 local function RefreshJournal(p, db)
   local j = db.journal
+  local all = j
+  -- big moments only: the same journal, filtered
+  local bigOnly = db.settings.journalBig == true
+  if bigOnly then
+    local list = {}
+    for _, e in ipairs(all) do if IsBigMoment(e) then list[#list + 1] = e end end
+    j = list
+  end
+  if bigOnly then p.showBig:LockHighlight(); p.showAll:UnlockHighlight()
+  else p.showAll:LockHighlight(); p.showBig:UnlockHighlight() end
   local total = #j
   local tester = KT.IsTester()
   local width = p.paper:GetWidth() - p.leftPad - 56 -- (margin on the right too)
   if width < 200 then width = 470 end
   local textWidth = width - JOURNAL_DATE_W - (tester and 30 or 0)
-  local pages = JournalPages(p, j, textWidth)
+  local pages = JournalPages(p, j, textWidth, bigOnly and "big" or "all")
   local pageCount = math.max(1, #pages)
   if p.page > pageCount then p.page = pageCount end
   local first = pages[p.page] or 1
   local last = (pages[p.page + 1] or (total + 1)) - 1
   p.copy:SetShown(tester)
   local flagged = 0
-  for _, e in ipairs(j) do if e.flagged then flagged = flagged + 1 end end
+  for _, e in ipairs(all) do if e.flagged then flagged = flagged + 1 end end
   if total == 0 then
     p.header:SetText(INK .. L.UI_JOURNAL_EMPTY .. "|r")
   else
@@ -433,9 +478,10 @@ local function RefreshJournal(p, db)
       row:SetPoint("TOPLEFT", p.paper, "TOPLEFT", p.leftPad, -y)
       row:SetWidth(width)
       row.fs:SetWidth(textWidth)
-      local color = e.flagged and INK_FLAG or INK
+      local big = IsBigMoment(e)
+      local color = (e.flagged and INK_FLAG) or (big and INK) or INK_SOFT
       row.when:SetText(date("%d/%m %H:%M", e.t))
-      row.fs:SetText(color .. StripCodes(e.text or "") .. "|r")
+      row.fs:SetText((big and STAR or "") .. color .. StripCodes(e.text or "") .. "|r")
       local h = math.max(row.fs:GetStringHeight(), 14)
       row:SetHeight(h)
       row.flag:SetText(e.flagged and "x" or "!")
