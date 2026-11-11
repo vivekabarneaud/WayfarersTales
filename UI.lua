@@ -217,7 +217,7 @@ end
 -- Journal page: newest lines first, a flag button on each
 ---------------------------------------------------------------------------
 
-local JOURNAL_ROWS = 8
+local JOURNAL_ROWS = 24 -- at most this many lines on a page (pages are cut by height)
 local JOURNAL_DATE_W = 78 -- width of the date column
 
 -- Reporting a line: a small window with the line and a "why?" box
@@ -367,12 +367,48 @@ end
 -- ink colors on the paper
 local INK, INK_FLAG = "|cff2e1d0c", "|cffa01818"
 
+local JOURNAL_TOP, JOURNAL_BOTTOM, JOURNAL_GAP = 76, 28, 9
+
+-- Pages by height: each line is measured, and a page takes lines (newest first) until
+-- the sheet is full. Returns the index (from the newest) where each page starts.
+local function JournalPages(p, j, textWidth)
+  local avail = p.paper:GetHeight() - JOURNAL_TOP - JOURNAL_BOTTOM
+  if avail < 120 then avail = 380 end
+  local key = #j .. ":" .. textWidth .. ":" .. math.floor(avail)
+  if p.pagesKey == key then return p.pages end
+  if not p.measure then
+    p.measure = p.paper:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    p.measure:SetSpacing(2)
+    p.measure:SetAlpha(0)
+  end
+  p.measure:SetWidth(textWidth)
+  local pages, y, onPage = { 1 }, 0, 0
+  for i = 1, #j do
+    local e = j[#j - i + 1]
+    p.measure:SetText(StripCodes(e.text or ""))
+    local h = math.max(p.measure:GetStringHeight(), 14) + JOURNAL_GAP
+    if onPage > 0 and (y + h > avail or onPage >= JOURNAL_ROWS) then
+      pages[#pages + 1] = i
+      y, onPage = 0, 0
+    end
+    y, onPage = y + h, onPage + 1
+  end
+  p.pages, p.pagesKey = pages, key
+  return pages
+end
+
 local function RefreshJournal(p, db)
   local j = db.journal
   local total = #j
-  local pageCount = math.max(1, math.ceil(total / JOURNAL_ROWS))
-  if p.page > pageCount then p.page = pageCount end
   local tester = KT.IsTester()
+  local width = p.paper:GetWidth() - p.leftPad - 56 -- (margin on the right too)
+  if width < 200 then width = 470 end
+  local textWidth = width - JOURNAL_DATE_W - (tester and 30 or 0)
+  local pages = JournalPages(p, j, textWidth)
+  local pageCount = math.max(1, #pages)
+  if p.page > pageCount then p.page = pageCount end
+  local first = pages[p.page] or 1
+  local last = (pages[p.page + 1] or (total + 1)) - 1
   p.copy:SetShown(tester)
   local flagged = 0
   for _, e in ipairs(j) do if e.flagged then flagged = flagged + 1 end end
@@ -387,17 +423,16 @@ local function RefreshJournal(p, db)
   p.nxt:SetShown(total > 0)
 
   -- lines stacked from the top, each as tall as its text
-  local width = p.paper:GetWidth() - p.leftPad - 56 -- (margin on the right too)
-  if width < 200 then width = 470 end
-  local y = 76 -- (a generous top margin, under the page's decoration)
+  local y = JOURNAL_TOP -- (a generous top margin, under the page's decoration)
   for i, row in ipairs(p.rows) do
-    local e = j[total - (p.page - 1) * JOURNAL_ROWS - (i - 1)]
+    local n = first + i - 1
+    local e = n <= last and j[total - n + 1] or nil
     row.entry = e
     if e then
       row:ClearAllPoints()
       row:SetPoint("TOPLEFT", p.paper, "TOPLEFT", p.leftPad, -y)
       row:SetWidth(width)
-      row.fs:SetWidth(width - JOURNAL_DATE_W - (tester and 30 or 0))
+      row.fs:SetWidth(textWidth)
       local color = e.flagged and INK_FLAG or INK
       row.when:SetText(date("%d/%m %H:%M", e.t))
       row.fs:SetText(color .. StripCodes(e.text or "") .. "|r")
@@ -406,7 +441,7 @@ local function RefreshJournal(p, db)
       row.flag:SetText(e.flagged and "x" or "!")
       row.flag:SetShown(tester)
       row:Show()
-      y = y + h + 9
+      y = y + h + JOURNAL_GAP
     else
       row:Hide()
     end
