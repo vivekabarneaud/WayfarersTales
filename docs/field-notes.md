@@ -169,3 +169,4 @@ in-game report at the next login.
 | — | Bug | Eating and drinking together: a drink line named the food ("Vous sirotez votre [Lutjan à longue mâchoire]") | done | The last drink is tracked separately from the last food |
 | — | Idea | Journal: more padding left, right and top | done | Bigger margins, 8 lines per page |
 | — | Idea | Journal: highlight the big moments, fold the others | done | Big moments: a star and darker ink; everyday lines softer; "Tout / Grands moments" switch at the top |
+| — | Bug | Energy never seems to go down (100% after a long session without /sleep) | done | It drained over 3h30 and any city refilled it. Now about 2 hours to exhausted, and resting places only refill you indoors and standing still (inn, house in town) |

@@ -281,17 +281,17 @@ function E.Tick()
     state.hunger = Clamp(state.hunger - rate * dt)
   end
 
-  -- Energy: ~3h30 of adventuring from rested to exhausted.
-  -- You recover at an inn or in a city, sitting by a campfire, eating or drinking, dozing
-  -- off (AFK), or napping (/sleep, fast). Sitting elsewhere helps a little, up to 60;
-  -- standing still only stops the drop.
+  -- Energy: ~2h of adventuring from rested to exhausted (walking in town counts too).
+  -- You recover indoors and still in a resting place (an inn, a house in town), sitting
+  -- by a campfire, eating or drinking, dozing off (AFK), or napping (/sleep, fast).
+  -- Sitting elsewhere helps a little, up to 60; standing still only stops the drop.
   local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
   if (moving or env.combat) and (sitting or napping) then E.StandUp() end
   local recover = 0
   if env.seatedAtFire then recover = math.max(recover, 0.15) end
   if env.afk then recover = math.max(recover, 0.1) end
   if env.eating or env.drinking then recover = math.max(recover, 0.08) end
-  if env.resting then recover = math.max(recover, 0.05) end
+  if env.resting and env.indoors and not moving then recover = math.max(recover, 0.05) end
   if napping then recover = math.max(recover, D.NAP_RATE) end
   if recover > 0 then
     state.energy = Clamp(state.energy + recover * dt)
@@ -302,7 +302,7 @@ function E.Tick()
   elseif not moving and not env.combat and not env.swimming then
     -- standing still: you don't get more tired, but you don't rest either
   else
-    local rate = 100 / 12600
+    local rate = 100 / 7200 -- (about 2 hours)
     if env.combat or env.swimming then rate = rate * 1.5 end
     if state.temp < 20 then rate = rate * 1.2 end
     state.energy = Clamp(state.energy - rate * dt)
