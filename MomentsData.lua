@@ -54,6 +54,7 @@ D.MOMENT_RULES = {
   questWanted      = { cd = 30,  chance = 1,   gap = 0 },  -- you take a wanted poster
   flightNew        = { cd = 60,  chance = 1,   gap = 0 },  -- a new flight path
   questAccept_119  = { cd = 0,   chance = 1,   gap = 0 },  -- Le retour chez Verner (Goldshire, from Argus)
+  questAccept_120  = { cd = 0,   chance = 1,   gap = 0 },  -- Un message pour Hurlevent (Lakeshire, from Magistrate Solomon)
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -1224,4 +1225,12 @@ D.MOMENTS.questAccept_119 = {
   { draft = true,
     en = "You leave with the box of horseshoes under your arm, and the distinct feeling that you've just been told off.",
     fr = "Vous repartez avec la caisse de fers à cheval sous le bras, et le net sentiment de vous être fait gronder." },
+}
+
+-- Quest 120, Un message pour Hurlevent: Magistrate Solomon sends you to Stormwind,
+-- Lakeshire is under siege and he needs help fast
+D.MOMENTS.questAccept_120 = {
+  { draft = true,
+    en = "You slip Magistrate Solomon's letter into your bag. Lakeshire is counting on you: no dawdling on the road.",
+    fr = "Vous glissez la lettre du magistrat Solomon dans votre sac. Comté-du-Lac compte sur vous : pas question de traîner en route." },
 }
