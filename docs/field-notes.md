@@ -154,3 +154,5 @@ in-game report at the next login.
 | 15:05 | NPC | Argus le forgeron (514), male human, blacksmith master, busy and not very patient | done | `D.NPCS` + line (draft) |
 | — | Idea | The report shouldn't list every NPC and quest: only what the player chooses to share | done | Testers' report: flagged lines, notes, proposals, roofs, errors. NPC and quest lists only in dev mode |
 | — | Bug | Poppo asked for [Lait glacé] (a drink he can't eat) while you ate and drank together | done | A drink never counts as the meal to share |
+| — | Flag | "Vous vous asseyez et prenez une première bouchée" while already seated, eating several items in a row | done | Only the first item of a meal gets the sit-down line; the next ones only a first-taste or milestone line |
+| — | Idea | Tell testers about the Homework window on Discord | done | Tip added to the #rapports guide (docs/discord.md) |

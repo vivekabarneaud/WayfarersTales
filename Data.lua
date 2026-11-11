@@ -111,6 +111,7 @@ D.LOSS = {
 }
 
 D.MEAL_WINDOW        = 30    -- seconds to answer a meal request (you're still eating)
+D.MEAL_CHAIN         = 8     -- eating the next item within this many seconds: still the same meal
 D.ATTENTION_WINDOW   = 120   -- seconds to answer a petting request
 D.ATTENTION_COOLDOWN = 2400
 D.IDLE_COOLDOWN      = 600

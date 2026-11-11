@@ -57,12 +57,16 @@ Wayfarer's Tales ajoute de petites lignes d'histoire à vos aventures dans WoW :
 3. Whenever you like, click **Send the report** (Journal tab), then Ctrl+A, Ctrl+C.
 4. Create a post here and paste the report. A long report comes in numbered parts (buttons 1, 2, 3...): paste part 1 in the post, then each next part as a reply. A screenshot always helps!
 
+**Tip:** type **/wt homework** for a small window that reminds you what's worth noting while you play (an NPC with a personality, a quest, a special place, a moonwell, a roof...), with one click to note it and a box for your own comments. All of it goes into your report.
+
 **Comment envoyer un rapport**
 
 1. En jeu, tapez **/wt tester** (une seule fois) pour passer en mode testeur.
 2. Une ligne bizarre ? Cliquez sur le **!** à côté d'elle dans l'onglet Journal, et dites-nous ce qui ne va pas.
 3. Quand vous voulez, cliquez sur **Envoyer le rapport** (onglet Journal), puis Ctrl+A, Ctrl+C.
 4. Créez un post ici et collez le rapport. Un long rapport arrive en plusieurs parties numérotées (boutons 1, 2, 3...) : collez la partie 1 dans le post, puis chaque partie suivante en réponse. Une capture d'écran aide toujours !
+
+**Astuce :** tapez **/wt devoirs** (ou /wt homework) pour une petite fenêtre qui vous rappelle ce qui vaut la peine d'être noté en jouant (un PNJ avec du caractère, une quête, un lieu particulier, un puits de lune, un toit...), avec un clic pour le noter et une case pour vos propres commentaires. Tout part dans votre rapport.
 
 ### `#idées` (Post Guidelines)
 

@@ -257,13 +257,16 @@ local function DiaryLine(drink, itemID, link, n)
   return false
 end
 
-local function MealLine(drink, tries)
+-- chained: you're still seated, starting the next item right after the last one
+local function MealLine(drink, tries, chained)
   local itemID, link = KT.LastFood and KT.LastFood(6)
   if not link and tries < 2 then
-    After(1.5, function() MealLine(drink, tries + 1) end, "meal")
+    After(1.5, function() MealLine(drink, tries + 1, chained) end, "meal")
     return
   end
   if link and DiaryLine(drink, itemID, link, CountMeal(itemID)) then return end
+  -- the usual "you sit down and take a first bite" only for the first item of a meal
+  if chained then return end
   if not drink then
     if link then Play("eatItem", { item = link }) else Play("eat") end
     return
@@ -279,14 +282,18 @@ local function MealLine(drink, tries)
 end
 
 local wasEating, wasDrinking, wasCampSit, wasCampBuff, campSitAt
+local mealEndAt -- when you last stopped eating or drinking
 local function CheckMeal()
   local eating = W.HasAura(D.SPELL_FOOD_AURA, true)
   local drinking = W.HasAura(D.SPELL_DRINK_AURA, true)
+  -- the next item right after the last one: you never stood up
+  local chained = mealEndAt ~= nil and GetTime() - mealEndAt < D.MEAL_CHAIN
   if eating and not wasEating then
-    After(1, function() MealLine(false, 1) end, "eat")
+    After(1, function() MealLine(false, 1, chained) end, "eat")
   elseif drinking and not wasDrinking and not eating then
-    After(1, function() MealLine(true, 1) end, "drink")
+    After(1, function() MealLine(true, 1, chained) end, "drink")
   end
+  if (wasEating or wasDrinking) and not eating and not drinking then mealEndAt = GetTime() end
   wasEating, wasDrinking = eating, drinking
 
   -- campfires: sitting down by one (the 60 s "stay seated" buff), then its rested buff
