@@ -1867,6 +1867,7 @@ function KT.NarrateText(module, key, text, vars, important)
   if not KT.ModuleOn(module) then return end
   if not important and db.settings.chatty == 0 then return end
   text = Fill(text, vars or {})
+  text = text:gsub("^%l", string.upper) -- ("l'aubergiste Allison vous..." starts a line)
   AddJournal(module, key, text)
   local color = db.settings.label and MSG_COLOR or EmoteColor()
   text = text:gsub("|r", "|r" .. color)

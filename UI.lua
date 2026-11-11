@@ -493,7 +493,7 @@ function KT.ShowReport()
       close:SetPoint("TOPRIGHT", -4, -4)
     end
     if f.TitleText then f.TitleText:SetText("Wayfarer's Tales") end
-    f:SetSize(480, 320)
+    f:SetSize(500, 380)
     f:SetPoint("CENTER")
     f:SetFrameStrata("FULLSCREEN_DIALOG")
     f:EnableMouse(true)
@@ -506,9 +506,30 @@ function KT.ShowReport()
     f.help:SetPoint("TOPLEFT", 14, -30)
     f.help:SetPoint("TOPRIGHT", -14, -30)
     f.help:SetJustifyH("LEFT")
+    -- one button per part (Discord takes at most 2000 characters per message)
+    f.partLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    f.partLabel:SetPoint("TOPLEFT", 14, -68)
+    f.partButtons = {}
+    for i = 1, 10 do
+      local b = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+      b:SetSize(28, 20)
+      b:SetText(i)
+      b:SetScript("OnClick", function() f:ShowPart(i) end)
+      f.partButtons[i] = b
+    end
+    function f:ShowPart(i)
+      self.part = i
+      self.edit:SetText(self.parts[i] or "")
+      for n, b in ipairs(self.partButtons) do
+        if n == i then b:LockHighlight() else b:UnlockHighlight() end
+      end
+      self.edit:SetFocus()
+      self.edit:HighlightText()
+    end
     local scroll = CreateFrame("ScrollFrame", nil, f, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 14, -52)
+    scroll:SetPoint("TOPLEFT", 14, -94)
     scroll:SetPoint("BOTTOMRIGHT", -34, 14)
+    f.scroll = scroll
     local edit = CreateFrame("EditBox", nil, scroll)
     edit:SetMultiLine(true)
     edit:SetFontObject(ChatFontNormal)
@@ -519,11 +540,40 @@ function KT.ShowReport()
     f.edit = edit
     reportFrame = f
   end
-  reportFrame.help:SetText(string.format(L.UI_JOURNAL_COPY_HELP, D.DISCORD))
-  reportFrame.edit:SetText(text)
-  reportFrame:Show()
-  reportFrame.edit:SetFocus()
-  reportFrame.edit:HighlightText()
+  -- Cut the report into parts that fit in one Discord message, between lines
+  local parts, cur, size = {}, {}, 0
+  for line in (text .. "\n"):gmatch("(.-)\n") do
+    if size + #line + 1 > D.REPORT_PART and #cur > 0 then
+      parts[#parts + 1] = table.concat(cur, "\n")
+      cur, size = {}, 0
+    end
+    cur[#cur + 1] = line
+    size = size + #line + 1
+  end
+  if #cur > 0 then parts[#parts + 1] = table.concat(cur, "\n") end
+  if #parts > #reportFrame.partButtons then -- (very long: the last part takes the rest)
+    local rest = {}
+    for i = #reportFrame.partButtons, #parts do rest[#rest + 1] = parts[i] end
+    for i = #parts, #reportFrame.partButtons, -1 do parts[i] = nil end
+    parts[#reportFrame.partButtons] = table.concat(rest, "\n")
+  end
+  if #parts > 1 then
+    for i, p in ipairs(parts) do parts[i] = string.format("(%d/%d)\n", i, #parts) .. p end
+  end
+  reportFrame.parts = parts
+
+  local f = reportFrame
+  f.help:SetText(string.format(L.UI_JOURNAL_COPY_HELP, D.DISCORD))
+  f.partLabel:SetText(#parts > 1 and string.format(L.UI_REPORT_PARTS, #parts) or "")
+  local prev
+  for i, b in ipairs(f.partButtons) do
+    b:SetShown(#parts > 1 and i <= #parts)
+    b:ClearAllPoints()
+    if prev then b:SetPoint("LEFT", prev, "RIGHT", 4, 0) else b:SetPoint("LEFT", f.partLabel, "RIGHT", 8, 0) end
+    prev = b
+  end
+  f:Show()
+  f:ShowPart(1)
 end
 
 ---------------------------------------------------------------------------

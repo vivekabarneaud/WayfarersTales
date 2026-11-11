@@ -27,11 +27,13 @@ D.PROCESSED = {
     ["2026-11-11 14:08"] = true, ["2026-11-11 14:15"] = true, ["2026-11-11 14:19"] = true, -- wanted, Solomon, inns
     ["2026-11-11 14:20"] = true, ["2026-11-11 14:21"] = true, ["2026-11-11 14:24"] = true, -- foods, titles, Wental
     ["2026-11-11 14:25"] = true, ["2026-11-11 14:39"] = true, ["2026-11-11 14:46"] = true, -- question, birds, sounds
+    ["2026-11-11 15:04"] = true, ["2026-11-11 15:05"] = true, -- Argus, his quest
   },
   flagsAt = {
     ["2026-11-11 08:45"] = true, ["2026-11-11 09:15"] = true, ["2026-11-11 09:21"] = true, -- mail, bomb, canals
     ["2026-11-11 09:25"] = true, ["2026-11-11 09:42"] = true, ["2026-11-11 09:54"] = true, -- auction, drink, meal
     ["2026-11-11 10:04"] = true, -- pet licks crumbs of a fish
+    ["2026-11-11 15:07"] = true, ["2026-11-11 15:16"] = true, -- pet solo wording, Aubergiste Allison
   },
   -- errors logged by versions older than this were fixed (secret values, v0.31)
   errorsBefore = "0.31.0",

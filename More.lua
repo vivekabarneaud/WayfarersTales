@@ -385,8 +385,8 @@ D.POOL_DRAFTS = {
   },
   -- your pet won a fight you didn't take part in (no attack, spell or shot from you)
   petSolo = {
-    { en = "{pet} handled that fight without your help, and holds their head high.",
-      fr = "{pet} a réglé ce combat sans votre aide, et garde la tête haute." },
+    { en = "{pet} handled that fight without your help, and comes back to you, chest puffed out with pride.",
+      fr = "{pet} a réglé ce combat sans votre aide, et revient vers vous le torse bombé de fierté." },
     { en = "While you were busy elsewhere, {pet} took the fight in hand. Nice work.",
       fr = "Pendant que vous aviez à faire ailleurs, {pet} a pris le combat en main. Du beau travail." },
   },

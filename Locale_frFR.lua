@@ -1113,6 +1113,7 @@ L.UI_AGO_DAYS        = "il y a %d jours"
 L.UI_JOURNAL_COPY    = "Envoyer le rapport"
 L.UI_JOURNAL_COPY_HELP = "Ajoutez vos idées en bas si vous voulez, puis Ctrl+A et Ctrl+C pour copier, et collez le tout sur le Discord de l'addon : %s"
 L.UI_DISCORD = "Rejoignez-nous sur Discord (cliquez, puis Ctrl+C pour copier) :"
+L.UI_REPORT_PARTS = "%d parties, à envoyer une par une :"
 L.UI_FLAG_POPUP      = "Signaler cette ligne :\n\n|cffffd0a0%s|r\n\nQu'est-ce qui ne va pas ? (facultatif)"
 L.UI_FLAG_OK         = "Signaler"
 -- Titres : un par palier de découvertes (D.DISCOVERY_TITLES), accordés selon votre personnage

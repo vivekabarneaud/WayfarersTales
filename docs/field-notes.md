@@ -142,3 +142,13 @@ in-game report at the next login.
 | 14:25 | Question | A pet line at the inn: would a non-hunter see something? | info | Yes: ambiance lines are for everyone; pet lines come on top for hunters |
 | 14:39 | Place | Birds singing at Lake Everstill | done | Lake Everstill lines: birds, lapping water (draft) |
 | 14:46 | Idea | Not enough "hearing" lines | done | 17 sound lines across landscapes (draft) |
+
+## 2026-11-11 — First report on Discord
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| — | Bug | The report is too long for one Discord post (2000 characters) | done | Long reports come in numbered parts, one message each |
+| 15:07 | Flag | Poppo solo win: "revient vers vous le torse bombé de fierté" rather than "garde la tête haute" | done | Reworded (draft) |
+| 15:16 | Flag | "Aubergiste Allison vous accueille": should read "L'aubergiste Allison" | done | French NPC names starting with a job read "l'aubergiste X", "le magistrat X"... |
+| 15:04 | Quest | Le retour chez Verner (from Argus): "vous repartez avec la caisse de fers à cheval et le sentiment de vous être fait gronder" | done | Quest accept line, quest 119 (draft; to check that 119 is the right ID) |
+| 15:05 | NPC | Argus le forgeron (514), male human, blacksmith master, busy and not very patient | done | `D.NPCS` + line (draft) |

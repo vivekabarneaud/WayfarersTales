@@ -652,6 +652,18 @@ local function LogNPC(kind)
 end
 
 -- A line about the NPC you're dealing with, if we know their race and role (D.NPCS).
+-- An NPC's name as it reads in a sentence. In French, a name that starts with a job
+-- ("Aubergiste Allison") becomes "l'aubergiste Allison" (D.NPC_TITLES_FR); the line's
+-- first letter is capitalized when it's shown.
+local function NpcName(name, sex)
+  if not name or not (KT.CurrentLanguage and KT.CurrentLanguage() == "fr") then return name end
+  local first, rest = name:match("^(%S+)%s+(.+)$")
+  local t = first and D.NPC_TITLES_FR and D.NPC_TITLES_FR[first]
+  if not t then return name end
+  if type(t) == "table" then t = (sex == 3 and t[2]) or t[1] end
+  return t .. " " .. rest
+end
+
 -- Returns true if a line was shown.
 local function NPCLine(info)
   local known = info and info.id and D.NPCS[info.id]
@@ -659,7 +671,7 @@ local function NPCLine(info)
   if not known or not state then return false end
   state.npcLine = state.npcLine or {}
   if time() - (state.npcLine[info.id] or 0) < D.NPC_LINE_CD then return false end
-  if Play("npc", { npc = info.name }, { npcRace = known.race, npcRole = known.role, npcSex = info.sex, npcID = info.id }) then
+  if Play("npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race, npcRole = known.role, npcSex = info.sex, npcID = info.id }) then
     state.npcLine[info.id] = time()
     return true
   end

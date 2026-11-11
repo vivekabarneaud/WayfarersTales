@@ -53,6 +53,7 @@ D.MOMENT_RULES = {
   questDone_22     = { cd = 0,   chance = 1,   gap = 0 },
   questWanted      = { cd = 30,  chance = 1,   gap = 0 },  -- you take a wanted poster
   flightNew        = { cd = 60,  chance = 1,   gap = 0 },  -- a new flight path
+  questAccept_119  = { cd = 0,   chance = 1,   gap = 0 },  -- Le retour chez Verner (Goldshire, from Argus)
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -1194,3 +1195,33 @@ local NPC_REDRIDGE = {
     when = { npcID = 14845 } },
 }
 for _, line in ipairs(NPC_REDRIDGE) do table.insert(D.MOMENTS.npc, line) end
+
+-- French NPC names that start with their job ("Aubergiste Allison"): in a sentence they
+-- read "l'aubergiste Allison" (feminine form when the NPC is a woman). Moments: NpcName.
+D.NPC_TITLES_FR = {
+  ["Aubergiste"] = "l'aubergiste",
+  ["Commissaire-priseur"] = { "le commissaire-priseur", "la commissaire-priseur" },
+  ["Magistrat"] = "le magistrat",
+  ["Banquier"] = "le banquier", ["Banquière"] = "la banquière",
+  ["Capitaine"] = { "le capitaine", "la capitaine" },
+  ["Sergent"] = { "le sergent", "la sergente" },
+  ["Lieutenant"] = { "le lieutenant", "la lieutenante" },
+  ["Maréchal"] = { "le maréchal", "la maréchale" },
+  ["Garde"] = { "le garde", "la garde" },
+  ["Intendant"] = "l'intendant", ["Intendante"] = "l'intendante",
+  ["Gardien"] = "le gardien", ["Gardienne"] = "la gardienne",
+  ["Fermier"] = "le fermier", ["Fermière"] = "la fermière",
+}
+
+-- Goldshire (noted 2026-11-11): Argus the blacksmith is busy and not very patient
+D.NPCS[514] = { race = "Human", role = "trainer_blacksmith" } -- Argus le forgeron, Goldshire
+table.insert(D.MOMENTS.npc, { draft = true,
+  en = "{npc} sighs when he sees you coming. Clearly, you've picked a bad moment: he has better things to do than chat.",
+  fr = "{npc} soupire en vous voyant arriver. Visiblement, vous tombez mal : il a mieux à faire que bavarder.",
+  when = { npcID = 514 } })
+-- Quest 119, Le retour chez Verner: Argus hands you the box of horseshoes for Verner
+D.MOMENTS.questAccept_119 = {
+  { draft = true,
+    en = "You leave with the box of horseshoes under your arm, and the distinct feeling that you've just been told off.",
+    fr = "Vous repartez avec la caisse de fers à cheval sous le bras, et le net sentiment de vous être fait gronder." },
+}
