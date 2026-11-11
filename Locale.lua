@@ -161,7 +161,7 @@ L.GUIDE = table.concat({
   "Rude emotes, your pet falling in combat (-1) and long stays in the stable (-1 per week) lower affection a little. It never drops below a bond stage you have reached.",
   "",
   "|cffffd100Commands|r",
-  "/wt  open this window\n/wt nope  flag the last line as odd\n/wt status  short summary in chat\n/wt memories  your memories in chat\n/wt chatty 0-3  how often your pet speaks up\n/wt sound  hear your pet's sounds\n/wt debug  technical messages\n(/kt still works too)",
+  "/wt  open this window\n/wt status  short summary in chat\n/wt memories  your memories in chat\n/wt chatty 0-3  how often your pet speaks up\n/wt sound  hear your pet's sounds\n/wt tester  tester mode (notes and report)\n(/kt still works too)",
 }, "\n")
 
 L.CMD_HELP = {
@@ -169,14 +169,27 @@ L.CMD_HELP = {
   "/wt status - your pet's story so far, in chat",
   "/wt memories - your memories together",
   "/wt chatty 0-3 - how often your pet speaks up: 0 = only big moments, 1 = quiet, 2 = normal (default), 3 = very chatty",
-  "/wt debug - show technical info (for testing)",
-  "/wt nope - flag the last line as wrong or odd (you can add a comment: /wt nope too long)",
   "/wt sound - hear your pet's sounds",
   "/wt guide, /wt journal, /wt options - open a tab of the window",
-  "/wt resetvisits - forget visited places and line cooldowns (for testing)",
-  "/wt homework - a small window listing what to note while you play (for testers)",
+  "/wt tester - tester mode: notes, flagged lines and a report to send us (again to leave it)",
+}
+L.CMD_HELP_TESTER = {
+  "|cffffd100Tester mode|r",
+  "/wt homework - a small window listing what to note while you play",
+  "/wt nope - flag the last line as wrong or odd (you can add a comment: /wt nope too long)",
   "/wt roof - this spot has a roof over your head even if the game says outdoors: no open-sky lines here (again to undo)",
 }
+L.CMD_HELP_DEV = {
+  "|cffffd100Dev|r",
+  "/wt debug - show technical info",
+  "/wt resetvisits - forget visited places and line cooldowns",
+}
+L.CMD_TESTER_ON   = "Tester mode on: thanks for helping! Type /wt homework for the notes window, /wt help for the commands."
+L.CMD_TESTER_OFF  = "Tester mode off."
+L.CMD_TESTER_DEV  = "You're in dev mode (Dev.lua is in the addon folder): tester features are always on."
+L.CMD_TESTER_ONLY = "This command is for testers. Type /wt tester to switch tester mode on."
+L.TESTER_LEAVE_CONFIRM = "Leave tester mode?\n\nYour notes, flagged lines, NPC and quest logs and saved errors will be deleted."
+L.ERROR_PLAYER    = "ran into a problem. If it keeps happening, type /wt tester and send us the report."
 L.CMD_ROOF = {
   added = "Roof noted here: lines about the open sky won't play within a few steps of this spot. Type /wt roof again to undo.",
   removed = "Roof removed: open-sky lines can play here again.",
@@ -1041,7 +1054,7 @@ L.SN_GUIDE = table.concat({
   "Little moments get a line too, each on its own timer: a hard fight, a meal, gathering herbs or ore, skinning, your hearthstone, landing after a long flight, dawn and dusk, stepping indoors or out, the bank, the mailbox, the auction house, your trainer, learning a profession or a recipe, finding a rare or epic item, crafting something special or for the first time, coming back to life, or simply standing still for a while.",
   "Your character also remembers everything they eat and drink: a new food gets its own line about its taste, and an old favourite or a 25th, 50th, 100th time too.",
   "Lines depend on the landscape, the exact place, day or night, indoors or out, the weather and how many people are around.",
-  "The Ambiance tab shows what the addon sees where you stand, and every line that could appear here. If a line ever feels wrong, flag it with /wt nope.",
+  "If a line ever feels wrong, tell us! In tester mode (/wt tester), flag it with the ! button in the Journal or with /wt nope.",
 }, "\n")
 
 

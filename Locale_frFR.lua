@@ -159,7 +159,7 @@ L.GUIDE = table.concat({
   "Les emotes grossières, un familier tombé au combat (-1) et les longs séjours à l'écurie (-1 par semaine) font un peu baisser l'affection. Jamais sous un palier déjà atteint.",
   "",
   "|cffffd100Commandes|r",
-  "/wt  ouvrir cette fenêtre\n/wt nope  signaler la dernière ligne comme bizarre\n/wt status  résumé dans le chat\n/wt memories  vos souvenirs dans le chat\n/wt chatty 0-3  fréquence des réactions\n/wt sound  écouter les sons de votre familier\n/wt debug  messages techniques\n(/kt fonctionne toujours)",
+  "/wt  ouvrir cette fenêtre\n/wt status  résumé dans le chat\n/wt memories  vos souvenirs dans le chat\n/wt chatty 0-3  fréquence des réactions\n/wt sound  écouter les sons de votre familier\n/wt tester  mode testeur (notes et rapport)\n(/kt fonctionne toujours)",
 }, "\n")
 
 L.CMD_HELP = {
@@ -167,14 +167,27 @@ L.CMD_HELP = {
   "/wt status - l'histoire de votre familier, dans le chat",
   "/wt memories - vos souvenirs ensemble",
   "/wt chatty 0-3 - fréquence des réactions : 0 = grands moments seulement, 1 = discret, 2 = normal (par défaut), 3 = bavard",
-  "/wt debug - informations techniques (pour les tests)",
-  "/wt nope - signaler la dernière ligne comme fausse ou bizarre (avec un commentaire si vous voulez : /wt nope trop long)",
   "/wt sound - écouter les sons de votre familier",
   "/wt guide, /wt journal, /wt options - ouvrir un onglet de la fenêtre",
-  "/wt resetvisits - oublier les lieux visités et le repos des lignes (pour les tests)",
-  "/wt devoirs - une petite fenêtre avec ce qu'il faut noter en jouant (pour les testeurs)",
-  "/wt toit - cet endroit a un toit au-dessus de votre tête même si le jeu dit « dehors » : plus de lignes sur le ciel ici (à nouveau pour annuler)",
+  "/wt tester - mode testeur : notes, lignes signalées et un rapport à nous envoyer (à nouveau pour le quitter)",
 }
+L.CMD_HELP_TESTER = {
+  "|cffffd100Mode testeur|r",
+  "/wt homework (ou /wt devoirs) - une petite fenêtre avec ce qu'il faut noter en jouant",
+  "/wt nope - signaler la dernière ligne comme fausse ou bizarre (avec un commentaire si vous voulez : /wt nope trop long)",
+  "/wt roof (ou /wt toit) - cet endroit a un toit au-dessus de votre tête même si le jeu dit « dehors » : plus de lignes sur le ciel ici (à nouveau pour annuler)",
+}
+L.CMD_HELP_DEV = {
+  "|cffffd100Dev|r",
+  "/wt debug - informations techniques",
+  "/wt resetvisits - oublier les lieux visités et le repos des lignes",
+}
+L.CMD_TESTER_ON   = "Mode testeur activé : merci de votre aide ! Tapez /wt homework pour la fenêtre de notes, /wt help pour les commandes."
+L.CMD_TESTER_OFF  = "Mode testeur désactivé."
+L.CMD_TESTER_DEV  = "Vous êtes en mode dev (Dev.lua est dans le dossier de l'addon) : les outils de test sont toujours actifs."
+L.CMD_TESTER_ONLY = "Cette commande est réservée aux testeurs. Tapez /wt tester pour activer le mode testeur."
+L.TESTER_LEAVE_CONFIRM = "Quitter le mode testeur ?\n\nVos notes, lignes signalées, journaux de PNJ et de quêtes et erreurs enregistrées seront supprimés."
+L.ERROR_PLAYER    = "a rencontré un problème. Si cela se reproduit, tapez /wt tester et envoyez-nous le rapport."
 L.CMD_ROOF = {
   added = "Toit noté ici : les lignes qui parlent du ciel ne joueront plus à quelques pas de cet endroit. Retapez /wt toit pour annuler.",
   removed = "Toit retiré : les lignes sur le ciel peuvent de nouveau jouer ici.",
@@ -1033,7 +1046,7 @@ L.SN_GUIDE = table.concat({
   "Les petits moments ont aussi leurs lignes, chacun avec son propre minuteur : un combat difficile, un repas, une cueillette ou une extraction de minerai, le dépeçage, votre pierre de foyer, l'atterrissage après un long vol, l'aube et le crépuscule, entrer ou sortir d'un bâtiment, la banque, la boîte aux lettres, l'hôtel des ventes, votre maître de métier ou de classe, apprendre un métier ou une recette, trouver un objet rare ou épique, fabriquer quelque chose de spécial ou pour la première fois, le retour à la vie, ou simplement rester immobile un moment.",
   "Votre personnage se souvient aussi de tout ce qu'il mange et boit : un nouvel aliment a droit à sa propre ligne sur son goût, tout comme un vieux classique ou une 25e, 50e, 100e fois.",
   "Les lignes dépendent du paysage, du lieu précis, du jour ou de la nuit, de l'intérieur ou de l'extérieur, de la météo et du monde autour de vous.",
-  "L'onglet Ambiance montre ce que l'addon voit là où vous êtes, et toutes les lignes qui pourraient apparaître ici. Si une ligne vous semble fausse, signalez-la avec /wt nope.",
+  "Si une ligne vous semble fausse, dites-le-nous ! En mode testeur (/wt tester), signalez-la avec le bouton ! du Journal ou avec /wt nope.",
 }, "\n")
 
 -- Fenêtre des devoirs (/wt devoirs) : quoi noter en jouant, pour les testeurs

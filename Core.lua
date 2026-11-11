@@ -272,9 +272,57 @@ function KT.ModuleOn(name)
   return db and db.modules and db.modules[name] ~= false
 end
 
+-- Modes: players (default) get no dev windows and nothing extra saved.
+-- Testers (/wt tester): Homework window, flags, report, NPC / quest / error logs.
+-- Dev (us): only when Dev.lua is there (the repo); release zips leave it out.
+function KT.IsDev() return KT.DEV == true end
+function KT.IsTester() return KT.DEV == true or (db and db.settings.tester) == true end
+
+-- What testers save, erased when they go back to player mode
+local TESTER_DATA = { "npcs", "questsDone", "errors", "fieldNotes", "proposals", "roofs", "weatherLog", "weatherApi" }
+local function HasTesterData()
+  for _, k in ipairs(TESTER_DATA) do
+    if type(db[k]) == "table" and next(db[k]) then return true end
+  end
+  return false
+end
+local function EraseTesterData()
+  for _, k in ipairs(TESTER_DATA) do db[k] = nil end
+  for _, e in ipairs(db.journal or {}) do e.flagged, e.flagNote = nil, nil end
+  db.settings.homework = nil
+end
+
+StaticPopupDialogs["WAYFARERSTALES_LEAVE_TESTER"] = {
+  text = "%s", button1 = YES, button2 = NO,
+  OnAccept = function()
+    EraseTesterData()
+    db.settings.tester = false
+    if KT.Homework then KT.Homework.Toggle(false) end
+    Print(L.CMD_TESTER_OFF)
+    if KT.RefreshPanel then KT.RefreshPanel() end
+  end,
+  timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
+}
+
+local function ToggleTester()
+  if KT.IsDev() then Print(L.CMD_TESTER_DEV) return end
+  if not db.settings.tester then
+    db.settings.tester = true
+    Print(L.CMD_TESTER_ON)
+  elseif HasTesterData() then
+    StaticPopup_Show("WAYFARERSTALES_LEAVE_TESTER", L.TESTER_LEAVE_CONFIRM)
+    return
+  else
+    db.settings.tester = false
+    if KT.Homework then KT.Homework.Toggle(false) end
+    Print(L.CMD_TESTER_OFF)
+  end
+  if KT.RefreshPanel then KT.RefreshPanel() end
+end
+
 -- important = shown even when chattiness is 0
 -- Draft lines for message pools (More.lua: D.POOL_DRAFTS = { key = { { en, fr }, ... } }),
--- added to the pool while the option "Try new lines" is on. Not for banded pools.
+-- added to the pool in dev mode (S.Testing). Not for banded pools.
 local function WithDrafts(key, pool)
   local drafts = D.POOL_DRAFTS and D.POOL_DRAFTS[key]
   if not drafts or not (KT.Senses and KT.Senses.Testing and KT.Senses.Testing()) then return pool end
@@ -1313,6 +1361,10 @@ function H.ADDON_LOADED(name)
   -- 0.32: the heart is now off by default; turn it off once for older saves too
   if not s.heartOffOnce then s.showHeart, s.heartOffOnce = false, true end
   db.probes = nil
+  -- 0.54: modes. Saves that already hold tester data (our testers) start in tester mode.
+  if s.tester == nil then s.tester = HasTesterData() end
+  s.testDrafts = nil -- drafts now play in dev mode only
+  if not KT.IsDev() then s.debug = nil; db.weatherLog, db.weatherApi = nil, nil end
   KT.ApplyLanguage()
   if not db.welcomed then
     db.welcomed = true
@@ -1392,7 +1444,7 @@ function H.PLAYER_LOGIN()
   state.loginAt = GetTime()
   CreateHeart()
   if KT.CreateMinimapButton then KT.CreateMinimapButton() end
-  KT.StartWeatherRecorder()
+  if KT.IsDev() then KT.StartWeatherRecorder() end
   C_Timer.NewTicker(60, function()
     if not KT.ModuleOn("kindred") or not PetAlive() then return end
     pet.lastSeen = time()
@@ -1611,7 +1663,15 @@ SLASH_WAYFARERSTALES2 = "/kt" -- old Kindred Tales command, still works
 -- (not "/wayfarer": another addon, Wayfarer, already uses it)
 SlashCmdList.WAYFARERSTALES = function(msg)
   local cmd, arg = (msg or ""):lower():match("^(%S*)%s*(.-)$")
-  if cmd == "nope" then
+  local testerCmds = { nope = true, devoirs = true, homework = true, toit = true, roof = true }
+  local devCmds = { debug = true, resetvisits = true }
+  if (testerCmds[cmd] and not KT.IsTester()) or (devCmds[cmd] and not KT.IsDev()) then
+    Print(L.CMD_TESTER_ONLY)
+    return
+  end
+  if cmd == "tester" then
+    ToggleTester()
+  elseif cmd == "nope" then
     -- flag the latest journal line as wrong/odd, with an optional comment (/wt nope too long)
     local note = (msg or ""):match("^%S*%s*(.-)%s*$")
     local last = KT.FlagLastLine(note)
@@ -1620,6 +1680,8 @@ SlashCmdList.WAYFARERSTALES = function(msg)
     if KT.RefreshPanel then KT.RefreshPanel() end
   elseif cmd == "help" then
     for _, line in ipairs(L.CMD_HELP) do Print(line) end
+    if KT.IsTester() then for _, line in ipairs(L.CMD_HELP_TESTER) do Print(line) end end
+    if KT.IsDev() then for _, line in ipairs(L.CMD_HELP_DEV) do Print(line) end end
   elseif cmd == "memories" then
     if not pet then Print(L.CMD_NO_PET) return end
     if #pet.memories == 0 then Print(L.CMD_NO_MEMORY) return end
@@ -1741,8 +1803,13 @@ end
 local errorsShown = false
 function KT.LogError(where, err)
   if not db then return end
-  db.errors = db.errors or {}
   local msg = tostring(where) .. ": " .. tostring(err)
+  if not KT.IsTester() then -- players: one short message, nothing saved
+    Debug("error:", msg)
+    if not errorsShown then errorsShown = true; Print(L.ERROR_PLAYER) end
+    return
+  end
+  db.errors = db.errors or {}
   for _, e in ipairs(db.errors) do
     if e.msg == msg then e.count = (e.count or 1) + 1; e.last = time(); return end
   end

@@ -267,11 +267,12 @@ pcall(ev.RegisterEvent, ev, "QUEST_TURNED_IN")
 ev:SetScript("OnEvent", function(_, event, questID)
   local ok, err = pcall(function()
     if event == "PLAYER_LOGIN" then
+      if not KT.IsTester() then return end
       H.Prune()
       if KT.GetDB().settings.homework then H.Toggle(true) end
     elseif event == "QUEST_COMPLETE" then
       rewardTitle = GetTitleText and GetTitleText() or nil
-    elseif event == "QUEST_TURNED_IN" and questID then
+    elseif event == "QUEST_TURNED_IN" and questID and KT.IsTester() then
       local db = KT.GetDB()
       db.questsDone = db.questsDone or {}
       table.insert(db.questsDone, { id = questID, title = QuestTitle(questID) or rewardTitle, zone = GetRealZoneText(), t = time() })

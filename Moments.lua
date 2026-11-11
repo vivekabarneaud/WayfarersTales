@@ -630,8 +630,8 @@ local function LogNPC(kind)
   if not ok or type(guid) ~= "string" then return end
   local unitType, _, _, _, _, npcID = strsplit("-", guid)
   if unitType ~= "Creature" or not npcID then return end
-  db.npcs = db.npcs or {}
-  local e = db.npcs[npcID] or { first = time() }
+  -- testers save it (for the report); for players it only serves the NPC lines
+  local e = (db.npcs and db.npcs[npcID]) or { first = time() }
   local okN, name = pcall(UnitName, "npc")
   if okN and type(name) == "string" then e.name = name end
   local okS, sex = pcall(UnitSex, "npc")
@@ -644,7 +644,10 @@ local function LogNPC(kind)
   e.kinds = e.kinds or {}
   e.kinds[kind] = true
   e.n, e.last = (e.n or 0) + 1, time()
-  db.npcs[npcID] = e
+  if KT.IsTester() then
+    db.npcs = db.npcs or {}
+    db.npcs[npcID] = e
+  end
   return { id = tonumber(npcID), name = e.name, sex = e.sex }
 end
 

@@ -252,6 +252,7 @@ local function BuildJournal(parent)
   copy:SetPoint("TOPRIGHT", -6, -4)
   Label(copy, "UI_JOURNAL_COPY")
   copy:SetScript("OnClick", function() KT.ShowReport() end)
+  p.copy = copy -- testers only (see RefreshJournal)
 
   p.rows = {}
   for i = 1, JOURNAL_ROWS do
@@ -290,6 +291,8 @@ local function RefreshJournal(p, db)
   local total = #j
   local pageCount = math.max(1, math.ceil(total / JOURNAL_ROWS))
   if p.page > pageCount then p.page = pageCount end
+  local tester = KT.IsTester()
+  p.copy:SetShown(tester)
   local flagged = 0
   for _, e in ipairs(j) do if e.flagged then flagged = flagged + 1 end end
   if total == 0 then
@@ -305,6 +308,7 @@ local function RefreshJournal(p, db)
       local color = e.flagged and "|cffff6060" or "|cffffd0a0"
       row.fs:SetText(Grey(date("%d/%m %H:%M", e.t)) .. "  " .. color .. StripCodes(e.text or "") .. "|r")
       row.flag:SetText(e.flagged and "x" or "!")
+      row.flag:SetShown(tester)
       row:Show()
     else
       row:Hide()
@@ -701,8 +705,7 @@ local function BuildOptions(parent)
   Check("showThermo", "UI_OPT_THERMO", function() if KT.Elements then KT.Elements.UpdateThermo() end end)
   Check("label", "UI_OPT_LABEL")
   Check("sound", "UI_OPT_SOUND")
-  Check("testDrafts", "UI_OPT_TESTDRAFTS")
-  Check("debug", "UI_OPT_DEBUG")
+  if KT.IsDev() then Check("debug", "UI_OPT_DEBUG") end
 
   -- Language
   y = y - 8
@@ -795,9 +798,11 @@ local function Build()
     title:SetText("Wayfarer's Tales")
   end
 
-  local list = { { "companion", "UI_TAB_COMPANION" }, { "body", "UI_TAB_BODY" }, { "senses", "UI_TAB_SENSES" },
+  local list = { { "companion", "UI_TAB_COMPANION" }, { "body", "UI_TAB_BODY" },
     { "travels", "UI_TAB_TRAVELS" }, { "journal", "UI_TAB_JOURNAL" }, { "guide", "UI_TAB_GUIDE" },
     { "options", "UI_TAB_OPTIONS" } }
+  -- the Ambiance tab (situation, possible lines) is for us only
+  if KT.IsDev() then table.insert(list, 3, { "senses", "UI_TAB_SENSES" }) end
   for i, t in ipairs(list) do
     local b = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
     b:SetSize(82, 26)
