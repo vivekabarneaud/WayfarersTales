@@ -153,15 +153,9 @@ D.BIRTH_CLASS = {
               fr = "Quelque chose de sombre murmure aux confins de votre esprit. Le pouvoir a un prix, et vous comptez bien le payer." },
 }
 
--- Discovery score ("Carnet" tab): points for each new thing discovered.
-D.DISCOVERY_POINTS = {
-  zones = 10, subzones = 2, spots = 5, dungeons = 15,   -- places
-  foods = 3, drinks = 3, alcohols = 3,                   -- flavors
-  professions = 10, crafts = 2,                          -- know-how
-  flights = 3, inns = 3,                                 -- travels
-}
+-- Discoveries ("Carnet" tab): every new thing discovered counts 1 (Discovery.lua).
 -- crossing one of these totals brings a line in the chat (once each)
-D.DISCOVERY_MILESTONES = { 50, 100, 250, 500, 1000, 2000, 4000 }
+D.DISCOVERY_MILESTONES = { 15, 30, 60, 120, 250, 500, 1000 } -- (every discovery counts 1)
 
 -- How long you stand still (not AFK, not fighting) before a quiet moment
 D.QUIET_AFTER = 150

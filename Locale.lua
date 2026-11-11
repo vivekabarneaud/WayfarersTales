@@ -99,13 +99,13 @@ L.UI_TAB_TRAVELS = "Travels"
 -- "Travels" tab: the discovery score
 L.DISC = {
   title = "%s's travel notebook",
-  total = "Discovery points: %d", pts = "%d pts",
-  intro = "Every new discovery earns points: a dungeon 15, a zone or a profession 10, a special spot 5, a flavor, a flight destination or an inn 3, a place or a creation 2.",
-  places = "Places", placesLine = "Zones %d  ·  Places %d  ·  Special spots %d  ·  Dungeons %d",
-  tastes = "Flavors", tastesLine = "Foods %d  ·  Drinks %d  ·  Alcohols %d",
-  crafts = "Know-how", craftsLine = "Professions %d  ·  Creations %d",
-  travels = "Travels", travelsLine = "Flight destinations %d  ·  Inns %d",
-  favTastes = "Your favourite tastes", dungeonList = "Dungeons", flightList = "Flight destinations", innList = "Inns",
+  total = "%d discoveries",
+  places = "Places", tastes = "Flavors", crafts = "Know-how", travels = "Travels",
+  labels = { zones = "Zones", subzones = "Places", spots = "Notable spots", dungeons = "Dungeons",
+    foods = "Foods", drinks = "Drinks", alcohols = "Alcohols", professions = "Professions", crafts = "Creations",
+    flights = "Flight paths", inns = "Inns" },
+  favTastes = "Most consumed", times = "%d times",
+  guide = "Everything you discover for the first time counts: a zone, a place, a dungeon, a food, a drink, a profession, a creation, a flight path, an inn... The more you discover, the more your title grows. Notable spots are small, precise places with lines of their own: a moonwell, a forge fire, a farm kitchen...",
   none = "Nothing yet.",
 }
 L.UI_MODULES     = "Modules"
@@ -1127,9 +1127,9 @@ L.UI_FLAG_POPUP      = "Report this line:\n\n|cffffd0a0%s|r\n\nWhat's wrong with
 L.UI_FLAG_OK         = "Report"
 -- Titles: one for each discovery milestone (D.DISCOVERY_TITLES)
 L.DISC_TITLES = { "Greenhorn", "Stroller", "Traveler", "Roamer", "Globetrotter", "Explorer", "Wayfarer", "Legend of the Road" }
-L.DISC_TITLE_LINE = "%s · %d discovery points"
+L.DISC_TITLE_LINE = "%s · %d discoveries"
 L.DISC_YOUR_TITLE = "Your title"
-L.DISC_NEXT       = "Next title: %s, at %d"
+L.DISC_NEXT       = "Next title: %s, at %d discoveries"
 L.DISC_TOP        = "The highest title there is!"
 L.DISC_NEW_TITLE  = "New title: %s"
 

@@ -54,11 +54,34 @@ function Di.Counts()
   return c
 end
 
+-- Your discoveries: every new thing counts 1
 function Di.Score(c)
   c = c or Di.Counts()
   local total = 0
-  for k, n in pairs(c) do total = total + n * (D.DISCOVERY_POINTS[k] or 0) end
+  for _, n in pairs(c) do total = total + n end
   return total
+end
+
+-- The Carnet's columns: each category, its total and its rows (label, count)
+local CATEGORIES = {
+  { "places", { "zones", "subzones", "spots", "dungeons" } },
+  { "tastes", { "foods", "drinks", "alcohols" } },
+  { "crafts", { "professions", "crafts" } },
+  { "travels", { "flights", "inns" } },
+}
+function Di.Categories(c)
+  c = c or Di.Counts()
+  local T = L.DISC
+  local out = {}
+  for _, cat in ipairs(CATEGORIES) do
+    local rows, total = {}, 0
+    for _, k in ipairs(cat[2]) do
+      rows[#rows + 1] = { T.labels[k] or k, c[k] or 0 }
+      total = total + (c[k] or 0)
+    end
+    out[#out + 1] = { name = T[cat[1]], total = total, rows = rows }
+  end
+  return out
 end
 
 -- Your title for a score: one per milestone (0, then D.DISCOVERY_MILESTONES).
@@ -126,6 +149,8 @@ end
 local function CheckMilestone()
   local st = S.State()
   if not st then return end
+  -- 0.6: discoveries count 1 each now (were weighted): take the new milestones silently
+  if not st.discoveryOnePoint then st.discoveryOnePoint, st.discoveryMilestone = true, nil end
   local score = Di.Score()
   local reached = 0
   for _, m in ipairs(D.DISCOVERY_MILESTONES) do
@@ -168,57 +193,20 @@ local function ItemName(id)
   return name or ("#" .. id)
 end
 
+-- Below the columns: what this character has eaten and drunk the most
 function Di.PageText()
   local st = S.State()
-  local c = Di.Counts()
-  local P = D.DISCOVERY_POINTS
+  local T = L.DISC
   local lines = {}
   local function add(s) lines[#lines + 1] = s or "" end
-  local function pts(...)
-    local n = 0
-    for _, k in ipairs({ ... }) do n = n + c[k] * P[k] end
-    return Grey("  ·  " .. string.format(L.DISC.pts, n))
-  end
-  local T = L.DISC
-
-  add(Head(string.format(T.title, UnitName("player") or "")))
-  add("|cffffd100" .. string.format(T.total, Di.Score(c)) .. "|r")
-  add(Grey(T.intro))
-  add("")
-  add(Pink(T.places) .. pts("zones", "subzones", "spots", "dungeons"))
-  add("   " .. string.format(T.placesLine, c.zones, c.subzones, c.spots, c.dungeons))
-  add(Pink(T.tastes) .. pts("foods", "drinks", "alcohols"))
-  add("   " .. string.format(T.tastesLine, c.foods, c.drinks, c.alcohols))
-  add(Pink(T.crafts) .. pts("professions", "crafts"))
-  add("   " .. string.format(T.craftsLine, c.professions, c.crafts))
-  add(Pink(T.travels) .. pts("flights", "inns"))
-  add("   " .. string.format(T.travelsLine, c.flights, c.inns))
-
-  if not st then return table.concat(lines, "\n") end
-
-  -- Your favourite tastes (most eaten / drunk first)
-  local tastes = {}
-  for id, n in pairs(st.diary or {}) do tastes[#tastes + 1] = { id = id, n = n } end
-  table.sort(tastes, function(a, b) return a.n > b.n end)
-  add("")
   add(Head(T.favTastes))
+  local tastes = {}
+  for id, n in pairs(st and st.diary or {}) do tastes[#tastes + 1] = { id = id, n = n } end
+  table.sort(tastes, function(a, b) return a.n > b.n end)
   if #tastes == 0 then add(Grey(T.none)) end
   for i = 1, math.min(10, #tastes) do
-    add("   " .. ItemName(tastes[i].id) .. Grey("  x" .. tastes[i].n))
+    add("   " .. ItemName(tastes[i].id) .. Grey("  (" .. string.format(T.times, tastes[i].n) .. ")"))
   end
-
-  local function list(title, t, valueIsName)
-    local names = {}
-    for k, v in pairs(t or {}) do names[#names + 1] = valueIsName and tostring(v) or tostring(k) end
-    table.sort(names)
-    add("")
-    add(Head(title))
-    if #names == 0 then add(Grey(T.none)) end
-    for _, n in ipairs(names) do add("   " .. n) end
-  end
-  list(T.dungeonList, st.dungeons, true)
-  list(T.flightList, st.flights)
-  list(T.innList, st.inns)
   return table.concat(lines, "\n")
 end
 

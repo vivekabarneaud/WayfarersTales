@@ -161,3 +161,7 @@ in-game report at the next login.
 | — | Idea | Split flavors into foods, drinks and alcohols | done | Three counts; alcohol recognized from the game's "tipsy" messages |
 | — | Idea | The numbers (points vs counts) aren't clear | done | Categories show "· N pts"; the intro says what each kind of discovery is worth; header and total say "points de découverte" |
 | — | Info | Flight paths and inns low | info | They only count since the version that started tracking them |
+| — | Idea | Carnet in columns, one per category, one row per kind | done | Four columns (Lieux, Saveurs, Savoir-faire, Voyages) with their counts |
+| — | Idea | One point per discovery, easier to understand | done | Every discovery counts 1; titles at 15, 30, 60, 120, 250, 500, 1000 |
+| — | Idea | "Endroits particuliers" isn't clear | done | Now "Lieux remarquables", explained in the Carnet's guide |
+| — | Idea | No full lists of inns and flight paths (there will be many) | done | Lists removed; "Vos saveurs préférées" → "Les plus consommés" |

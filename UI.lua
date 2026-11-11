@@ -1140,6 +1140,20 @@ end
 
 local function BuildTravels(parent)
   local page = ScrollPage(parent)
+  -- header: "Carnet de voyage de X" and the total on the right
+  local h = CreateFrame("Frame", nil, page.p)
+  h:SetSize(PAGE_W, 28)
+  page.heading = h:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+  page.heading:SetPoint("LEFT", 2, 0)
+  page.total = h:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+  page.total:SetPoint("RIGHT", -4, 0)
+  local hl = h:CreateTexture(nil, "ARTWORK")
+  hl:SetColorTexture(0.5, 0.4, 0.22, 0.8)
+  hl:SetHeight(1)
+  hl:SetPoint("BOTTOMLEFT", 0, -3)
+  hl:SetPoint("BOTTOMRIGHT", 0, -3)
+  page:Add(h, 12)
+
   local box = Box(page.p, 72)
   local small = box:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
   small:SetPoint("TOPLEFT", 12, -10)
@@ -1153,22 +1167,65 @@ local function BuildTravels(parent)
   page.next = box:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
   page.next:SetPoint("TOPLEFT", page.bar, "BOTTOMLEFT", 0, -8)
   page:Add(box, 12)
-  page.text = Para(page, "GameFontHighlight", 10)
+
+  -- one column per category (Lieux, Saveurs, Savoir-faire, Voyages), one row per kind
+  local GAP, ROWS = 8, 4
+  local colW = math.floor((PAGE_W - 3 * GAP) / 4)
+  local grid = CreateFrame("Frame", nil, page.p)
+  grid:SetSize(PAGE_W, 30 + ROWS * 17 + 10)
+  page.cols = {}
+  for i = 1, 4 do
+    local col = Box(grid, grid:GetHeight())
+    col:SetWidth(colW)
+    col:SetPoint("TOPLEFT", (i - 1) * (colW + GAP), 0)
+    col.head = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    col.head:SetPoint("TOPLEFT", 10, -9)
+    col.head:SetTextColor(1, 0.56, 0.69)
+    col.rows = {}
+    for r = 1, ROWS do
+      local label = col:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+      label:SetPoint("TOPLEFT", 10, -30 - (r - 1) * 17)
+      label:SetJustifyH("LEFT")
+      local count = col:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+      count:SetPoint("TOPRIGHT", -10, -30 - (r - 1) * 17)
+      col.rows[r] = { label = label, count = count }
+    end
+    page.cols[i] = col
+  end
+  page:Add(grid, 14)
+
+  page.text = Para(page, "GameFontHighlight", 12)
+  page.guide = GuideBox(page)
   return page
 end
 
 local function RefreshTravels(page)
   local Di = KT.Discovery
   if Di then
-    local score = Di.Score()
+    local c = Di.Counts()
+    local score = Di.Score(c)
+    page.heading:SetText(string.format(L.DISC.title, UnitName("player") or ""))
+    page.total:SetText(string.format(L.DISC.total, score))
     local name, at, nextName, nextAt = Di.Title(score)
     page.title:SetText(name)
     page.bar:SetMinMaxValues(at or 0, nextAt or ((at or 0) + 1))
     page.bar:SetValue(nextAt and score or ((at or 0) + 1))
     page.bar.text:SetText(nextAt and (score .. " / " .. nextAt) or tostring(score))
     page.next:SetText(nextName and string.format(L.DISC_NEXT, nextName, nextAt) or L.DISC_TOP)
+    for i, cat in ipairs(Di.Categories(c)) do
+      local col = page.cols[i]
+      if col then
+        col.head:SetText(cat.name .. Grey("  · " .. cat.total))
+        for r, row in ipairs(col.rows) do
+          local data = cat.rows[r]
+          row.label:SetText(data and data[1] or "")
+          row.count:SetText(data and tostring(data[2]) or "")
+        end
+      end
+    end
   end
   page.text:SetText(Di and Di.PageText() or "")
+  page.guide.text:SetText(L.DISC.guide)
   page:Layout()
 end
 
