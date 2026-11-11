@@ -165,3 +165,4 @@ in-game report at the next login.
 | — | Idea | One point per discovery, easier to understand | done | Every discovery counts 1; titles at 15, 30, 60, 120, 250, 500, 1000 |
 | — | Idea | "Endroits particuliers" isn't clear | done | Now "Lieux remarquables", explained in the Carnet's guide |
 | — | Idea | No full lists of inns and flight paths (there will be many) | done | Lists removed; "Vos saveurs préférées" → "Les plus consommés" |
+| — | Idea | Journal: lines closer together, < > at the bottom and centered, a paper background like the mail | done | Lines as tall as their text, page buttons centered at the bottom, paper background (mail stationery, else a spellbook page, over a parchment color) with dark ink |

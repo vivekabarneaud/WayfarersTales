@@ -217,7 +217,7 @@ end
 -- Journal page: newest lines first, a flag button on each
 ---------------------------------------------------------------------------
 
-local JOURNAL_ROWS = 10
+local JOURNAL_ROWS = 12
 
 -- Reporting a line: a small window with the line and a "why?" box
 local function FlagWithNote(dialog, entry)
@@ -252,40 +252,72 @@ local function BuildJournal(parent)
   p:SetAllPoints()
   p.page = 1
 
-  p.header = p:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  p.header:SetPoint("TOPLEFT", 10, -9)
+  -- Paper, like a letter in the mail: the game's stationery if the client has it,
+  -- over a parchment color (so the dark text always reads well)
+  local paper = CreateFrame("Frame", nil, p, BackdropTemplateMixin and "BackdropTemplate" or nil)
+  paper:SetPoint("TOPLEFT", 2, -4)
+  paper:SetPoint("BOTTOMRIGHT", -4, 4)
+  if paper.SetBackdrop then
+    paper:SetBackdrop({ edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 12,
+      insets = { left = 3, right = 3, top = 3, bottom = 3 } })
+    paper:SetBackdropBorderColor(0.45, 0.33, 0.18)
+  end
+  local base = paper:CreateTexture(nil, "BACKGROUND", nil, 0)
+  base:SetPoint("TOPLEFT", 3, -3)
+  base:SetPoint("BOTTOMRIGHT", -3, 3)
+  base:SetColorTexture(0.87, 0.79, 0.62, 1)
+  local tex = paper:CreateTexture(nil, "BACKGROUND", nil, 1)
+  tex:SetPoint("TOPLEFT", 3, -3)
+  tex:SetPoint("BOTTOMRIGHT", -3, 3)
+  for _, path in ipairs({ "Interface\\Stationery\\StationeryTest1", "Interface\\Spellbook\\Spellbook-Page-1" }) do
+    local ok = tex:SetTexture(path)
+    if ok ~= false and tex:GetTexture() ~= nil then break end
+    tex:SetTexture(nil)
+  end
+  p.paper = paper
 
-  local prev = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-  prev:SetSize(28, 20)
-  prev:SetPoint("TOPRIGHT", -192, -4)
-  prev:SetText("<")
-  prev:SetScript("OnClick", function() p.page = math.max(1, p.page - 1); KT.RefreshPanel() end)
-  local nxt = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
-  nxt:SetSize(28, 20)
-  nxt:SetPoint("TOPRIGHT", -160, -4)
-  nxt:SetText(">")
-  nxt:SetScript("OnClick", function() p.page = p.page + 1; KT.RefreshPanel() end)
-  local copy = CreateFrame("Button", nil, p, "UIPanelButtonTemplate")
+  p.header = paper:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+  p.header:SetPoint("TOPLEFT", 16, -14)
+  p.header:SetShadowOffset(0, 0)
+
+  local copy = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
   copy:SetSize(150, 20)
-  copy:SetPoint("TOPRIGHT", -6, -4)
+  copy:SetPoint("TOPRIGHT", -12, -10)
   Label(copy, "UI_JOURNAL_COPY")
   copy:SetScript("OnClick", function() KT.ShowReport() end)
   p.copy = copy -- testers only (see RefreshJournal)
 
+  -- page buttons, centered at the bottom
+  p.pageText = paper:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  p.pageText:SetPoint("BOTTOM", 0, 14)
+  p.pageText:SetShadowOffset(0, 0)
+  p.pageText:SetTextColor(0.3, 0.2, 0.08)
+  local prev = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
+  prev:SetSize(28, 20)
+  prev:SetPoint("RIGHT", p.pageText, "LEFT", -12, 0)
+  prev:SetText("<")
+  prev:SetScript("OnClick", function() p.page = math.max(1, p.page - 1); KT.RefreshPanel() end)
+  local nxt = CreateFrame("Button", nil, paper, "UIPanelButtonTemplate")
+  nxt:SetSize(28, 20)
+  nxt:SetPoint("LEFT", p.pageText, "RIGHT", 12, 0)
+  nxt:SetText(">")
+  nxt:SetScript("OnClick", function() p.page = p.page + 1; KT.RefreshPanel() end)
+  p.prev, p.nxt = prev, nxt
+
   p.rows = {}
   for i = 1, JOURNAL_ROWS do
-    local row = CreateFrame("Frame", nil, p)
-    row:SetSize(CONTENT_WIDTH + 24, 38)
-    row:SetPoint("TOPLEFT", 6, -30 - (i - 1) * 40)
+    local row = CreateFrame("Frame", nil, paper)
+    row:SetHeight(20)
     local flag = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
-    flag:SetSize(22, 20)
-    flag:SetPoint("RIGHT", row, "RIGHT", 0, 0)
+    flag:SetSize(22, 18)
+    flag:SetPoint("TOPRIGHT", row, "TOPRIGHT", 0, 2)
     flag:SetText("!")
     local fs = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     fs:SetPoint("TOPLEFT", 0, 0)
-    fs:SetPoint("BOTTOMRIGHT", flag, "BOTTOMLEFT", -4, -9)
     fs:SetJustifyH("LEFT")
     fs:SetJustifyV("TOP")
+    fs:SetSpacing(2)
+    fs:SetShadowOffset(0, 0)
     flag:SetScript("OnClick", function()
       local e = row.entry
       if not e then return end
@@ -311,6 +343,9 @@ local function BuildJournal(parent)
   return p
 end
 
+-- ink colors on the paper
+local INK, INK_DATE, INK_FLAG = "|cff2e1d0c", "|cff7a6648", "|cffa01818"
+
 local function RefreshJournal(p, db)
   local j = db.journal
   local total = #j
@@ -321,20 +356,35 @@ local function RefreshJournal(p, db)
   local flagged = 0
   for _, e in ipairs(j) do if e.flagged then flagged = flagged + 1 end end
   if total == 0 then
-    p.header:SetText(L.UI_JOURNAL_EMPTY)
+    p.header:SetText(INK .. L.UI_JOURNAL_EMPTY .. "|r")
   else
-    p.header:SetText(string.format(L.UI_JOURNAL_PAGE, p.page, pageCount)
-      .. (flagged > 0 and ("   |cffff6060" .. string.format(L.UI_JOURNAL_FLAGGED, flagged) .. "|r") or ""))
+    p.header:SetText(flagged > 0 and (INK_FLAG .. string.format(L.UI_JOURNAL_FLAGGED, flagged) .. "|r") or "")
   end
+  p.pageText:SetText(string.format(L.UI_JOURNAL_PAGE, p.page, pageCount))
+  p.pageText:SetShown(total > 0)
+  p.prev:SetShown(total > 0)
+  p.nxt:SetShown(total > 0)
+
+  -- lines stacked from the top, each as tall as its text
+  local width = p.paper:GetWidth() - 32
+  if width < 200 then width = 560 end
+  local y = 40
   for i, row in ipairs(p.rows) do
     local e = j[total - (p.page - 1) * JOURNAL_ROWS - (i - 1)]
     row.entry = e
     if e then
-      local color = e.flagged and "|cffff6060" or "|cffffd0a0"
-      row.fs:SetText(Grey(date("%d/%m %H:%M", e.t)) .. "  " .. color .. StripCodes(e.text or "") .. "|r")
+      row:ClearAllPoints()
+      row:SetPoint("TOPLEFT", p.paper, "TOPLEFT", 16, -y)
+      row:SetWidth(width)
+      row.fs:SetWidth(width - (tester and 30 or 0))
+      local color = e.flagged and INK_FLAG or INK
+      row.fs:SetText(INK_DATE .. date("%d/%m %H:%M", e.t) .. "|r   " .. color .. StripCodes(e.text or "") .. "|r")
+      local h = math.max(row.fs:GetStringHeight(), 14)
+      row:SetHeight(h)
       row.flag:SetText(e.flagged and "x" or "!")
       row.flag:SetShown(tester)
       row:Show()
+      y = y + h + 9
     else
       row:Hide()
     end
