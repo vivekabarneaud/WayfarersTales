@@ -710,7 +710,10 @@ local function CreateThermo()
   border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
   border:SetPoint("TOPLEFT")
   thermo.text = thermo:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  thermo.text:SetPoint("CENTER", thermo, "TOPLEFT", 17, -15)
+  thermo.text:SetPoint("CENTER", thermo, "TOPLEFT", 19, -17)
+  -- 1 px smaller than the usual small font, to sit nicely inside the ring
+  local font, size, flags = thermo.text:GetFont()
+  if font and size then thermo.text:SetFont(font, size - 1, flags) end
 
   thermo:SetScript("OnClick", function(_, button)
     if button == "RightButton" then

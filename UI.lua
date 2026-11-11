@@ -519,7 +519,7 @@ function KT.ShowReport()
     f.edit = edit
     reportFrame = f
   end
-  reportFrame.help:SetText(L.UI_JOURNAL_COPY_HELP)
+  reportFrame.help:SetText(string.format(L.UI_JOURNAL_COPY_HELP, D.DISCORD))
   reportFrame.edit:SetText(text)
   reportFrame:Show()
   reportFrame.edit:SetFocus()
@@ -1150,6 +1150,23 @@ local function BuildOptions(parent)
     page.debug = CheckBox(box, 0, -156, "debug", "UI_OPT_DEBUG")
   end
   page:Add(box, 10)
+
+  -- Discord: the game can't open links, so the address sits in a box you can copy from
+  local dc = Box(page.p, 58)
+  BoxLabel(dc, 10, -10, "UI_DISCORD")
+  local eb = CreateFrame("EditBox", nil, dc, "InputBoxTemplate")
+  eb:SetSize(260, 20)
+  eb:SetPoint("TOPLEFT", 16, -30)
+  eb:SetAutoFocus(false)
+  eb:SetText(D.DISCORD)
+  eb:SetCursorPosition(0)
+  -- read-only: whatever is typed, the address comes back; clicking selects it all
+  eb:SetScript("OnTextChanged", function(self) if self:GetText() ~= D.DISCORD then self:SetText(D.DISCORD) end end)
+  eb:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
+  eb:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+  eb:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
+  page:Add(dc, 10)
+
   page.note = Para(page, "GameFontDisableSmall", 10)
   return page
 end
