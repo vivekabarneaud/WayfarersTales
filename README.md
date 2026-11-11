@@ -4,23 +4,27 @@ Little touches of life on your journey, for **World of Warcraft: Forever**.
 Purely cosmetic: nothing changes your stats, and everything stays on your computer.
 English and French.
 
-> **Beta.** Things still change often. Feedback is very welcome: use the in-game
-> *Report & ideas* button (Journal tab) and paste it into an issue here.
+> **Beta.** Many lines are brand new. If one feels wrong, or you have an idea, tell us on
+> Discord: https://discord.gg/5bgAnccyHj
 
-## Modules (each can be turned on or off)
+## What it does
 
-- **Kindred**: build a bond with your hunter pet. Affection grows with cuddles, meals,
-  campfires and adventures. Emote reactions, a secret favorite food, moods, memories,
-  sounds, and a pet that reacts to its surroundings.
-- **Elements**: how your character feels. Cold and heat (with a thermometer by the
-  minimap), wetness, thirst, hunger and tiredness. Your body tells you in the chat;
-  the details are in the window.
-- **Senses**: short immersion lines about the world around you: smells, sounds, the
-  wind, the weather, first visits to new places, and the feeling of danger.
+- **Ambiance**: now and then, a short line tells you what your character smells, hears and
+  feels, right where they are: the landscape, the zone, the village, the inn, day or night,
+  the weather, the people around you. New places greet you with a line of their own, and
+  the little moments of your life on the road have theirs too.
+- **Body comfort**: your character feels the cold, the heat, the rain, thirst, hunger and
+  tiredness, with a small thermometer by the minimap.
+- **Your hunter pet**: a bond that grows with cuddles, meals, campfires and adventures,
+  daily moods, a secret favorite food, requests, memories.
+- **Travel log**: every discovery counts, and your title grows with it.
+- **Journal**: every line of your story, with the big moments marked by a star.
+
+Each part can be turned on or off in its own tab of the window.
 
 ## Install
 
-Copy the `WayfarersTales` folder into
+With CurseForge, or by hand: copy the `WayfarersTales` folder into
 `World of Warcraft\_forever_\Interface\AddOns\`, then restart the game.
 
 ## Commands
@@ -28,19 +32,18 @@ Copy the `WayfarersTales` folder into
 | Command | |
 |---|---|
 | `/wt` | open the window |
-| `/wt nope` | flag the last line as wrong or odd |
 | `/wt status` | your pet's story, in chat |
+| `/wt memories` | your memories together |
+| `/wt chatty 0-3` | how often your pet speaks up |
 | `/wt sound` | hear your pet's sounds |
-| `/wt debug` | technical messages |
+| `/wt tester` | tester mode: flag lines with a comment and send a report |
+
+## Help us
+
+Type `/wt tester` once. You can then flag any line with the **!** button in the Journal tab,
+take notes with `/wt homework`, and click **Send the report** to paste it on Discord.
 
 ## License
 
 MIT: you're free to reuse and adapt this addon, as long as you keep the copyright notice
 (see `LICENSE`).
-
-## Writing lines
-
-Immersion lines live in `SensesData.lua`: English and French side by side, with
-conditions (day or night, indoors, weather, temperature, place...) so a line only plays
-where it is true. The *Ambiance* tab in game shows every line for the place you're
-standing in, and why each one can or can't play right now.
