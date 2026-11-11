@@ -218,6 +218,7 @@ end
 ---------------------------------------------------------------------------
 
 local JOURNAL_ROWS = 12
+local JOURNAL_DATE_W = 78 -- width of the date column
 
 -- Reporting a line: a small window with the line and a "why?" box
 local function FlagWithNote(dialog, entry)
@@ -269,11 +270,14 @@ local function BuildJournal(parent)
   local tex = paper:CreateTexture(nil, "BACKGROUND", nil, 1)
   tex:SetPoint("TOPLEFT", 3, -3)
   tex:SetPoint("BOTTOMRIGHT", -3, 3)
-  for _, path in ipairs({ "Interface\\Stationery\\StationeryTest1", "Interface\\Spellbook\\Spellbook-Page-1" }) do
+  -- (the spellbook page first: bigger, so less blurry once stretched; kept faint, the
+  -- parchment color underneath does most of the work)
+  for _, path in ipairs({ "Interface\\Spellbook\\Spellbook-Page-1", "Interface\\Stationery\\StationeryTest1" }) do
     local ok = tex:SetTexture(path)
     if ok ~= false and tex:GetTexture() ~= nil then break end
     tex:SetTexture(nil)
   end
+  tex:SetAlpha(0.45)
   p.paper = paper
 
   p.header = paper:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -312,8 +316,16 @@ local function BuildJournal(parent)
     flag:SetSize(22, 18)
     flag:SetPoint("TOPRIGHT", row, "TOPRIGHT", 0, 2)
     flag:SetText("!")
+    -- the date in its own column, so a long line wraps under the start of the sentence
+    local when = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    when:SetPoint("TOPLEFT", 0, 0)
+    when:SetWidth(JOURNAL_DATE_W)
+    when:SetJustifyH("LEFT")
+    when:SetShadowOffset(0, 0)
+    when:SetTextColor(0.33, 0.22, 0.1)
+    row.when = when
     local fs = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    fs:SetPoint("TOPLEFT", 0, 0)
+    fs:SetPoint("TOPLEFT", JOURNAL_DATE_W, 0)
     fs:SetJustifyH("LEFT")
     fs:SetJustifyV("TOP")
     fs:SetSpacing(2)
@@ -344,7 +356,7 @@ local function BuildJournal(parent)
 end
 
 -- ink colors on the paper
-local INK, INK_DATE, INK_FLAG = "|cff2e1d0c", "|cff7a6648", "|cffa01818"
+local INK, INK_FLAG = "|cff2e1d0c", "|cffa01818"
 
 local function RefreshJournal(p, db)
   local j = db.journal
@@ -376,9 +388,10 @@ local function RefreshJournal(p, db)
       row:ClearAllPoints()
       row:SetPoint("TOPLEFT", p.paper, "TOPLEFT", 16, -y)
       row:SetWidth(width)
-      row.fs:SetWidth(width - (tester and 30 or 0))
+      row.fs:SetWidth(width - JOURNAL_DATE_W - (tester and 30 or 0))
       local color = e.flagged and INK_FLAG or INK
-      row.fs:SetText(INK_DATE .. date("%d/%m %H:%M", e.t) .. "|r   " .. color .. StripCodes(e.text or "") .. "|r")
+      row.when:SetText(date("%d/%m %H:%M", e.t))
+      row.fs:SetText(color .. StripCodes(e.text or "") .. "|r")
       local h = math.max(row.fs:GetStringHeight(), 14)
       row:SetHeight(h)
       row.flag:SetText(e.flagged and "x" or "!")
