@@ -354,6 +354,8 @@ local function Say(poolKey, vars, delta, important)
   if not important and db.settings.chatty == 0 then return end
   -- body-type version of the pool if there is one (birds, scaly, chitin)
   local key = (pet and pet.archetype and M[poolKey .. "_" .. pet.archetype]) and (poolKey .. "_" .. pet.archetype) or poolKey
+  -- a demon only says what was written for it (never a hunter pet's line)
+  if pet and pet.demon and key == poolKey then return end
   local pool = WithDrafts(key, M[key])
   if not pool then return end
   if type(pool[1]) == "table" then pool = pool[Band()] or pool[1] end -- banded pool
@@ -432,7 +434,10 @@ local function MemoryText(m, rec)
   if not vars.tierIndex and vars.tier then
     vars.tierIndex = IndexOf(KT.EN.L.TIERS, vars.tier) or (KT.FR and IndexOf(KT.FR.L.TIERS, vars.tier))
   end
-  if vars.tierIndex then vars.tier = L.TIERS[vars.tierIndex] end
+  if vars.tierIndex then
+    local r = rec or pet
+    vars.tier = (r and r.demon and L.DEMON_TIERS[vars.tierIndex]) or L.TIERS[vars.tierIndex]
+  end
   if not vars.foodKind and vars.food then
     vars.foodKind = KeyOf(KT.EN.L.FOOD_KINDS, vars.food) or (KT.FR and KeyOf(KT.FR.L.FOOD_KINDS, vars.food))
   end
@@ -447,11 +452,21 @@ end
 
 local UpdateHeart -- forward
 
+-- Bond stage names: a demon's respect has its own (Mépris... Loyauté troublante)
+local function TierName(idx, rec)
+  rec = rec or pet
+  return (rec and rec.demon and L.DEMON_TIERS[idx]) or L.TIERS[idx]
+end
+local function TierDesc(idx, rec)
+  rec = rec or pet
+  return (rec and rec.demon and L.DEMON_TIER_DESC[idx]) or L.TIER_DESC[idx]
+end
+
 local function CheckTier()
   local idx = TierIndex(math.floor(pet.affection))
   if idx > pet.bestTier then
     pet.bestTier = idx
-    Say("tierUp", { tier = L.TIERS[idx] }, nil, true)
+    Say("tierUp", { tier = TierName(idx) }, nil, true)
     AddMemory("tier", { tierIndex = idx })
   end
 end
@@ -459,6 +474,8 @@ end
 -- Returns the amount actually gained.
 local function Gain(src, amount)
   if not pet or not KT.ModuleOn("kindred") then return 0 end
+  -- a demon's respect only grows the demon's way (fights, Health Funnel, time...)
+  if pet.demon and not D.DEMON_GAINS[src] then return 0 end
   local rule = D.GAIN[src] or {}
   amount = amount or rule.amount or 0
   local room = DailyRoom(src, rule.cap)
@@ -671,17 +688,26 @@ local function CheckMilestones()
   end
 end
 
+-- A warlock's demon: its type ("imp", "voidwalker"...) from the family the game gives
+local function DemonType()
+  if select(2, UnitClass("player")) ~= "WARLOCK" then return nil end
+  local fam = UnitCreatureFamily("pet")
+  return (fam and D.DEMON_FAMILY[fam]) or "demon"
+end
+
 local function OnPetAppear()
   local _, isHunterPet = HasPetUI()
-  if not UnitExists("pet") or not isHunterPet then
+  local demon = UnitExists("pet") and not isHunterPet and DemonType() or nil
+  if not UnitExists("pet") or not (isHunterPet or demon) then
     pet, diet = nil, nil
     UpdateHeart()
     return
   end
 
   local name, family = UnitName("pet"), UnitCreatureFamily("pet")
-  local entry = GetActiveEntry()
-  local key = entry and entry.petNumber and (CharKey() .. ":" .. entry.petNumber)
+  local entry = not demon and GetActiveEntry() or nil
+  local key = (demon and (CharKey() .. ":demon:" .. demon))
+    or (entry and entry.petNumber and (CharKey() .. ":" .. entry.petNumber))
     or (CharKey() .. ":name:" .. tostring(name) .. ":" .. tostring(family))
   local rec = db.pets[key]
   local wasSame = pet == rec and rec ~= nil
@@ -703,6 +729,27 @@ local function OnPetAppear()
   pet.family = family
   pet.archetype = D.FAMILY_TYPE[family or ""] -- nil = furry (default messages)
   pet.soundSet = D.FAMILY_SOUND[family or ""]  -- nil = no creature sounds known
+
+  -- A demon: respect instead of affection, its own lines (pools "<key>_imp"...), no
+  -- meals, moods or stable. A line when it's summoned, a mocking one if you just died.
+  if demon then
+    pet.demon, pet.archetype, pet.soundSet = true, demon, nil
+    if isNew then AddMemory("met", { zone = CurrentZone() or "Azeroth" }) end
+    if not wasSame then
+      if state.playerDiedAt and time() - state.playerDiedAt < D.DEMON_DEATH_WINDOW then
+        state.playerDiedAt = nil
+        Say("summonDeath", nil, nil, true)
+      elseif Ready("summonMsg", D.DEMON_SUMMON_CD) then
+        Mark("summonMsg")
+        Say("summon")
+      end
+    end
+    local lvl = UnitLevel("pet")
+    if lvl and lvl > 0 then pet.level = lvl end
+    pet.lastSeen = time()
+    UpdateHeart()
+    return
+  end
   local spoke = false
 
   if isNew then
@@ -864,6 +911,11 @@ local function OnEmote(kind, targeted, token)
   end
   if kind == "affection" then
     if not targeted then return end
+    -- a demon doesn't want your cuddles (it grows more tolerant with respect): no gain
+    if pet.demon then
+      if Ready("demonPet", 60) then Mark("demonPet"); Say("affection", nil, nil, true) end
+      return
+    end
     pet.stats.emotes = pet.stats.emotes + 1
     FirstMemory("firstCuddle")
     if TryComfort() or TryAttention() then return end
@@ -912,6 +964,7 @@ end
 -- Pet asks for cuddles now and then; answer with /pet in time for a bonus.
 local function MaybeAskAttention()
   if state.attention or state.meal or InCombat() or db.settings.chatty == 0 then return false end
+  if pet and pet.demon then return false end -- (a demon never asks for a cuddle)
   if not KT.LineGapOK() then return false end
   if not Ready("attention", D.ATTENTION_COOLDOWN) or not Chance(0.05 * MoodMult("attention")) then return false end
   Mark("attention")
@@ -927,8 +980,31 @@ local function MaybeAskAttention()
   return true
 end
 
+-- A random item from your bags (a demon likes to taunt you with your things)
+local function RandomBagItem()
+  local links = {}
+  local numSlots = C_Container and C_Container.GetContainerNumSlots or GetContainerNumSlots
+  local itemLink = C_Container and C_Container.GetContainerItemLink or GetContainerItemLink
+  if not (numSlots and itemLink) then return nil end
+  for bag = 0, 4 do
+    local okN, n = pcall(numSlots, bag)
+    for slot = 1, (okN and n or 0) do
+      local okL, link = pcall(itemLink, bag, slot)
+      if okL and link then links[#links + 1] = link end
+    end
+  end
+  return #links > 0 and links[math.random(#links)] or nil
+end
+
 local function IdleMoment()
   if InCombat() or not Ready("idle", D.IDLE_COOLDOWN) then return end
+  -- a demon: its own idle lines, and now and then (low respect) a taunt with your things
+  if pet.demon then
+    local item = Band() < 3 and math.random() < 0.3 and RandomBagItem()
+    local pool = item and "taunt" or "idle"
+    if Flavor(pool, 0.08, item and { item = item } or nil) then Mark("idle") end
+    return
+  end
   local pool = "idle"
   local hour = GetGameTime()
   if IsSwimming() then
@@ -1036,7 +1112,7 @@ local function PetRefuses(itemID, link)
 end
 
 local function OnPlayerEat(itemID, link)
-  if not PetAlive() or InCombat() or state.meal then return end
+  if not PetAlive() or InCombat() or state.meal or pet.demon then return end -- (demons don't eat)
   if db.settings.chatty == 0 then return end
   -- food it won't eat: a sniff and a face, now and then
   if PetRefuses(itemID, link) then
@@ -1320,8 +1396,8 @@ local function ShowTooltip(self)
   GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
   local idx = TierIndex(math.floor(pet.affection))
   GameTooltip:AddLine(pet.name, 1, 0.56, 0.69)
-  GameTooltip:AddLine(L.TIERS[idx], 1, 0.82, 0)
-  GameTooltip:AddLine(L.TIER_DESC[idx], 1, 1, 1, true)
+  GameTooltip:AddLine(TierName(idx), 1, 0.82, 0)
+  GameTooltip:AddLine(TierDesc(idx), 1, 1, 1, true)
   if pet.mood and pet.mood.date == Today() then
     GameTooltip:AddLine(string.format(L.TT_MOOD, L.MOODS[pet.mood.key] or pet.mood.key), 0.8, 0.8, 1)
   end
@@ -1563,6 +1639,13 @@ function H.UNIT_SPELLCAST_SUCCEEDED(unit, _, spellID)
   if unit ~= "player" then return end
   -- a spell while an enemy is targeted: you're taking part in the fight
   if UnitExists("target") and UnitCanAttack("player", "target") then state.actedAt = GetTime() end
+  -- Health Funnel: your life into your demon (respect grows, now and then a line)
+  if pet and pet.demon and SpellName(spellID) and SpellName(spellID) == SpellName(D.SPELL_HEALTH_FUNNEL) then
+    if Ready("funnel", D.DEMON_FUNNEL_CD) then
+      Mark("funnel")
+      Say("funnel", nil, Gain("funnel"))
+    end
+  end
   if spellID == D.SPELL_FEED_PET then
     Debug("Feed Pet cast succeeded, waiting for the food to leave the bags")
     state.feedPendingAt = GetTime()
@@ -1676,6 +1759,15 @@ function H.UNIT_FLAGS(unit)
 end
 -- what you do in a fight (melee swings, auto shot)
 function H.PLAYER_ENTER_COMBAT() state.meleeOn = true; state.actedAt = GetTime() end
+
+-- Demons: your death (re-summoned soon after, it mocks you) and the attack order
+function H.PLAYER_DEAD() state.playerDiedAt = time() end
+function H.PET_ATTACK_START()
+  if pet and pet.demon and PetAlive() and Ready("demonAttack", D.DEMON_ATTACK_CD) and Chance(0.5) then
+    Mark("demonAttack")
+    Say("attack")
+  end
+end
 function H.PLAYER_LEAVE_COMBAT() state.meleeOn = false end
 function H.START_AUTOREPEAT_SPELL() state.shooting = true; state.actedAt = GetTime() end
 function H.STOP_AUTOREPEAT_SPELL() state.shooting = false; state.actedAt = GetTime() end
@@ -1855,8 +1947,8 @@ SlashCmdList.WAYFARERSTALES = function(msg)
   else -- "status" (or the window isn't available)
     if not pet then Print(L.CMD_NO_PET); Print(L.CMD_HELP[1]) return end
     local idx = TierIndex(math.floor(pet.affection))
-    Print(string.format("|cffffd100%s|r (%s): %s - %d/100", pet.name, pet.family or "?", L.TIERS[idx], math.floor(pet.affection)))
-    Print(L.TIER_DESC[idx])
+    Print(string.format("|cffffd100%s|r (%s): %s - %d/100", pet.name, pet.family or "?", TierName(idx), math.floor(pet.affection)))
+    Print(TierDesc(idx))
     if pet.mood and pet.mood.date == Today() then Print(string.format(L.TT_MOOD, L.MOODS[pet.mood.key] or "?")) end
     if pet.tastes then
       Print(string.format(L.TT_FAVORITE, pet.tastes.favoriteKnown and L.FOOD_KINDS[pet.tastes.favorite] or L.TT_SECRET))
@@ -1960,7 +2052,7 @@ KT.CharKey = function() return CharKey() end
 KT.api = {
   GetPet = function() return pet end,
   GetDB = function() return db end,
-  TierIndex = TierIndex,
+  TierIndex = TierIndex, TierName = TierName, TierDesc = TierDesc,
   MemoryText = MemoryText,
   Today = Today,
   CharKey = CharKey,

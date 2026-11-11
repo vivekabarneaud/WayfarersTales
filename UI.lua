@@ -15,6 +15,7 @@ local function Icon() return D.CUSTOM_ICON or "Interface\\Icons\\INV_Misc_Note_0
 local function Head(text) return "|cffffd100" .. text .. "|r" end
 local function Pink(text) return "|cffff8fb1" .. text .. "|r" end
 local function Grey(text) return "|cffaaaaaa" .. text .. "|r" end
+local function IsWarlock() return select(2, UnitClass("player")) == "WARLOCK" end
 
 ---------------------------------------------------------------------------
 -- Building blocks
@@ -1022,7 +1023,7 @@ local function CompanionText(pet)
   if pet then
     local idx = api.TierIndex(math.floor(pet.affection))
     if D.TIERS[idx + 1] then
-      add(Grey(string.format(L.TT_NEXT, L.TIERS[idx + 1], D.TIERS[idx + 1])))
+      add(Grey(string.format(L.TT_NEXT, api.TierName(idx + 1, pet), D.TIERS[idx + 1])))
       add("")
     end
     if pet.mood and pet.mood.date == api.Today() then
@@ -1039,11 +1040,15 @@ local function CompanionText(pet)
     local s = pet.stats
     add("")
     add(Head(L.UI_TOGETHER))
-    add(string.format(L.UI_STATS, api.FormatDuration(s.minutes or 0), s.kills or 0, s.feeds or 0,
-      s.meals or 0, s.campfires or 0, s.emotes or 0))
+    if pet.demon then -- (no meals or cuddles with a demon)
+      add(string.format(L.UI_STATS_DEMON, api.FormatDuration(s.minutes or 0), s.kills or 0))
+    else
+      add(string.format(L.UI_STATS, api.FormatDuration(s.minutes or 0), s.kills or 0, s.feeds or 0,
+        s.meals or 0, s.campfires or 0, s.emotes or 0))
+    end
     -- (memories have their own scrolling box below)
   else
-    add(L.CMD_NO_PET)
+    add(IsWarlock() and L.CMD_NO_DEMON or L.CMD_NO_PET)
   end
 
   -- Other pets of this character
@@ -1058,7 +1063,7 @@ local function CompanionText(pet)
     add(Head(L.UI_OTHERS))
     for _, r in ipairs(others) do
       local i = api.TierIndex(math.floor(r.affection))
-      add(r.name .. Grey(" (" .. (r.family or "?") .. ")") .. " - " .. Pink(L.TIERS[i]) .. " " .. math.floor(r.affection))
+      add(r.name .. Grey(" (" .. (r.family or "?") .. ")") .. " - " .. Pink(api.TierName(i, r)) .. " " .. math.floor(r.affection))
     end
   end
   return table.concat(lines, "\n")
@@ -1066,7 +1071,7 @@ end
 
 local function BuildCompanion(parent)
   local page = ScrollPage(parent)
-  page.header = ModuleHeader(page, "UI_COMPANION_TITLE", "kindred", function(on)
+  page.header = ModuleHeader(page, IsWarlock() and "UI_DEMON_TITLE" or "UI_COMPANION_TITLE", "kindred", function(on)
     api.UpdateHeart()
     if on then api.Rescan() end
   end)
@@ -1156,8 +1161,8 @@ local function RefreshCompanion(page)
       local sub = pet.family or "?"
       if pet.level then sub = sub .. ", " .. L.UI_LEVEL .. " " .. pet.level end
       page.sub:SetText(sub)
-      page.tier:SetText(L.TIERS[idx])
-      page.desc:SetText(L.TIER_DESC[idx])
+      page.tier:SetText(api.TierName(idx, pet))
+      page.desc:SetText(api.TierDesc(idx, pet))
       page.bar:SetValue(pet.affection)
       page.bar.text:SetText(string.format(L.TT_SCORE, math.floor(pet.affection)))
     end
@@ -1166,7 +1171,7 @@ local function RefreshCompanion(page)
     page.chatty:Select(chatty)
     page.chattyDesc:SetText(L.UI_CHATTY_DESC[chatty] or "")
     page.sound:Refresh()
-    page.guide.text:SetText(L.UI_KINDRED_GUIDE)
+    page.guide.text:SetText((pet and pet.demon or (not pet and IsWarlock())) and L.UI_DEMON_GUIDE or L.UI_KINDRED_GUIDE)
   end
   page:Layout()
 end
@@ -1546,7 +1551,9 @@ local function Build()
 
   -- Tabs (Companion only for hunters)
   local list = { { "body", "UI_TAB_BODY" } }
-  if select(2, UnitClass("player")) == "HUNTER" then list[#list + 1] = { "companion", "UI_TAB_COMPANION" } end
+  local class = select(2, UnitClass("player"))
+  if class == "HUNTER" then list[#list + 1] = { "companion", "UI_TAB_COMPANION" } end
+  if class == "WARLOCK" then list[#list + 1] = { "companion", "UI_TAB_DEMON" } end
   for _, t in ipairs({ { "senses", "UI_TAB_SENSES" }, { "travels", "UI_TAB_TRAVELS" },
     { "journal", "UI_TAB_JOURNAL" }, { "options", "UI_TAB_OPTIONS" } }) do list[#list + 1] = t end
   local prev

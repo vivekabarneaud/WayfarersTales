@@ -1127,3 +1127,73 @@ L.DISC_YOUR_TITLE = "Votre titre"
 L.DISC_NEXT       = "Prochain titre : %s, à %d découvertes"
 L.DISC_TOP        = "Le plus haut titre qui soit !"
 L.DISC_NEW_TITLE  = "Nouveau titre : %s"
+
+-- Démons de démoniste : le respect plutôt que l'affection (rien ne s'accorde avec le démon)
+L.UI_TAB_DEMON    = "Démon"
+L.CMD_NO_DEMON    = "Aucun démon n'est invoqué pour le moment."
+L.UI_DEMON_TITLE  = "Votre démon"
+L.UI_DEMON_GUIDE  = "Un démon ne mange pas et ne veut pas de vos caresses. Son respect se gagne : des combats gagnés ensemble, des combats qu'il remporte seul, la vie que vous lui transférez, et le temps passé ensemble. Il baisse un peu quand il tombe au combat.\nPlus il vous respecte, plus ses manières changent. Pas toujours de façon rassurante."
+L.UI_STATS_DEMON  = "Temps passé ensemble : %s\nAventures : %d"
+L.DEMON_TIERS = { "Mépris", "Dédain", "Tolérance", "Respect", "Allégeance", "Loyauté troublante" }
+L.DEMON_TIER_DESC = {
+  "Votre démon vous obéit parce qu'on ne lui laisse pas le choix, et tient à ce que vous le sachiez.",
+  "Votre démon vous suit en traînant les pieds, avec la conviction de mériter mieux.",
+  "Votre démon a cessé de vous mépriser ouvertement. C'est déjà ça.",
+  "Votre démon reconnaît votre pouvoir, même sans jamais l'avouer.",
+  "Votre démon se battrait pour vous. Pour vous, et pour personne d'autre.",
+  "Votre démon vous est dévoué d'une façon un peu inquiétante.",
+}
+
+-- Les lignes du diablotin (pools "<clé>_imp" ; trois paliers : respect bas, moyen, haut)
+M.idle_imp = {
+  {
+    "{pet} crache par terre, juste à côté de vos pieds. Par pur hasard, évidemment.",
+    "{pet} marmonne quelque chose dans sa barbe. Vous ne saisissez pas les mots, mais le ton est très clair.",
+    "{pet} soupire bruyamment, à intervalles réguliers. Pour que vous n'oubliiez pas à quel point tout ceci l'ennuie.",
+  },
+  {
+    "{pet} jongle distraitement avec une petite flamme, l'air presque détendu.",
+    "{pet} vous observe un moment, puis hoche la tête. Comme une approbation, à contrecœur.",
+  },
+  {
+    "{pet} reste tout près de vous et fusille du regard quiconque s'approche un peu trop.",
+    "{pet} vous regarde avec une fierté étrange, presque possessive.",
+  },
+}
+M.taunt_imp = {
+  "{pet} sort votre {item} de votre sac, vous l'agite sous le nez en ricanant... puis vous rend votre bien, l'air de rien.",
+}
+M.summon_imp = {
+  { "{pet} surgit dans un nuage de soufre. « Encore vous... »" },
+  { "{pet} apparaît dans une gerbe d'étincelles et s'étire. « Bon. On y va ? »" },
+  { "{pet} apparaît et vous adresse un petit salut, presque cérémonieux. « {Maître|Maîtresse|Maître}. »" },
+}
+M.summonDeath_imp = {
+  { "{pet} réapparaît et vous toise de haut en bas. « Alors, on est {mort|morte|mort·e} ? » Son ricanement résonne longtemps." },
+  { "{pet} réapparaît et vous toise de haut en bas. « Alors, on est {mort|morte|mort·e} ? » Son ricanement résonne longtemps." },
+  { "{pet} réapparaît, vous examine d'un air soucieux... puis se reprend aussitôt. « Hm. Vous êtes en vie. Tant mieux. »" },
+}
+M.attack_imp = {
+  { "{pet} obéit en traînant les pieds, avec un long soupir exaspéré." },
+  { "{pet} s'élance avec un rire grinçant. Au moins, ça, ça l'amuse." },
+  { "{pet} se jette dans la mêlée avant même la fin de votre ordre." },
+}
+M.kill_imp = {
+  { "{pet} contemple les restes fumants. « Pas grâce à vous. »" },
+  { "{pet} se frotte les mains d'un air satisfait. Le feu, c'est vraiment ce qu'il y a de mieux." },
+  { "{pet} se tourne vers vous comme pour guetter votre approbation, puis détourne vite le regard." },
+}
+M.petSolo_imp = { "{pet} a réglé ce combat sans vous, et ne manque pas de vous le faire remarquer." }
+M.petSoloAfk_imp = { "Pendant votre absence, {pet} a dû se battre sans vous. À votre retour, on vous fait bien comprendre que ce n'était pas son travail." }
+M.funnel_imp = {
+  { "{pet} accepte votre vie sans un merci. Comme un dû." },
+  { "{pet} accepte votre vie sans un merci. Comme un dû." },
+  { "{pet} sent votre vie l'envahir, et un silence étrange passe entre vous." },
+}
+M.affection_imp = {
+  { "{pet} recule d'un bond. « Ne. Me. Touchez. Pas. »" },
+  { "{pet} esquive votre main d'un bond. « On ne se connaît pas à ce point. »" },
+  { "{pet} se laisse faire une seconde... puis s'écarte en grommelant. Personne n'a rien vu." },
+}
+M.death_imp = { "{pet} disparaît dans un dernier crépitement de flammes. Un silence étrange s'installe, et son absence vous surprend." }
+M.tierUp_imp = { "Quelque chose a changé dans le regard de {pet}. Votre lien : {tier}." }

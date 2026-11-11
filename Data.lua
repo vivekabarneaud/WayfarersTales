@@ -283,3 +283,22 @@ D.FOOD_WORDS = {
 
 -- Drinks, so a looted water bottle doesn't make your pet drool.
 D.DRINKS = { [159] = true, [1179] = true, [1205] = true, [1708] = true, [1645] = true, [8766] = true, [252031] = true }
+
+---------------------------------------------------------------------------
+-- Warlock demons (Kindred): respect instead of affection, their own lines
+---------------------------------------------------------------------------
+-- family name as the game gives it (EN / FR) -> demon type (its lines: pools "<key>_imp"...)
+D.DEMON_FAMILY = {
+  Imp = "imp", Diablotin = "imp",
+  Voidwalker = "voidwalker", ["Marcheur du Vide"] = "voidwalker",
+  Succubus = "succubus", Succube = "succubus",
+  Felhunter = "felhunter", ["Chasseur corrompu"] = "felhunter",
+}
+D.SPELL_HEALTH_FUNNEL = 755  -- Health Funnel (found by name, any rank)
+D.DEMON_DEATH_WINDOW = 900   -- summoned within 15 min of your death: it mocks you
+D.DEMON_SUMMON_CD    = 600   -- at most one summon line every 10 minutes
+D.DEMON_ATTACK_CD    = 600   -- the attack order gets a line at most every 10 minutes
+D.DEMON_FUNNEL_CD    = 300   -- Health Funnel: a line (and respect) at most every 5 minutes
+D.GAIN.funnel        = { amount = 1, cap = 3 }
+-- the only ways a demon's respect grows (no meals, no cuddles, no campfires)
+D.DEMON_GAINS = { kill = true, time = true, petSolo = true, funnel = true, level = true, anniversary = true }

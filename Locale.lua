@@ -1135,6 +1135,76 @@ L.DISC_NEXT       = "Next title: %s, at %d discoveries"
 L.DISC_TOP        = "The highest title there is!"
 L.DISC_NEW_TITLE  = "New title: %s"
 
+-- Warlock demons: respect instead of affection
+L.UI_TAB_DEMON    = "Demon"
+L.CMD_NO_DEMON    = "No demon is summoned right now."
+L.UI_DEMON_TITLE  = "Your demon"
+L.UI_DEMON_GUIDE  = "A demon doesn't eat and doesn't want your cuddles. Its respect is earned: fights won together, fights it wins on its own, the life you give it with Health Funnel, and time spent together. It drops a little when it falls in battle.\nThe more it respects you, the more its manners change. Not always in a reassuring way."
+L.UI_STATS_DEMON  = "Time together: %s\nAdventures: %d"
+L.DEMON_TIERS = { "Contempt", "Disdain", "Grudging Tolerance", "Respect", "Allegiance", "Unsettling Loyalty" }
+L.DEMON_TIER_DESC = {
+  "Your demon obeys you because it's given no choice, and wants you to know it.",
+  "Your demon follows you, dragging its feet, convinced it deserves better.",
+  "Your demon has stopped openly despising you. That's something.",
+  "Your demon acknowledges your power, though it will never admit it.",
+  "Your demon would fight for you. For you, and no one else.",
+  "Your demon is devoted to you in a way that's a little unsettling.",
+}
+
+-- The imp's lines (pools "<key>_imp"; three steps: low, middle, high respect)
+M.idle_imp = {
+  {
+    "{pet} spits on the ground, right by your feet. Purely by accident, of course.",
+    "{pet} mutters something under its breath. You don't catch the words, but the tone is very clear.",
+    "{pet} sighs loudly, at regular intervals. So you don't forget how boring all this is.",
+  },
+  {
+    "{pet} idly juggles a small flame, looking almost relaxed.",
+    "{pet} watches you for a moment, then nods. Something like approval, grudgingly.",
+  },
+  {
+    "{pet} stays right by you and glares at anyone who comes a little too close.",
+    "{pet} looks at you with a strange, almost possessive pride.",
+  },
+}
+M.taunt_imp = {
+  "{pet} takes your {item} out of your bag, waves it under your nose with a snicker... then gives it back, as if nothing happened.",
+}
+M.summon_imp = {
+  { "{pet} appears in a puff of sulfur. \"You again...\"" },
+  { "{pet} appears in a shower of sparks and stretches. \"Right. Shall we?\"" },
+  { "{pet} appears and gives you a small, almost formal bow. \"{Master|Mistress|Master}.\"" },
+}
+M.summonDeath_imp = {
+  { "{pet} reappears and looks you up and down. \"So, we died?\" Its snicker lingers." },
+  { "{pet} reappears and looks you up and down. \"So, we died?\" Its snicker lingers." },
+  { "{pet} reappears and looks you over with concern... then catches itself. \"Hm. You're alive. Good.\"" },
+}
+M.attack_imp = {
+  { "{pet} obeys, dragging its feet, with a long exasperated sigh." },
+  { "{pet} dashes off with a grating laugh. That, at least, it enjoys." },
+  { "{pet} throws itself into the fight before you've even finished the order." },
+}
+M.kill_imp = {
+  { "{pet} contemplates the smoking remains. \"No thanks to you.\"" },
+  { "{pet} rubs its hands with a satisfied air. Fire really is the best." },
+  { "{pet} turns to you as if waiting for your approval, then quickly looks away." },
+}
+M.petSolo_imp = { "{pet} handled that fight without you, and makes sure you notice." }
+M.petSoloAfk_imp = { "While you were away, {pet} had to fight without you. Now that you're back, it makes it very clear that wasn't its job." }
+M.funnel_imp = {
+  { "{pet} takes your life force without a thank-you. As if it were owed." },
+  { "{pet} takes your life force without a thank-you. As if it were owed." },
+  { "{pet} feels your life flow through it, and a strange silence passes between you." },
+}
+M.affection_imp = {
+  { "{pet} jumps back. \"Do. Not. Touch. Me.\"" },
+  { "{pet} dodges your hand with a hop. \"We're not that close.\"" },
+  { "{pet} allows it for a second... then pulls away, grumbling. Nobody saw anything." },
+}
+M.death_imp = { "{pet} vanishes in a last crackle of flames. A strange silence settles, and its absence surprises you." }
+M.tierUp_imp = { "Something has changed in the way {pet} looks at you. Your bond: {tier}." }
+
 -- Keep an untouched copy of the English texts, so the language can be switched
 -- back and forth (other languages are laid over these, see Locale_frFR.lua).
 local function copy(t)
