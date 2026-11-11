@@ -712,9 +712,16 @@ local function NPCLine(info)
   local known = info and info.id and D.NPCS[info.id]
   local state = S.State()
   if not known or not state then return false end
+  -- visits: coming back after more than 30 minutes away counts as a new visit
+  state.npcVisits = state.npcVisits or {}
+  local v = state.npcVisits[info.id] or { n = 0, last = 0 }
+  if time() - v.last > D.NPC_VISIT_GAP then v.n = v.n + 1 end
+  v.last = time()
+  state.npcVisits[info.id] = v
   state.npcLine = state.npcLine or {}
   if time() - (state.npcLine[info.id] or 0) < D.NPC_LINE_CD then return false end
-  if Play("npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race, npcRole = known.role, npcSex = info.sex, npcID = info.id }) then
+  if Play("npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race, npcRole = known.role,
+    npcSex = info.sex, npcID = info.id, npcVisits = v.n }) then
     state.npcLine[info.id] = time()
     return true
   end

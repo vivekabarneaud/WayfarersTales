@@ -897,6 +897,7 @@ D.MOMENTS.questAccept_2159 = { -- Livraison à Dolanaar (Teldrassil): leaving Sh
 -- {npc} = the NPC's name.
 ---------------------------------------------------------------------------
 D.NPC_LINE_CD = 1200 -- the same NPC gets a line at most every 20 minutes
+D.NPC_VISIT_GAP = 1800 -- back after more than this many seconds away: a new visit (lines by number of visits)
 D.NPCS = {
   [3589] = { race = "NightElf", role = "bowyer" },          -- Keina, Aldrassil: bows and arrows
   [6091] = { race = "NightElf", role = "food" },            -- Dellylah, Aldrassil: food and drink
@@ -1228,3 +1229,24 @@ D.MOMENTS.questAccept_120 = {
     en = "You slip Magistrate Solomon's letter into your bag. Lakeshire is counting on you: no dawdling on the road.",
     fr = "Vous glissez la lettre du magistrat Solomon dans votre sac. Comté-du-Lac compte sur vous : pas question de traîner en route." },
 }
+
+-- Allison (Gilded Rose): she gets to know you, visit after visit (D.NPC_VISIT_GAP).
+-- Not friends: just the way an innkeeper treats someone who keeps coming back.
+local NPC_ALLISON_VISITS = {
+  { draft = true, when = { npcID = 6740, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "{npc} recognizes you at a glance and gives you a small nod, between two customers.",
+    fr = "{npc} vous reconnaît d'un coup d'œil et vous adresse un petit signe de tête, entre deux clients." },
+  { draft = true, when = { npcID = 6740, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "{npc} seems to remember your face. A quick smile: you're no longer quite just passing through.",
+    fr = "{npc} semble se souvenir de votre visage. Un sourire rapide : vous n'êtes plus tout à fait {un voyageur de passage|une voyageuse de passage|une personne de passage}." },
+  { draft = true, when = { npcID = 6740, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "{npc} greets you like a regular: a warm smile before you've even said a word. It feels good to come back here.",
+    fr = "{npc} vous accueille comme {un habitué|une habituée|un·e habitué·e} : un sourire chaleureux avant même que vous n'ayez dit un mot. Ça fait du bien de revenir ici." },
+  { draft = true, when = { npcID = 6740, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "{npc} looks genuinely pleased to see a loyal customer again.",
+    fr = "{npc} a l'air sincèrement contente de revoir {un client fidèle|une cliente fidèle|un·e client·e fidèle}." },
+  { draft = true, when = { npcID = 6740, visitsAtLeast = 15 },
+    en = "{npc} hardly needs to ask what you'll have anymore. At the Gilded Rose, you're starting to feel a little at home.",
+    fr = "{npc} n'a presque plus besoin de vous demander ce que vous prendrez. À la Rose dorée, vous commencez à vous sentir un peu chez vous." },
+}
+for _, line in ipairs(NPC_ALLISON_VISITS) do table.insert(D.MOMENTS.npc, line) end

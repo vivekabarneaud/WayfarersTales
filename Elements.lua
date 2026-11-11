@@ -262,11 +262,11 @@ function E.Tick()
   local target = E.Target(env)
   state.temp = state.temp + (target - state.temp) * (1 - math.exp(-dt / TEMP_HALFLIFE))
 
-  -- Thirst: ~1h30 from full to empty in mild air, faster in the heat and in combat
+  -- Thirst: ~2h15 from full to empty in mild air, faster in the heat and in combat
   if env.drinking then
     state.thirst = Clamp(state.thirst + 2 * dt)
   else
-    local rate = 100 / 5400 * (1 + 0.04 * heat)
+    local rate = 100 / 8100 * (1 + 0.04 * heat)
     if env.combat then rate = rate * 1.3 end
     state.thirst = Clamp(state.thirst - rate * dt)
   end
