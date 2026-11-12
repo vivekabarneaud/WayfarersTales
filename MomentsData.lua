@@ -55,6 +55,8 @@ D.MOMENT_RULES = {
   flightNew        = { cd = 60,  chance = 1,   gap = 0 },  -- a new flight path
   questAccept_119  = { cd = 0,   chance = 1,   gap = 0 },  -- Le retour chez Verner (Goldshire, from Argus)
   questAccept_120  = { cd = 0,   chance = 1,   gap = 0 },  -- Un message pour Hurlevent (Lakeshire, from Magistrate Solomon)
+  questAccept_145  = { cd = 0,   chance = 1,   gap = 0 },  -- Un message pour Darkshire (Lakeshire: through Duskwood)
+  questDone_145    = { cd = 0,   chance = 1,   gap = 0 },  -- Un message pour Darkshire (Darkshire can't send help)
   afterFight      = { cd = 900,  chance = 1,   gap = 0 },
   afterFightClose = { cd = 900,  chance = 1,   gap = 0, shares = "afterFight" },
   quiet           = { cd = 1200, chance = 1,   gap = 120 },
@@ -1229,6 +1231,27 @@ D.MOMENTS.questAccept_120 = {
     en = "You slip Magistrate Solomon's letter into your bag. Lakeshire is counting on you: no dawdling on the road.",
     fr = "Vous glissez la lettre du magistrat Solomon dans votre sac. Comté-du-Lac compte sur vous : pas question de traîner en route." },
 }
+
+-- Quest 145, Un message pour Darkshire (noted 2026-11-12): taken in Lakeshire right after
+-- handing in 144; the message has to reach Darkshire fast, through Duskwood
+D.MOMENTS.questAccept_145 = {
+  { draft = true,
+    en = "You tuck the message away carefully. It has to go fast, and the road runs through Duskwood... Just thinking about it sends a shiver down your spine.",
+    fr = "Vous rangez le message avec soin. Il faut faire vite, et la route passe par le Bois de la Pénombre... Rien qu'à y penser, un frisson vous parcourt." },
+}
+-- ...handed in at Darkshire's town hall: Darkshire can't send help to Lakeshire
+D.MOMENTS.questDone_145 = {
+  { draft = true,
+    en = "Darkshire can't send help. You think of Lakeshire, waiting for an answer, and your heart sinks. You'll do your best.",
+    fr = "Darkshire ne peut pas envoyer d'aide. Vous pensez à Comté-du-Lac, qui attend une réponse, et votre cœur se serre. Vous ferez de votre mieux." },
+}
+
+-- Darkshire (noted 2026-11-12): Trelayne, innkeeper of the Scarlet Raven Tavern, is nice
+D.NPCS[6790] = { race = "Human", role = "innkeeper" } -- Trelayne l'aubergiste, Darkshire
+table.insert(D.MOMENTS.npc, { draft = true,
+  en = "{npc} greets you with a warm smile. In a village this dark, it does you a world of good.",
+  fr = "{npc} vous accueille avec un sourire chaleureux. Dans un village aussi sombre, ça fait un bien fou.",
+  when = { npcID = 6790 } })
 
 -- Allison (Gilded Rose): she gets to know you, visit after visit (D.NPC_VISIT_GAP).
 -- Not friends: just the way an innkeeper treats someone who keeps coming back.
