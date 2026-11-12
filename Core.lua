@@ -1179,13 +1179,13 @@ local function ResolveFeed(itemID, link)
   end
 end
 
--- Sure the pet won't touch this food? (its diet is known, the food type too, and it
--- has never eaten this item) - or it's the food it dislikes.
+-- Sure the pet won't touch this food? It's the food it dislikes (even if you once fed it
+-- some), or its diet is known, the food type too, and it has never eaten this item.
 local function PetRefuses(itemID, link)
-  if not itemID or pet.foods[itemID] then return false end
+  if not itemID then return false end
   local k = FoodKind(itemID, link)
-  if not k then return false end
-  if pet.tastes and k == pet.tastes.dislike then return true end
+  if k and pet.tastes and k == pet.tastes.dislike then return true end
+  if not k or pet.foods[itemID] then return false end
   return diet ~= nil and diet.count < 6 and not diet[k]
 end
 
