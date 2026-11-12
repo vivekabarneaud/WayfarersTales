@@ -15,10 +15,14 @@ KT.Mascot = Ma
 ---------------------------------------------------------------------------
 
 -- kind of mascot, from words in its name (EN / FR)
--- (whole = true: whole words only, so "Achat" or "Caterpillar" don't count as cats)
+-- (whole = true: whole words only, so "Achat" or "Caterpillar" don't count as cats).
+-- The French words come from the auction house's cages and baskets ("Panier à chat
+-- (Siamois)", "Cage de perroquet (Sénégal)"): the summoned pet's own name may differ.
 D.MASCOT_KINDS = {
   { "rabbit", { "lapin", "rabbit", "lièvre", "hare" } },
-  { "cat", { "cat", "kitten", "chat", "chaton" }, whole = true },
+  { "cat", { "cat", "kitten", "chat", "chaton", "siamese", "siamois", "bombay", "tabby", "tigré",
+    "cornish", "cornouailles" }, whole = true },
+  { "parrot", { "parrot", "perroquet", "macaw", "ara", "cockatiel", "calopsitte", "senegal", "sénégal" }, whole = true },
 }
 -- A mage's mascot reacts to magic: spells found by name (any rank, any language)
 D.MASCOT_MAGIC_SPELLS = {
@@ -146,7 +150,7 @@ local LINES = {
         fr = "{pet} couche les oreilles sous la pluie et vous lance un regard : c'est clairement de votre faute." },
     },
     -- a few minutes of rain, and it has just stopped
-    puddle = {
+    afterRain = {
       { draft = true,
         en = "The rain has left puddles. {pet} stops at the edge of one and laps at the water with the tip of its little pink tongue.",
         fr = "La pluie a laissé des flaques. {pet} s'arrête au bord de l'une d'elles et lape l'eau du bout de sa petite langue rose." },
@@ -223,6 +227,147 @@ local LINES = {
         fr = "{pet} renifle votre {item} avec un intérêt très sérieux. Vous lui en laissez une miette, qui disparaît aussitôt." },
     },
   },
+
+  -- Parrots (drafts, 2026-11-12)
+  parrot = {
+    idle = {
+      { draft = true,
+        en = "{pet} preens its feathers one by one, with meticulous care.",
+        fr = "{pet} se lisse les plumes une à une, avec une application méticuleuse." },
+      { draft = true,
+        en = "{pet} tilts its head one way, then the other, staring at you with one round eye.",
+        fr = "{pet} penche la tête d'un côté, puis de l'autre, en vous fixant d'un œil rond." },
+      { draft = true,
+        en = "{pet} lets out a piercing shriek that makes you jump. Then falls silent, looking perfectly innocent.",
+        fr = "{pet} pousse un cri perçant qui vous fait sursauter. Puis se tait, l'air parfaitement innocent." },
+      { draft = true,
+        en = "{pet} imitates the clink of the coins in your purse. Very convincing. A little too convincing.",
+        fr = "{pet} imite le tintement des pièces dans votre bourse. Très ressemblant. Un peu trop." },
+      { draft = true,
+        en = "{pet} whistles three notes, stops, and waits for an answer.",
+        fr = "{pet} siffle trois notes, s'arrête, et attend qu'on lui réponde." },
+      { draft = true,
+        en = "{pet} puffs up all its feathers at once, shakes, and is back to its normal size in an instant.",
+        fr = "{pet} gonfle toutes ses plumes d'un coup, se secoue, et retrouve aussitôt sa taille normale." },
+      { draft = true,
+        en = "{pet} lets out a little laugh that sounds strangely like yours.",
+        fr = "{pet} lâche un petit rire qui ressemble étrangement au vôtre." },
+      { draft = true,
+        en = "{pet} scratches its head with one foot, eye half closed, balanced on the other.",
+        fr = "{pet} se gratte la tête avec une patte, l'œil mi-clos, en équilibre sur l'autre." },
+      { draft = true,
+        en = "{pet} clicks its beak, twice, as if to get your attention. Then pretends to look elsewhere.",
+        fr = "{pet} fait claquer son bec, deux fois, comme pour attirer votre attention. Puis fait semblant de regarder ailleurs." },
+      { draft = true, when = { indoors = false },
+        en = "{pet} perfectly imitates the creak of a door. There's no door here.",
+        fr = "{pet} imite à la perfection le grincement d'une porte. Il n'y a pas de porte ici." },
+      { draft = true, when = { night = true },
+        en = "{pet} draws closer to you and mutters softly, in a language you don't understand.",
+        fr = "{pet} se rapproche de vous et marmonne tout bas, dans une langue que vous ne comprenez pas." },
+      { draft = true, when = { crowd = { "lively", "crowded" } },
+        en = "{pet} imitates the hubbub of the crowd, a little quieter.",
+        fr = "{pet} imite le brouhaha de la foule, un ton plus bas." },
+      { draft = true, maxBand = 1,
+        en = "{pet} studies you with one eye, then the other, as if deciding whether you can be trusted.",
+        fr = "{pet} vous observe d'un œil, puis de l'autre, comme pour décider si vous êtes digne de confiance." },
+      { draft = true, maxBand = 1,
+        en = "{pet} keeps its distance and comments on your every move with a short, sharp cry.",
+        fr = "{pet} garde ses distances et commente chacun de vos gestes d'un petit cri sec." },
+      { draft = true, minBand = 3,
+        en = "{pet} lands on your shoulder and nibbles your ear, very gently.",
+        fr = "{pet} se pose sur votre épaule et vous mordille l'oreille, très doucement." },
+      { draft = true, minBand = 3,
+        en = "{pet} repeats your name in a croaky voice. Well, something close to it.",
+        fr = "{pet} répète votre nom d'une voix éraillée. Enfin, quelque chose qui y ressemble." },
+      { draft = true, minBand = 3, when = { indoors = false },
+        en = "{pet} brings you a twig and proudly drops it in your hand.",
+        fr = "{pet} vous apporte une brindille et la dépose fièrement dans votre main." },
+    },
+    idleGrass = {
+      { draft = true, when = { indoors = false, moving = true, notBiomes = GRASS.notBiomes },
+        en = "{pet} lands in the grass and waddles along beside you, with very dignified steps.",
+        fr = "{pet} se pose dans l'herbe et marche à côté de vous en se dandinant, d'un pas très digne." },
+    },
+    rain = {
+      { draft = true,
+        en = "In the rain, {pet} spreads its wings wide and lets itself get soaked, with obvious pleasure.",
+        fr = "Sous la pluie, {pet} ouvre grand les ailes et se laisse tremper avec un plaisir évident." },
+    },
+    afterRain = {
+      { draft = true,
+        en = "The rain stops. {pet} shakes out every feather and gives you a thorough spraying.",
+        fr = "La pluie s'arrête. {pet} se secoue de toutes ses plumes et vous asperge copieusement." },
+    },
+    cold = {
+      { draft = true,
+        en = "{pet} fluffs up its feathers until it looks like a ball, and huddles against your neck.",
+        fr = "{pet} gonfle ses plumes jusqu'à ressembler à une boule, et se serre contre votre cou." },
+    },
+    sit = {
+      { draft = true,
+        en = "As soon as you sit down, {pet} lands on your knee and sets about smoothing your sleeve with the tip of its beak.",
+        fr = "Dès que vous vous asseyez, {pet} se pose sur votre genou et entreprend de vous lisser la manche du bout du bec." },
+    },
+    afkLap = {
+      { draft = true,
+        en = "When you come back, you find {pet} on your shoulder, greeting you with a resounding \"Ha!\"",
+        fr = "À votre retour, vous trouvez {pet} sur votre épaule, qui vous accueille d'un « Ah ! » retentissant." },
+    },
+    campfire = {
+      { draft = true,
+        en = "{pet} perches near the fire, fluffs up its feathers and half closes its eyes.",
+        fr = "{pet} se perche près du feu, gonfle ses plumes et ferme les yeux à demi." },
+      { draft = true,
+        en = "{pet} imitates the crackle of the fire so well that you no longer know which of the two you're hearing.",
+        fr = "{pet} imite le crépitement du feu, si bien que vous ne savez plus lequel des deux vous entendez." },
+    },
+    cuddle = {
+      { draft = true, maxBand = 1,
+        en = "{pet} lets you scratch its head for a second... then nips your finger, just for form.",
+        fr = "{pet} se laisse gratter la tête une seconde... puis vous pince le doigt, pour la forme." },
+      { draft = true, minBand = 2, maxBand = 2,
+        en = "{pet} lowers its head under your hand so you'll scratch its neck.",
+        fr = "{pet} baisse la tête sous votre main pour que vous lui grattiez la nuque." },
+      { draft = true, minBand = 3,
+        en = "{pet} closes its eyes while you scratch its head, with a small, satisfied click of its beak.",
+        fr = "{pet} ferme les yeux pendant que vous lui grattez la tête, avec un petit claquement de bec satisfait." },
+      { draft = true, minBand = 3,
+        en = "{pet} gives you a little bow, wings half open, head low, asking for a scratch on the neck.",
+        fr = "{pet} vous fait une petite révérence, ailes entrouvertes, la tête basse, pour réclamer une caresse sur la nuque." },
+    },
+    -- {place}: the place you're in (subzone, else zone)
+    newPlace = {
+      { draft = true,
+        en = "{pet} circles over this new place, squawking, as if to announce your arrival.",
+        fr = "{pet} fait un tour au-dessus de ce nouvel endroit en criant, comme pour annoncer votre arrivée." },
+      { draft = true,
+        en = "{pet} repeats \"{place}\" in a croaky voice, several times, as if to remember it.",
+        fr = "{pet} répète « {place} » d'une voix éraillée, plusieurs fois, comme pour s'en souvenir." },
+    },
+    nap = {
+      { draft = true,
+        en = "{pet} perches close by, tucks its head under its wing and falls asleep before you.",
+        fr = "{pet} se perche tout près, glisse la tête sous son aile et s'endort avant vous." },
+    },
+    danger = {
+      { draft = true,
+        en = "{pet} lets out a shrill alarm call and flies off to take cover.",
+        fr = "{pet} pousse un cri d'alarme strident et s'envole se mettre à l'abri." },
+      { draft = true,
+        en = "{pet} perches on your shoulder and screams at the enemy with all its might.",
+        fr = "{pet} se perche sur votre épaule et crie sur l'ennemi de toutes ses forces." },
+    },
+    meal_fruit = {
+      { draft = true,
+        en = "You hold out a piece of your {item} to {pet}, who takes it apart with the seriousness of a connoisseur.",
+        fr = "Vous tendez un morceau de votre {item} à {pet}, qui le décortique avec un sérieux de connaisseur." },
+    },
+    meal_bread = {
+      { draft = true,
+        en = "{pet} accepts the crumb of your {item} that you hold out, and holds it delicately in one foot to nibble it.",
+        fr = "{pet} accepte la miette de votre {item} que vous lui tendez, et la tient délicatement dans sa patte pour la grignoter." },
+    },
+  },
 }
 
 -- A mage's mascot: magic rubs off on it as the bond grows. These lines are added to
@@ -290,6 +435,28 @@ local MAGE = {
         fr = "À peine avez-vous disparu que {pet} vous rejoint d'un coup d'aile, comme si vous jouiez à cache-cache." } } },
   },
   kind = {
+    parrot = {
+      spell_polymorph = {
+        { draft = true,
+          en = "{pet} imitates the sheep's bleat to perfection. The sheep looks puzzled.",
+          fr = "{pet} imite le bêlement du mouton à la perfection. Le mouton semble perplexe." } },
+      spell_intellect = {
+        { draft = true,
+          en = "{pet} repeats the last syllables of your incantation. Fortunately, nothing happens.",
+          fr = "{pet} répète les dernières syllabes de votre incantation. Heureusement, rien ne se passe." } },
+      spell_conjure = {
+        { draft = true,
+          en = "{pet} repeats the last syllables of your incantation. Fortunately, nothing happens.",
+          fr = "{pet} répète les dernières syllabes de votre incantation. Heureusement, rien ne se passe." } },
+      spell_frostNova = {
+        { draft = true,
+          en = "{pet} imitates the crackle of the frost. The effect is striking.",
+          fr = "{pet} imite le craquement du givre. Le résultat est saisissant." } },
+      spell_blink = {
+        { draft = true,
+          en = "Just as you vanish, {pet} lets out a very convincing \"Poof!\"",
+          fr = "Au moment où vous disparaissez, {pet} lance un « Pouf ! » très convaincant." } },
+    },
     cat = {
       spell_blink = {
         { draft = true,
@@ -431,10 +598,22 @@ end
 
 local function Kind(name)
   local n = (name or ""):lower()
+  -- a whole word: no letter right before or after it (accented letters count as letters)
+  local function HasWord(word)
+    local init = 1
+    while true do
+      local s, e = n:find(word, init, true)
+      if not s then return false end
+      local before, after = n:sub(s - 1, s - 1), n:sub(e + 1, e + 1)
+      if s == 1 then before = "" end
+      if not before:find("^[%w\128-\255]") and not after:find("^[%w\128-\255]") then return true end
+      init = s + 1
+    end
+  end
   for _, k in ipairs(D.MASCOT_KINDS) do
     for _, w in ipairs(k[2]) do
       if k.whole then
-        if n:find("%f[%w]" .. w .. "%f[%W]") then return k[1] end
+        if HasWord(w) then return k[1] end
       elseif n:find(w, 1, true) then
         return k[1]
       end
@@ -583,7 +762,8 @@ local function Say(event, vars, important)
   local fits = {}
   for _, line in ipairs(list) do
     if band >= (line.minBand or 1) and band <= (line.maxBand or 3)
-      and (not line.draft or testing) and line.notPetType ~= cur.petType then
+      and (not line.draft or testing) and line.notPetType ~= cur.petType
+      and (not (line.en or ""):find("{place}", 1, true) or (vars and vars.place)) then
       local ok = true
       if line.when and KT.Senses and KT.Senses.Check then
         if not ctx then
@@ -703,7 +883,9 @@ local function Tick()
     Gain(cur, "place")
     if D.MASCOT_PLACE_MILESTONES[cur.stats.places] then AddMemory(cur, "places", { count = cur.stats.places }) end
     if Ready(cur, "place", D.MASCOT_PLACE_CD) and KT.LineGapOK() then
-      if Say("newPlace") then Mark(cur, "place") end
+      local sub, zone = GetSubZoneText(), GetRealZoneText()
+      local place = (sub and sub ~= "") and sub or zone
+      if Say("newPlace", { place = (place and place ~= "") and place or nil }) then Mark(cur, "place") end
     end
   end
   lastPlaces = places or lastPlaces
@@ -746,7 +928,7 @@ local function Tick()
   end
   wasRain = rain
 
-  -- puddles: a few minutes of rain outdoors, then it stops (once the rain-stop line is past)
+  -- after the rain (puddles...): a few minutes of rain outdoors, then it stops (once the rain-stop line is past)
   if env.rain then
     rainSince = rainSince or now
     rainEnded = nil
@@ -757,8 +939,8 @@ local function Tick()
   if rainEnded and now - rainEnded >= 35 then
     if now - rainEnded > 240 then
       rainEnded = nil
-    elseif not env.indoors and not env.combat and KT.LineGapOK() and Ready(cur, "puddle", 1800) then
-      if Say("puddle") then Mark(cur, "puddle") end
+    elseif not env.indoors and not env.combat and KT.LineGapOK() and Ready(cur, "afterRain", 1800) then
+      if Say("afterRain") then Mark(cur, "afterRain") end
       rainEnded = nil
     end
   end
@@ -779,13 +961,14 @@ local function Tick()
   end
   wasCold = cold
 
-  -- you start eating meat, fish or cheese: a little bit for your mascot (not every meal),
-  -- a few seconds after the meal's own line
+  -- you start eating something your mascot likes (cat: meat, fish, cheese; parrot: fruit,
+  -- bread): a little bit for it (not every meal), a few seconds after the meal's own line
   if env.eating and not wasEating and Ready(cur, "meal", D.MASCOT_MEAL_CD) and math.random() < 0.5 then
     local id, link
     if KT.LastFood then id, link = KT.LastFood(12) end -- (not "a and f()": it keeps only the id)
     local kind = id and KT.FoodKind and KT.FoodKind(id, link)
-    if link and (kind == "meat" or kind == "fish" or kind == "cheese") then
+    local own = cur.kind and LINES[cur.kind]
+    if link and kind and own and own["meal_" .. kind] then
       C_Timer.After(12, function()
         local ok, err = pcall(function()
           if not cur then return end
