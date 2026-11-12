@@ -24,6 +24,7 @@ D.MASCOT_KINDS = {
     "cornish", "cornouailles" }, whole = true },
   { "parrot", { "parrot", "perroquet", "macaw", "ara", "cockatiel", "calopsitte", "senegal", "sénégal" }, whole = true },
   { "owl", { "owl", "chouette", "hibou", "grand-duc" }, whole = true },
+  { "frog", { "frog", "toad", "grenouille", "crapaud" }, whole = true },
 }
 -- A mage's mascot reacts to magic: spells found by name (any rank, any language)
 D.MASCOT_MAGIC_SPELLS = {
@@ -471,6 +472,97 @@ local LINES = {
         fr = "Vous tendez un morceau de votre {item} à {pet}, qui l'avale tout rond." },
     },
   },
+
+  -- Frogs (drafts, 2026-11-12)
+  frog = {
+    idle = {
+      { draft = true,
+        en = "{pet} puffs out its throat and lets out a loud croak. Then a second one, in case you missed the first.",
+        fr = "{pet} gonfle sa gorge et lâche un coassement sonore. Puis un deuxième, au cas où vous n'auriez pas entendu le premier." },
+      { draft = true,
+        en = "{pet} stays perfectly still... then flicks out its tongue, so fast you don't have time to see what it caught.",
+        fr = "{pet} reste parfaitement immobile... puis projette sa langue d'un coup, si vite que vous n'avez pas le temps de voir ce qu'elle a attrapé." },
+      { draft = true, when = { moving = true },
+        en = "{pet} follows you in little hops, with a soft \"plop\" at every landing.",
+        fr = "{pet} vous suit par petits bonds, avec un léger « ploc » à chaque atterrissage." },
+      { draft = true,
+        en = "When {pet} swallows, its eyes sink into its head for a moment. It's fascinating, and a little unsettling.",
+        fr = "Quand {pet} avale, ses yeux s'enfoncent un instant dans sa tête. C'est fascinant, et un peu dérangeant." },
+      { draft = true,
+        en = "If not for the steady beat of its throat, you could mistake {pet} for a pebble.",
+        fr = "Sans le battement régulier de sa gorge, on pourrait prendre {pet} pour un caillou." },
+      { draft = true, maxBand = 1,
+        en = "{pet} watches you from a safe distance, legs folded, ready to leap.",
+        fr = "{pet} vous observe à bonne distance, les pattes repliées, prêtes à bondir." },
+      { draft = true, minBand = 3,
+        en = "{pet} hops onto your foot and settles there, as if it were the best perch in the world.",
+        fr = "{pet} saute sur votre pied et s'y installe, comme si c'était le meilleur perchoir du monde." },
+      { draft = true, when = { swimming = true },
+        en = "You swim, and {pet} swims beside you, in its element at last.",
+        fr = "Vous nagez, et {pet} nage à vos côtés, enfin dans son élément." },
+    },
+    idleGrass = {
+      { draft = true, when = GRASS,
+        en = "{pet} disappears into the grass. A moment of worry... then a little hop, right next to you.",
+        fr = "{pet} disparaît dans l'herbe. Un instant d'inquiétude... puis un petit bond, juste à côté de vous." },
+    },
+    rain = {
+      { draft = true,
+        en = "The rain starts, and {pet} seems to come alive: little hops, croaks, all its energy back.",
+        fr = "La pluie commence, et {pet} semble revivre : petits bonds, coassements, toute son énergie retrouvée." },
+    },
+    afterRain = {
+      { draft = true,
+        en = "The rain has left puddles, and {pet} jumps into the first one with a satisfied \"plop\".",
+        fr = "La pluie a laissé des flaques, et {pet} saute dans la première venue avec un « ploc » satisfait." },
+    },
+    cold = {
+      { draft = true,
+        en = "In the cold, {pet} moves less and less. You offer it shelter in the hollow of your hands.",
+        fr = "Avec le froid, {pet} bouge de moins en moins. Vous lui offrez un abri au creux de vos mains." },
+    },
+    sit = {
+      { draft = true,
+        en = "As soon as you sit down, {pet} climbs onto your knee and settles there. You feel its coolness through the cloth.",
+        fr = "Dès que vous vous asseyez, {pet} grimpe sur votre genou et s'y installe. Vous sentez sa fraîcheur à travers le tissu." },
+    },
+    afkLap = {
+      { draft = true,
+        en = "When you come back, {pet} hasn't moved from your knee, not even an inch. When you get up, a little hop, and the road goes on.",
+        fr = "À votre retour, {pet} n'a pas bougé de votre genou, pas même d'un millimètre. Quand vous vous levez, un petit bond, et la route reprend." },
+    },
+    campfire = {
+      { draft = true,
+        en = "{pet} approaches the fire carefully, then backs away and settles a little further off, well away from the flames.",
+        fr = "{pet} s'approche du feu, prudemment, puis recule et s'installe un peu plus loin, à bonne distance des flammes." },
+    },
+    cuddle = {
+      { draft = true, maxBand = 1,
+        en = "{pet} lets you touch it with a fingertip... then hops out of reach.",
+        fr = "{pet} se laisse toucher du bout du doigt... puis bondit hors de portée." },
+      { draft = true, minBand = 2, maxBand = 2,
+        en = "{pet} stays under your finger, throat pulsing, eyes half closed.",
+        fr = "{pet} reste sous votre doigt, la gorge qui palpite, les yeux mi-clos." },
+      { draft = true, minBand = 3,
+        en = "{pet} lets out a very soft little croak when you stroke its back. You'd swear it was a purr.",
+        fr = "{pet} lâche un petit coassement très doux quand vous lui caressez le dos. Vous jureriez que c'est un ronronnement." },
+    },
+    newPlace = {
+      { draft = true,
+        en = "{pet} explores this new place in big leaps, then comes back to you, throat beating fast.",
+        fr = "{pet} explore ce nouvel endroit à grands bonds, puis revient vers vous, la gorge battant à toute vitesse." },
+    },
+    nap = {
+      { draft = true,
+        en = "{pet} snuggles against you, closes its eyes and stops moving. All you can hear now is your own breathing.",
+        fr = "{pet} se blottit contre vous, ferme les yeux et ne bouge plus. On n'entend plus que votre respiration." },
+    },
+    danger = {
+      { draft = true,
+        en = "{pet} suddenly puffs up to twice its size, and looks at you as if that should be enough to scare the enemy away.",
+        fr = "{pet} se gonfle d'un coup, deux fois sa taille, et vous regarde comme si c'était suffisant pour faire fuir l'ennemi." },
+    },
+  },
 }
 
 -- A mage's mascot: magic rubs off on it as the bond grows. These lines are added to
@@ -538,6 +630,16 @@ local MAGE = {
         fr = "À peine avez-vous disparu que {pet} vous rejoint d'un coup d'aile, comme si vous jouiez à cache-cache." } } },
   },
   kind = {
+    frog = {
+      spell_polymorph = {
+        { draft = true,
+          en = "{pet} hops a few careful steps away from you. Just in case.",
+          fr = "{pet} s'éloigne prudemment de vous de quelques bonds. Juste au cas où." } },
+      spell_frostNova = {
+        { draft = true,
+          en = "Frost bursts out around you; {pet} jumps back and gives you an icy look. Literally.",
+          fr = "Le givre jaillit autour de vous ; {pet} saute en arrière et vous lance un regard glacial. Littéralement." } },
+    },
     owl = {
       spell_evocation = {
         { draft = true,
