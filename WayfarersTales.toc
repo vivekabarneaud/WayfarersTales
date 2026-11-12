@@ -18,6 +18,7 @@ MomentsData.lua
 Drafts.lua
 Processed.lua
 More.lua
+PetFamilies.lua
 Senses.lua
 Moments.lua
 Discovery.lua

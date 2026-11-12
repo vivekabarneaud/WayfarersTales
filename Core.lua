@@ -390,6 +390,36 @@ local function WithDrafts(key, pool)
   return out
 end
 
+-- A line for this pet's family (bear, boar, cat...: PetFamilies.lua) that fits this
+-- moment, or nil. Pools map to the family's events.
+local FAMILY_EVENT = { idle = "idle", idleWalking = "idle", idleNight = "idle", idleResting = "idle",
+  campfireRest = "campfire", campfireNear = "campfire", affection = "affection" }
+local function FamilyLine(poolKey)
+  if not pet or pet.demon or not D.PET_FAMILY_LINES then return nil end
+  local fam = D.FAMILY_SOUND[pet.family or ""]
+  local ev = FAMILY_EVENT[poolKey]
+  local list = fam and ev and D.PET_FAMILY_LINES[fam] and D.PET_FAMILY_LINES[fam][ev]
+  if not list then return nil end
+  local band, ctx = Band(), nil
+  local fits = {}
+  for _, line in ipairs(list) do
+    if (not line.draft or KT.DraftsOn()) and band >= (line.minBand or 1) and band <= (line.maxBand or 3) then
+      local ok = true
+      if line.when then
+        if not ctx then
+          local okC, c = pcall(KT.Senses.Context)
+          ctx = okC and c or {}
+        end
+        ok = KT.Senses.Check(line.when, ctx)
+      end
+      if ok then fits[#fits + 1] = line end
+    end
+  end
+  if #fits == 0 then return nil end
+  local line = fits[math.random(#fits)]
+  return (KT.CurrentLanguage and KT.CurrentLanguage() == "fr") and line.fr or line.en
+end
+
 local function Say(poolKey, vars, delta, important)
   if not KT.ModuleOn("kindred") then return end
   if not important and db.settings.chatty == 0 then return end
@@ -403,7 +433,13 @@ local function Say(poolKey, vars, delta, important)
   vars = vars or {}
   vars.pet = vars.pet or (pet and pet.name) or "?"
   local color = db.settings.label and MSG_COLOR or EmoteColor()
-  local text = Fill(PickLine(poolKey, pool), vars)
+  -- now and then, a line only this pet's family would say (a bear, a boar...)
+  local famText
+  if math.random() < (D.PET_FAMILY_CHANCE or 0) then
+    local okF, t = pcall(FamilyLine, poolKey)
+    famText = okF and t or nil
+  end
+  local text = Fill(famText or PickLine(poolKey, pool), vars)
   AddJournal("kindred", poolKey, text, delta)
   -- item links and highlights end with |r: switch back to our color after them
   text = text:gsub("|r", "|r" .. color)
