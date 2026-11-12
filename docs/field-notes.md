@@ -185,8 +185,8 @@ No errors, no flagged lines.
 | When | Kind | Note | Status | What we did |
 |---|---|---|---|---|
 | 11-11 20:17 | Note | "test note" (Westfall) | info | A test of the Homework window |
-| 16:33 | Quest | Un message pour la marche de l'Ouest (144), Lakeshire: the message must be carried fast through Duskwood, a shiver at the idea of going there | todo | Quest accept line, to discuss (TODO.md) |
-| 16:46 | Quest | Un message pour Darkshire (145): disappointed and worried that the Night Watch can't help Lakeshire, but you'll do your best | todo | Quest accept line, to discuss (TODO.md) |
+| 16:33 | Quest | Un message pour la marche de l'Ouest (144), Lakeshire: the message must be carried fast through Duskwood, a shiver at the idea of going there | done | The quest you carry through Duskwood is 145 (taken right after handing in 144): accept line for 145 (draft) |
+| 16:46 | Quest | Un message pour Darkshire (145): disappointed and worried that the Night Watch can't help Lakeshire, but you'll do your best | done | Hand-in line for 145, at Darkshire's town hall (draft) |
 | 16:49 | Note | Darkshire's inn, Taverne du Corbeau écarlate: not gloomy, warm and lively | todo | Inn line, to discuss (TODO.md) |
-| 16:49 | NPC | Trelayne l'aubergiste (6790), Darkshire: female human, nice | todo | `D.NPCS` + line, to discuss (TODO.md) |
+| 16:49 | NPC | Trelayne l'aubergiste (6790), Darkshire: female human, nice | done | `D.NPCS` innkeeper + line (draft) |
 | 16:50 | Bug | Poppo asked to share a cheese (Dalaran piquant) though he doesn't like cheese; idea: he sniffs it and makes a face | done | The "sniff and back away" lines already existed, but a food the pet had eaten once skipped the dislike check. Fixed: the disliked food always gets the sniff, never a request |
