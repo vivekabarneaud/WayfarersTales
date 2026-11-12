@@ -319,6 +319,28 @@ StaticPopupDialogs["WAYFARERSTALES_LEAVE_TESTER"] = {
   timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
 }
 
+-- Welcome, once per account (players who had the addon before see it once too):
+-- it's a beta, feedback and ideas are welcome on Discord.
+StaticPopupDialogs["WAYFARERSTALES_WELCOME"] = {
+  text = "%s", button1 = OKAY,
+  hasEditBox = true, editBoxWidth = 220,
+  OnShow = function(self)
+    local eb = self.editBox or self.EditBox or (self.GetName and _G[(self:GetName() or "") .. "EditBox"])
+    if eb then eb:SetText(D.DISCORD); eb:HighlightText(); eb:SetFocus() end
+  end,
+  EditBoxOnTextChanged = function(self)
+    if self:GetText() ~= D.DISCORD then self:SetText(D.DISCORD); self:HighlightText() end
+  end,
+  EditBoxOnEnterPressed = function(self) self:GetParent():Hide() end,
+  EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+  timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
+}
+local function Welcome()
+  if db.welcomed then return end
+  db.welcomed = true
+  StaticPopup_Show("WAYFARERSTALES_WELCOME", L.WELCOME)
+end
+
 local function ToggleTester()
   if KT.IsDev() then Print(L.CMD_TESTER_DEV) return end
   if not db.settings.tester then
@@ -1569,6 +1591,7 @@ function H.PLAYER_LOGIN()
   CreateHeart()
   if KT.CreateMinimapButton then KT.CreateMinimapButton() end
   if KT.IsDev() then KT.StartWeatherRecorder() end
+  C_Timer.After(8, function() pcall(Welcome) end) -- after the login chat settles
   C_Timer.NewTicker(60, function()
     if not KT.ModuleOn("kindred") or not PetAlive() then return end
     pet.lastSeen = time()
