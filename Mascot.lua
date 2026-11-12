@@ -23,6 +23,7 @@ D.MASCOT_KINDS = {
   { "cat", { "cat", "kitten", "chat", "chaton", "siamese", "siamois", "bombay", "tabby", "tigré",
     "cornish", "cornouailles" }, whole = true },
   { "parrot", { "parrot", "perroquet", "macaw", "ara", "cockatiel", "calopsitte", "senegal", "sénégal" }, whole = true },
+  { "owl", { "owl", "chouette", "hibou", "grand-duc" }, whole = true },
 }
 -- A mage's mascot reacts to magic: spells found by name (any rank, any language)
 D.MASCOT_MAGIC_SPELLS = {
@@ -368,6 +369,108 @@ local LINES = {
         fr = "{pet} accepte la miette de votre {item} que vous lui tendez, et la tient délicatement dans sa patte pour la grignoter." },
     },
   },
+
+  -- Owls (drafts, 2026-11-12): drowsy by day, wide awake at night
+  owl = {
+    idle = {
+      { draft = true, when = { night = false },
+        en = "In broad daylight, {pet} is half asleep, one eye closed, the other still keeping watch on you.",
+        fr = "En plein jour, {pet} somnole à moitié, un œil fermé, l'autre qui vous surveille quand même." },
+      { draft = true, when = { night = false },
+        en = "{pet} blinks slowly, as if daylight were a personal ordeal.",
+        fr = "{pet} cligne lentement des yeux, comme si la lumière du jour était une épreuve personnelle." },
+      { draft = true, when = { night = true, indoors = false },
+        en = "{pet} lets out a deep hoot that fades into the darkness.",
+        fr = "{pet} lance un hululement grave qui se perd dans l'obscurité." },
+      { draft = true, when = { night = true },
+        en = "Now that night has come, there's nothing sleepy left about {pet}: its big round eyes search the darkness.",
+        fr = "La nuit venue, {pet} n'a plus rien d'endormi : ses grands yeux ronds fouillent l'obscurité." },
+      { draft = true,
+        en = "{pet} turns its head almost all the way round to look at you. You can't get used to it.",
+        fr = "{pet} tourne la tête presque complètement vers l'arrière pour vous regarder. Vous n'arrivez pas à vous y habituer." },
+      { draft = true,
+        en = "{pet} sways its head left and right, then up and down, to get a better fix on you.",
+        fr = "{pet} balance la tête de gauche à droite, puis de haut en bas, pour mieux vous situer." },
+      { draft = true,
+        en = "{pet} lands right next to you. You didn't hear a thing.",
+        fr = "{pet} se pose tout près de vous. Vous n'avez rien entendu arriver." },
+      { draft = true,
+        en = "{pet} ruffles its feathers, then smooths them back in a single shiver.",
+        fr = "{pet} ébouriffe ses plumes, puis les remet en place d'un seul frisson." },
+      { draft = true, maxBand = 1,
+        en = "{pet} stares at you for a long time, without blinking, with a slightly intimidating gravity.",
+        fr = "{pet} vous fixe longuement, sans ciller, avec une gravité un peu intimidante." },
+      { draft = true, minBand = 3,
+        en = "{pet} lands on your arm and rubs its head against your cheek, very gently.",
+        fr = "{pet} se pose sur votre bras et frotte sa tête contre votre joue, tout doucement." },
+    },
+    idleGrass = {
+      { draft = true, when = GRASS,
+        en = "{pet} snaps its head toward the grass, motionless, listening to a sound you can't hear.",
+        fr = "{pet} tourne brusquement la tête vers l'herbe, immobile, à l'écoute d'un bruit que vous n'entendez pas." },
+    },
+    rain = {
+      { draft = true,
+        en = "{pet} hunches its head into its shoulders in the rain and gives you a look heavy with reproach.",
+        fr = "{pet} rentre la tête dans les épaules sous la pluie et vous lance un regard lourd de reproches." },
+    },
+    afterRain = {
+      { draft = true,
+        en = "The rain stops. {pet} shakes itself, and a little shower of drops falls around you.",
+        fr = "La pluie cesse. {pet} se secoue, et une petite pluie de gouttes retombe autour de vous." },
+    },
+    cold = {
+      { draft = true,
+        en = "{pet} fluffs up its feathers until it's twice its size, and huddles against you.",
+        fr = "{pet} gonfle ses plumes au point de doubler de volume, et se serre contre vous." },
+    },
+    sit = {
+      { draft = true,
+        en = "As soon as you sit down, {pet} lands on your knee, closes its eyes and doesn't move again.",
+        fr = "Dès que vous vous asseyez, {pet} se pose sur votre genou, ferme les yeux et ne bouge plus." },
+    },
+    afkLap = {
+      { draft = true,
+        en = "When you come back, {pet} is asleep on your shoulder, head tucked into its feathers. You get up very gently.",
+        fr = "À votre retour, {pet} dort sur votre épaule, la tête rentrée dans les plumes. Vous vous levez tout doucement." },
+    },
+    campfire = {
+      { draft = true,
+        en = "{pet} perches near the fire; the flames dance in its big round eyes.",
+        fr = "{pet} se perche près du feu ; les flammes se reflètent dans ses grands yeux ronds." },
+    },
+    cuddle = {
+      { draft = true, maxBand = 1,
+        en = "{pet} lets your hand come closer... then clacks its beak, to let you know that's enough.",
+        fr = "{pet} vous laisse approcher la main... puis claque du bec, pour vous signaler que ça suffit." },
+      { draft = true, minBand = 2, maxBand = 2,
+        en = "{pet} tilts its head so you'll scratch the top of it.",
+        fr = "{pet} incline la tête pour que vous lui grattiez le dessus du crâne." },
+      { draft = true, minBand = 3,
+        en = "{pet} closes its eyes under your fingers and lets out a very soft little hoot.",
+        fr = "{pet} ferme les yeux sous vos doigts et pousse un petit hululement très doux." },
+    },
+    newPlace = {
+      { draft = true,
+        en = "{pet} studies this new place by turning its head every which way, without moving the rest of its body.",
+        fr = "{pet} observe ce nouvel endroit en tournant la tête dans tous les sens, sans bouger le reste du corps." },
+    },
+    nap = {
+      { draft = true,
+        en = "{pet} perches close by, eyes half closed, as if to watch over your sleep.",
+        fr = "{pet} se perche tout près, les yeux mi-clos, comme pour veiller sur votre sommeil." },
+    },
+    danger = {
+      { draft = true,
+        en = "{pet} spreads its wings wide and clacks its beak, every feather on end.",
+        fr = "{pet} déploie grand les ailes et claque du bec, toutes plumes hérissées." },
+    },
+    meal_meat = {
+      { draft = true,
+        en = "You hold out a piece of your {item} to {pet}, who swallows it whole.",
+        fr = "Vous tendez un morceau de votre {item} à {pet}, qui l'avale tout rond." },
+    },
+  },
 }
 
 -- A mage's mascot: magic rubs off on it as the bond grows. These lines are added to
@@ -435,6 +538,20 @@ local MAGE = {
         fr = "À peine avez-vous disparu que {pet} vous rejoint d'un coup d'aile, comme si vous jouiez à cache-cache." } } },
   },
   kind = {
+    owl = {
+      spell_evocation = {
+        { draft = true,
+          en = "During your evocation, {pet} watches you gravely, like an old master keeping an eye on a student.",
+          fr = "Pendant votre évocation, {pet} vous observe gravement, comme un vieux maître qui surveille son élève." } },
+      spell_intellect = {
+        { draft = true,
+          en = "The glow of your spell shines in {pet}'s eyes, and it nods slowly, with an approving look.",
+          fr = "La lueur de votre sort se reflète dans les yeux de {pet}, qui hoche lentement la tête, l'air approbateur." } },
+      spell_polymorph = {
+        { draft = true,
+          en = "{pet} stares at the sheep with a predator's interest. Better not to know what's going on in its head.",
+          fr = "{pet} fixe le mouton avec un intérêt de prédateur. Mieux vaut ne pas savoir ce qui se passe dans sa tête." } },
+    },
     parrot = {
       spell_polymorph = {
         { draft = true,
