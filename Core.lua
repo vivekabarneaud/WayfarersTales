@@ -1591,7 +1591,7 @@ function H.PLAYER_LOGIN()
   CreateHeart()
   if KT.CreateMinimapButton then KT.CreateMinimapButton() end
   if KT.IsDev() then KT.StartWeatherRecorder() end
-  C_Timer.After(8, function() pcall(Welcome) end) -- after the login chat settles
+  C_Timer.After(3, function() pcall(Welcome) end) -- once the loading screen is gone
   C_Timer.NewTicker(60, function()
     if not KT.ModuleOn("kindred") or not PetAlive() then return end
     pet.lastSeen = time()
