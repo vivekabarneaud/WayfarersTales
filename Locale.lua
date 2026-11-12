@@ -175,6 +175,7 @@ L.CMD_HELP = {
   "/wt sound - hear your pet's sounds",
   "/wt guide, /wt journal, /wt options - open a tab of the window",
   "/wt tester - tester mode: notes, flagged lines and a report to send us (again to leave it)",
+  "/wt welcome - show the welcome message again (Discord link)",
 }
 L.CMD_HELP_TESTER = {
   "|cffffd100Tester mode|r",

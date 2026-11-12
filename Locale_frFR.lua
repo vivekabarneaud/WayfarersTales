@@ -173,6 +173,7 @@ L.CMD_HELP = {
   "/wt sound - écouter les sons de votre familier",
   "/wt guide, /wt journal, /wt options - ouvrir un onglet de la fenêtre",
   "/wt tester - mode testeur : notes, lignes signalées et un rapport à nous envoyer (à nouveau pour le quitter)",
+  "/wt welcome - revoir le message de bienvenue (lien Discord)",
 }
 L.CMD_HELP_TESTER = {
   "|cffffd100Mode testeur|r",

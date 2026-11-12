@@ -321,6 +321,9 @@ StaticPopupDialogs["WAYFARERSTALES_LEAVE_TESTER"] = {
 
 -- Welcome, once per account (players who had the addon before see it once too):
 -- it's a beta, feedback and ideas are welcome on Discord.
+-- Seen = closed by the player (OK, Enter, Escape): if anything else hides it (the loading
+-- screen...), it comes back at the next login. /wt welcome shows it again.
+local function WelcomeSeen() db.welcomeSeen = true end
 StaticPopupDialogs["WAYFARERSTALES_WELCOME"] = {
   text = "%s", button1 = OKAY,
   hasEditBox = true, editBoxWidth = 220,
@@ -328,17 +331,33 @@ StaticPopupDialogs["WAYFARERSTALES_WELCOME"] = {
     local eb = self.editBox or self.EditBox or (self.GetName and _G[(self:GetName() or "") .. "EditBox"])
     if eb then eb:SetText(D.DISCORD); eb:HighlightText(); eb:SetFocus() end
   end,
+  OnAccept = WelcomeSeen,
+  OnCancel = WelcomeSeen,
   EditBoxOnTextChanged = function(self)
     if self:GetText() ~= D.DISCORD then self:SetText(D.DISCORD); self:HighlightText() end
   end,
-  EditBoxOnEnterPressed = function(self) self:GetParent():Hide() end,
-  EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+  EditBoxOnEnterPressed = function(self) WelcomeSeen(); self:GetParent():Hide() end,
+  EditBoxOnEscapePressed = function(self) WelcomeSeen(); self:GetParent():Hide() end,
   timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
 }
-local function Welcome()
-  if db.welcomed then return end
-  db.welcomed = true
-  StaticPopup_Show("WAYFARERSTALES_WELCOME", L.WELCOME)
+local welcomeTried
+local function Welcome(force)
+  if not force and (db.welcomeSeen or welcomeTried) then return end
+  welcomeTried = true
+  local ok, err = pcall(StaticPopup_Show, "WAYFARERSTALES_WELCOME", L.WELCOME)
+  if not ok and KT.LogError then KT.LogError("Welcome", err) end
+end
+KT.Welcome = Welcome
+-- once the loading screen is really gone (else a few seconds after login)
+do
+  local wf = CreateFrame("Frame")
+  local okReg = pcall(wf.RegisterEvent, wf, "LOADING_SCREEN_DISABLED")
+  wf:SetScript("OnEvent", function(self)
+    self:UnregisterAllEvents()
+    C_Timer.After(2, function() if db then Welcome() end end)
+  end)
+  if not okReg then wf.fallback = true end
+  KT.welcomeFrame = wf
 end
 
 local function ToggleTester()
@@ -1591,7 +1610,8 @@ function H.PLAYER_LOGIN()
   CreateHeart()
   if KT.CreateMinimapButton then KT.CreateMinimapButton() end
   if KT.IsDev() then KT.StartWeatherRecorder() end
-  C_Timer.After(3, function() pcall(Welcome) end) -- once the loading screen is gone
+  -- the welcome: right after the loading screen; this is only the fallback
+  C_Timer.After(KT.welcomeFrame and not KT.welcomeFrame.fallback and 20 or 5, function() Welcome() end)
   C_Timer.NewTicker(60, function()
     if not KT.ModuleOn("kindred") or not PetAlive() then return end
     pet.lastSeen = time()
@@ -1898,6 +1918,8 @@ SlashCmdList.WAYFARERSTALES = function(msg)
   end
   if cmd == "tester" then
     ToggleTester()
+  elseif cmd == "welcome" or cmd == "bienvenue" then
+    Welcome(true)
   elseif cmd == "nope" then
     -- flag the latest journal line as wrong/odd, with an optional comment (/wt nope too long)
     local note = (msg or ""):match("^%S*%s*(.-)%s*$")
