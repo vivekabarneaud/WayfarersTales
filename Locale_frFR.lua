@@ -1200,6 +1200,57 @@ M.affection_imp = {
 M.death_imp = { "{pet} disparaît dans un dernier crépitement de flammes. Un silence étrange s'installe, et son absence vous surprend." }
 M.tierUp_imp = { "Quelque chose a changé dans le regard de {pet}. Votre lien : {tier}." }
 
+-- Le marcheur du Vide : silencieux, massif, froid. Son respect passe par les gestes, jamais par les mots.
+M.idle_voidwalker = {
+  {
+    "Un froid étrange émane de {pet}. Autour de vous, l'air semble plus lourd.",
+    "{pet} flotte derrière vous en silence. Vous oubliez parfois sa présence... jusqu'à ce que vous vous retourniez.",
+    "{pet} pousse un long grondement caverneux, venu de nulle part. Puis le silence revient.",
+  },
+  {
+    "{pet} reste immobile à vos côtés, une masse de fumée et d'ombre qui ne bouge plus.",
+    "Les yeux de {pet} luisent faiblement. Ils ne vous quittent pas.",
+  },
+  {
+    "{pet} se place d'instinct entre vous et le moindre bruit suspect.",
+    "Quand vous vous arrêtez, {pet} s'arrête aussi, exactement à la même distance. Toujours.",
+  },
+}
+M.summon_voidwalker = {
+  { "{pet} se forme lentement à partir d'une fumée violette et vous fixe de ses yeux vides, sans un mot." },
+  { "{pet} prend forme à vos côtés dans un grondement sourd, et attend vos ordres." },
+  { "{pet} se matérialise et incline légèrement sa masse vers vous. Une sorte de salut." },
+}
+M.summonDeath_voidwalker = {
+  { "{pet} réapparaît et vous contemple longuement. Vous avez la désagréable impression d'être {jugé|jugée|jugé·e}." },
+  { "{pet} réapparaît et vous contemple longuement. Vous avez la désagréable impression d'être {jugé|jugée|jugé·e}." },
+  { "{pet} réapparaît et ne vous quitte plus d'un pouce, plus près que jamais." },
+}
+M.attack_voidwalker = {
+  { "{pet} glisse vers l'ennemi, lentement, inexorablement." },
+  { "{pet} s'interpose entre vous et l'ennemi, sans un bruit. Encaisser, c'est ce qui lui va le mieux." },
+  { "{pet} fonce sur l'ennemi avant même votre ordre. Personne ne vous touchera tant que {pet} est là." },
+}
+M.kill_voidwalker = {
+  { "{pet} regarde le corps un instant, puis revient se placer derrière vous, comme si de rien n'était." },
+  { "{pet} contemple le corps, impassible. Un ennemi de moins." },
+  { "{pet} se tourne vers vous et gronde doucement. Vous commencez à comprendre que c'est sa façon de demander si vous allez bien." },
+}
+M.petSolo_voidwalker = { "{pet} a réglé ce combat sans vous, sans un bruit, et revient à sa place comme si de rien n'était." }
+M.petSoloAfk_voidwalker = { "Pendant votre absence, {pet} a dû se battre sans vous. À votre retour, son silence est plus lourd que d'habitude." }
+M.funnel_voidwalker = {
+  { "{pet} absorbe votre vie sans réaction apparente. Difficile de savoir si c'est de la reconnaissance." },
+  { "Votre vie coule vers {pet}, et sa forme s'affermit un peu. Un bref grondement, peut-être un merci." },
+  { "{pet} reçoit votre vie, puis s'approche tout près. Vous sentez son froid, et quelque chose comme de la gratitude." },
+}
+M.affection_voidwalker = {
+  { "Votre main s'enfonce dans {pet} comme dans une brume glacée. Vous la retirez aussitôt. {pet} ne réagit pas." },
+  { "Votre main traverse la fumée glacée de {pet}, qui incline légèrement la tête, sans comprendre." },
+  { "Vous posez la main sur {pet}. Le froid vous mord les doigts, mais {pet} ne s'écarte pas, et reste là, contre votre main." },
+}
+M.death_voidwalker = { "{pet} se dissout lentement en fumée violette. L'air redevient tiède, et vous vous sentez soudain très {exposé|exposée|exposé·e}." }
+M.tierUp_voidwalker = { "Le silence de {pet} a changé. Votre lien : {tier}." }
+
 -- Mascottes (le codex des mascottes)
 L.UI_TAB_MASCOT    = "Mascotte"
 L.UI_MASCOT_TITLE  = "Votre mascotte"

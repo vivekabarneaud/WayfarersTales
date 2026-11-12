@@ -1207,6 +1207,57 @@ M.affection_imp = {
 M.death_imp = { "{pet} vanishes in a last crackle of flames. A strange silence settles, and its absence surprises you." }
 M.tierUp_imp = { "Something has changed in the way {pet} looks at you. Your bond: {tier}." }
 
+-- The voidwalker: silent, massive, cold. Its respect shows in gestures, never in words.
+M.idle_voidwalker = {
+  {
+    "A strange cold comes off {pet}. Around you, the air feels heavier.",
+    "{pet} floats behind you in silence. Sometimes you forget it's there... until you turn around.",
+    "{pet} lets out a long, cavernous rumble, out of nowhere. Then the silence comes back.",
+  },
+  {
+    "{pet} stays motionless at your side, a mass of smoke and shadow that no longer moves.",
+    "{pet}'s eyes glow faintly. They never leave you.",
+  },
+  {
+    "{pet} moves on instinct between you and the slightest suspicious sound.",
+    "When you stop, {pet} stops too, at exactly the same distance. Always.",
+  },
+}
+M.summon_voidwalker = {
+  { "{pet} slowly takes shape out of a purple smoke and stares at you with empty eyes, without a word." },
+  { "{pet} takes shape at your side with a low rumble, and waits for your orders." },
+  { "{pet} materializes and tilts its bulk slightly toward you. A kind of greeting." },
+}
+M.summonDeath_voidwalker = {
+  { "{pet} reappears and looks at you for a long time. You have the unpleasant feeling of being judged." },
+  { "{pet} reappears and looks at you for a long time. You have the unpleasant feeling of being judged." },
+  { "{pet} reappears and doesn't leave your side by an inch, closer than ever." },
+}
+M.attack_voidwalker = {
+  { "{pet} glides toward the enemy, slowly, relentlessly." },
+  { "{pet} puts itself between you and the enemy, without a sound. Taking the blows is what it does best." },
+  { "{pet} charges the enemy before you've even given the order. Nobody will touch you while {pet} is here." },
+}
+M.kill_voidwalker = {
+  { "{pet} looks at the body for a moment, then goes back to its place behind you, as if nothing happened." },
+  { "{pet} contemplates the body, impassive. One enemy fewer." },
+  { "{pet} turns to you and rumbles softly. You're starting to understand it's its way of asking if you're all right." },
+}
+M.petSolo_voidwalker = { "{pet} settled this fight without you, without a sound, and goes back to its place as if nothing happened." }
+M.petSoloAfk_voidwalker = { "While you were away, {pet} had to fight without you. When you come back, its silence is heavier than usual." }
+M.funnel_voidwalker = {
+  { "{pet} absorbs your life with no visible reaction. Hard to tell if it's gratitude." },
+  { "Your life flows into {pet}, and its shape grows a little firmer. A brief rumble, maybe a thank-you." },
+  { "{pet} takes in your life, then comes very close. You feel its cold, and something like gratitude." },
+}
+M.affection_voidwalker = {
+  { "Your hand sinks into {pet} as into an icy mist. You pull it back at once. {pet} doesn't react." },
+  { "Your hand goes through {pet}'s icy smoke, and {pet} tilts its head slightly, not understanding." },
+  { "You put your hand on {pet}. The cold bites your fingers, but {pet} doesn't move away, and stays there, against your hand." },
+}
+M.death_voidwalker = { "{pet} slowly dissolves into purple smoke. The air grows mild again, and you suddenly feel very exposed." }
+M.tierUp_voidwalker = { "{pet}'s silence has changed. Your bond: {tier}." }
+
 -- Mascots (companion pets from the mascot codex)
 L.UI_TAB_MASCOT    = "Mascot"
 L.UI_MASCOT_TITLE  = "Your mascot"

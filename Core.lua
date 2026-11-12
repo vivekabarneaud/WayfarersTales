@@ -1077,7 +1077,8 @@ local function IdleMoment()
   if InCombat() or not Ready("idle", D.IDLE_COOLDOWN) then return end
   -- a demon: its own idle lines, and now and then (low respect) a taunt with your things
   if pet.demon then
-    local item = Band() < 3 and math.random() < 0.3 and RandomBagItem()
+    -- (only demons that taunt: the imp; the voidwalker never does)
+    local item = M["taunt_" .. (pet.archetype or "")] and Band() < 3 and math.random() < 0.3 and RandomBagItem()
     local pool = item and "taunt" or "idle"
     if Flavor(pool, 0.08, item and { item = item } or nil) then Mark("idle") end
     return
