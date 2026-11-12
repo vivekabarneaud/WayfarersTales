@@ -82,10 +82,85 @@ local LINES = {
     },
   },
 }
--- for any mascot (the bond growing)
+-- For any mascot, whatever it is (bird, cat, frog, clockwork, ghost...): nothing that
+-- needs a body part it might not have. Nothing agrees with the mascot in French.
 local GENERIC = {
   tierUp = {
     { en = "Your bond with {pet} has grown: {tier}.", fr = "Votre lien avec {pet} a grandi : {tier}." },
+  },
+  idle = {
+    { en = "{pet} stays right by your side, as if that were its place.",
+      fr = "{pet} reste tout près de vous, comme si c'était sa place." },
+    { en = "{pet} stops for a moment to watch something you can't see, then comes back to you.",
+      fr = "{pet} s'arrête un instant pour observer quelque chose que vous ne voyez pas, puis revient vers vous." },
+    { en = "{pet} glances at you, as if to check you're still there.",
+      fr = "{pet} vous lance un regard, comme pour vérifier que vous êtes toujours là." },
+    { minBand = 3,
+      en = "Without {pet} by your side, the road would feel much longer.",
+      fr = "Sans {pet} à vos côtés, la route vous semblerait bien plus longue." },
+  },
+  newPlace = {
+    { en = "{pet} discovers this new place with you, with boundless curiosity.",
+      fr = "{pet} découvre ce nouvel endroit avec vous, avec une curiosité sans bornes." },
+  },
+  campfire = {
+    { en = "{pet} settles by the fire, right next to you. The evening promises to be peaceful.",
+      fr = "{pet} s'installe près du feu, tout près de vous. La soirée s'annonce paisible." },
+  },
+  nap = {
+    { en = "{pet} stays close while you close your eyes, as if watching over your sleep.",
+      fr = "{pet} reste près de vous pendant que vous fermez les yeux, comme pour veiller sur votre sommeil." },
+  },
+  cuddle = {
+    { maxBand = 2,
+      en = "{pet} takes your gesture with a little surprise, then seems to enjoy it.",
+      fr = "{pet} accueille votre geste avec un peu de surprise, puis semble l'apprécier." },
+    { minBand = 3,
+      en = "{pet} answers your gesture with obvious joy.",
+      fr = "{pet} répond à votre geste avec une joie évidente." },
+  },
+  rain = {
+    { en = "The rain starts to fall, and {pet} draws closer to you.",
+      fr = "La pluie se met à tomber, et {pet} se rapproche de vous." },
+  },
+  danger = {
+    { en = "{pet} takes cover behind you until the danger passes.",
+      fr = "{pet} se met à l'abri derrière vous en attendant que le danger passe." },
+  },
+}
+
+-- By mascot family (the game's pet type): a few lines that only fit that family,
+-- added to the lines for any mascot. 2 dragonkin, 3 flying, 4 undead, 5 critter,
+-- 6 magic, 8 beast, 9 aquatic, 10 mechanical.
+local FAMILY = {
+  [2] = { idle = {
+    { en = "{pet} spreads its little wings for a moment, then folds them back with care.",
+      fr = "{pet} déploie un instant ses petites ailes, puis les replie avec soin." } } },
+  [3] = { idle = {
+    { en = "{pet} flutters around you, then comes back to settle close by.",
+      fr = "{pet} volette autour de vous, puis revient se poser tout près." } } },
+  [4] = { idle = {
+    { en = "A strange chill comes off {pet}. You've stopped noticing it, almost.",
+      fr = "Une fraîcheur étrange émane de {pet}. Vous n'y faites presque plus attention." } } },
+  [5] = { idle = {
+    { en = "{pet} investigates the ground at your feet with the utmost seriousness.",
+      fr = "{pet} inspecte le sol à vos pieds avec le plus grand sérieux." } } },
+  [6] = { idle = {
+    { en = "A faint glow dances around {pet}, then fades.",
+      fr = "Une faible lueur danse autour de {pet}, puis s'éteint." } } },
+  [8] = { idle = {
+    { en = "{pet} has a long stretch, then settles back down beside you.",
+      fr = "{pet} s'étire longuement, puis revient s'installer près de vous." } } },
+  [9] = { rain = {
+    { en = "The rain seems to delight {pet}. At least someone is happy.",
+      fr = "La pluie a l'air de ravir {pet}. Au moins, quelqu'un est content." } } },
+  [10] = {
+    idle = {
+      { en = "A small clicking comes from {pet}, steady as clockwork.",
+        fr = "Un petit cliquetis s'échappe de {pet}, régulier comme une horloge." } },
+    rain = {
+      { en = "{pet} creaks a little in the rain. Let's hope nothing rusts.",
+        fr = "{pet} grince un peu sous la pluie. Pourvu que rien ne rouille." } },
   },
 }
 
@@ -158,6 +233,7 @@ local function Record(guid, info)
   rec.name, rec.customName, rec.speciesID = info.name, info.customName, info.speciesID
   rec.displayID, rec.creatureID, rec.level = info.displayID, info.creatureID, info.level
   rec.kind = Kind(info.name)
+  rec.petType = info.petType
   return rec
 end
 
@@ -190,8 +266,16 @@ local function Say(event, vars, important)
   if not cur or not KT.ModuleOn("mascot") then return false end
   local db = KT.GetDB()
   if not important and (db.settings.chatty or 2) == 0 then return false end
-  local list = (cur.kind and LINES[cur.kind] and LINES[cur.kind][event]) or GENERIC[event]
-  if not list then return false end
+  -- a mascot with its own personality (the rabbit) speaks its own lines; any other one
+  -- gets the lines of its family and the lines for any mascot
+  local list = cur.kind and LINES[cur.kind] and LINES[cur.kind][event]
+  if not list then
+    list = {}
+    local fam = FAMILY[cur.petType or 0]
+    for _, l in ipairs(fam and fam[event] or {}) do list[#list + 1] = l end
+    for _, l in ipairs(GENERIC[event] or {}) do list[#list + 1] = l end
+  end
+  if #list == 0 then return false end
   local band = Ma.Band(cur)
   local ctx
   local fits = {}
