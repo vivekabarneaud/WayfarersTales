@@ -1,6 +1,6 @@
 # Discord — Wayfarer's Tales
 
-How the server is set up, and the messages to paste. Invite: https://discord.gg/5bgAnccyHj
+How the server is set up, and the messages to paste. Invite: https://discord.gg/5bgAnccyHj — CurseForge: https://www.curseforge.com/wow/addons/wayfarers-tales
 
 ## 1. Setup (once)
 
@@ -82,7 +82,7 @@ Un post par idée, avec un titre clair. Pour une idée de ligne, dites-nous **o�
 
 **Wayfarer's Tales 0.60.0, the first public beta, is out on CurseForge!** 🎉
 
-[CurseForge link]
+https://www.curseforge.com/wow/addons/wayfarers-tales
 
 What's in this first version: (paste the English part of CHANGELOG.md)
 

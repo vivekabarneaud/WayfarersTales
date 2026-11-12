@@ -1,9 +1,9 @@
 ## Interface: 16001
 ## Title: Wayfarer's Tales
-## Notes: Little touches of life on your journey: the world described around you, a body that feels the cold and the rain, and a bond with your hunter pet. Purely cosmetic, everything stays on your computer. Type /wt
+## Notes: Your character comes alive: the smell of an inn, the sound of the rain, the cold in their fingers, and a real bond with your hunter pet. Purely cosmetic, everything stays on your computer. Type /wt
 ## Version: 0.60.0
 ## Title-frFR: Wayfarer's Tales
-## Notes-frFR: De petites touches de vie au fil du voyage : le monde décrit autour de vous, un corps qui ressent le froid et la pluie, et un lien avec votre familier de chasseur. Purement cosmétique, tout reste sur votre ordinateur. Tapez /wt
+## Notes-frFR: Votre personnage prend vie : l'odeur d'une auberge, le bruit de la pluie, le froid au bout des doigts, et un vrai lien avec votre familier de chasseur. Purement cosmétique, tout reste sur votre ordinateur. Tapez /wt
 ## SavedVariables: WayfarersTalesDB
 
 Dev.lua

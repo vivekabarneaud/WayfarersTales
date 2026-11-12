@@ -24,7 +24,7 @@ Each part can be turned on or off in its own tab of the window.
 
 ## Install
 
-With CurseForge, or by hand: copy the `WayfarersTales` folder into
+With CurseForge (https://www.curseforge.com/wow/addons/wayfarers-tales), or by hand: copy the `WayfarersTales` folder into
 `World of Warcraft\_forever_\Interface\AddOns\`, then restart the game.
 
 ## Commands
