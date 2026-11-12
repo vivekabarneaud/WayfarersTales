@@ -62,6 +62,8 @@ end
 -- so we follow the sit key (X), /sit, /sleep and /stand, and moving gets you up.
 -- napping right now? (/sleep, until you move: the mascot naps with you)
 function E.Napping() return napping == true end
+-- sitting right now? (X key, /sit, /sleep; until you move or stand up)
+function E.Sitting() return sitting == true end
 
 function E.StandUp()
   if napping and state then
