@@ -43,7 +43,7 @@ How we work on Wayfarer's Tales, so we're always on the same page.
 3. Every text exists in English and French.
 4. Dev and tester features are off by default; no drafts play for players.
 5. `.toc`: version bumped, Interface number still matches the game.
-6. Changelog: Claude reads `git log main..dev`, skips `[dev]` commits, groups the rest by feature and writes the new entry at the top of `CHANGELOG.md`. The user approves the text.
+6. Changelog: Claude reads `git log main..dev`, skips `[dev]` commits, groups the rest by feature and writes the new entry at the top of `CHANGELOG.md`. The user approves the text. Copy that entry alone into `RELEASE_NOTES.md`: the CurseForge packager publishes it as the file's changelog.
 7. Merge `dev` into `main`, tag it, push both. Tag names: `vX.Y.Z-beta` while in beta, `vX.Y.Z` for full releases (the packager reads "beta" / "alpha" in the tag to set the release type).
 8. CurseForge's packager builds and publishes the zip by itself when it sees the new tag (`.pkgmeta`: leaves out `Dev.lua`, `docs/`, `tools/`; changelog from `CHANGELOG.md`). Check the file appeared on the project's Files tab.
 9. Announce on Discord.

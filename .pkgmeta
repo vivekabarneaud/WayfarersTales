@@ -1,9 +1,10 @@
 # CurseForge packager: builds the release zip when a tag is pushed (v0.61.0-beta...).
+# Its changelog: RELEASE_NOTES.md (only this version's notes; CHANGELOG.md keeps them all).
 # Keep it in sync with .gitattributes (export-ignore): nothing for us goes to players.
 package-as: WayfarersTales
 
 manual-changelog:
-  filename: CHANGELOG.md
+  filename: RELEASE_NOTES.md
   markup-type: markdown
 
 ignore:
@@ -14,3 +15,4 @@ ignore:
   - .gitattributes
   - .gitignore
   - .pkgmeta
+  - RELEASE_NOTES.md

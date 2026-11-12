@@ -5,3 +5,4 @@ tools export-ignore
 Dev.lua export-ignore
 TODO.md export-ignore
 .pkgmeta export-ignore
+RELEASE_NOTES.md export-ignore
