@@ -177,3 +177,16 @@ in-game report at the next login.
 | — | Bug | Homework says "0 notes" while the report has the comments | done | Comments added with the Journal's ! (or Bizarre) are flagged lines, not notes: the window now counts both |
 | — | Idea | Mascots: a tab, a bond, lines with personality (rabbit first), sounds | done | Mascot codex detection (C_PetJournal), one bond per character and mascot, "Mascotte" tab with model, stages, stats, memories; the rabbit's lines. Sounds still to do |
 | — | Idea | Mascot lines for every mascot, not only the brown rabbit | done | Lines for any mascot (nothing about a body part) + a few per family from the game's pet type (dragonkin, flying, undead, critter, magic, beast, aquatic, mechanical); the rabbit keeps its own |
+
+## 2026-11-12 — Redridge, Duskwood (Poppo's hunter), 0.62.0 playtest
+
+No errors, no flagged lines.
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 11-11 20:17 | Note | "test note" (Westfall) | info | A test of the Homework window |
+| 16:33 | Quest | Un message pour la marche de l'Ouest (144), Lakeshire: the message must be carried fast through Duskwood, a shiver at the idea of going there | todo | Quest accept line, to discuss (TODO.md) |
+| 16:46 | Quest | Un message pour Darkshire (145): disappointed and worried that the Night Watch can't help Lakeshire, but you'll do your best | todo | Quest accept line, to discuss (TODO.md) |
+| 16:49 | Note | Darkshire's inn, Taverne du Corbeau écarlate: not gloomy, warm and lively | todo | Inn line, to discuss (TODO.md) |
+| 16:49 | NPC | Trelayne l'aubergiste (6790), Darkshire: female human, nice | todo | `D.NPCS` + line, to discuss (TODO.md) |
+| 16:50 | Bug | Poppo asked to share a cheese (Dalaran piquant) though he doesn't like cheese; idea: he sniffs it and makes a face | done | The "sniff and back away" lines already existed, but a food the pet had eaten once skipped the dislike check. Fixed: the disliked food always gets the sniff, never a request |

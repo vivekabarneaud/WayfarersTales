@@ -28,6 +28,8 @@ D.PROCESSED = {
     ["2026-11-11 14:20"] = true, ["2026-11-11 14:21"] = true, ["2026-11-11 14:24"] = true, -- foods, titles, Wental
     ["2026-11-11 14:25"] = true, ["2026-11-11 14:39"] = true, ["2026-11-11 14:46"] = true, -- question, birds, sounds
     ["2026-11-11 15:04"] = true, ["2026-11-11 15:05"] = true, -- Argus, his quest
+    ["2026-11-11 20:17"] = true, ["2026-11-12 16:33"] = true, ["2026-11-12 16:46"] = true, -- test, quests 144, 145
+    ["2026-11-12 16:49"] = true, ["2026-11-12 16:50"] = true, -- Darkshire inn + Trelayne, cheese
   },
   flagsAt = {
     ["2026-11-11 08:45"] = true, ["2026-11-11 09:15"] = true, ["2026-11-11 09:21"] = true, -- mail, bomb, canals
