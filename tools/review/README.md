@@ -13,10 +13,10 @@ rewrite proposals) that the player uses to approve, tweak or reject lines.
   The page clears them from the reviewer's browser when it loads; a newer comment on the same
   line stays.
 
-Build (PowerShell; the addon folder's full path must be given to `Run`):
+Build (PowerShell; the repo folder's full path must be given to `Run`):
 
 ```powershell
-$root = "C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WayfarersTales"
+$root = "C:\Users\vvkbr\Projects\WayfarersTales"
 Set-Location "$root\tools\review"
 Add-Type -Path .\Extract.cs
 $json = [Extractor]::Run($root)

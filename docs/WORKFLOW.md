@@ -2,6 +2,11 @@
 
 How we work on Wayfarer's Tales, so we're always on the same page.
 
+## Folders
+- **The repo** lives in `C:\Users\vvkbr\Projects\WayfarersTales`: all work happens there.
+- **The game's copy** (`Interface\AddOns\WayfarersTales`) is a plain copy, safe to lose. `tools\deploy.ps1` mirrors the repo into it (Dev.lua included, so the game runs in dev mode). Claude runs it after every change; then restart the game.
+- If the CurseForge app (or anything else) wipes the game's copy, run the deploy again: nothing is lost.
+
 ## Branches
 - **`dev`**: all work happens here, always. It must always load in game without errors.
 - **`main`**: released versions only. We merge `dev` into `main` when we release.
