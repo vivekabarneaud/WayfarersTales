@@ -405,7 +405,7 @@ end
 -- A line for this pet's family (bear, boar, cat...: PetFamilies.lua) that fits this
 -- moment, or nil. Pools map to the family's events.
 local FAMILY_EVENT = { idle = "idle", idleWalking = "idle", idleNight = "idle", idleResting = "idle",
-  campfireRest = "campfire", campfireNear = "campfire", affection = "affection" }
+  campfireRest = "campfire", affection = "affection" } -- (not campfireNear: the "nearby" buff reaches far, and these lines lie by the fire)
 local function FamilyLine(poolKey)
   if not pet or pet.demon or not D.PET_FAMILY_LINES then return nil end
   local fam = D.FAMILY_SOUND[pet.family or ""]

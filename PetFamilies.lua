@@ -1,6 +1,6 @@
 -- Wayfarer's Tales - hunter pets: a few lines per family (bear, boar, cat...), on top of
 -- the lines for their body type (furry, bird, scaly, chitin). Keyed like D.FAMILY_SOUND.
--- Events: idle (any idle moment), campfire (resting or near a fire), affection (/pet...).
+-- Events: idle (any idle moment), campfire (resting by the fire, once you sat down at it), affection (/pet...).
 -- when: the usual Senses conditions (still = you're standing still, moving = walking,
 -- weather = "rain"...). minBand / maxBand: bond 1 low, 2 middle, 3 high.
 -- French: nothing agrees with the pet.
