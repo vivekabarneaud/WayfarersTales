@@ -25,6 +25,7 @@ D.MASCOT_KINDS = {
   { "parrot", { "parrot", "perroquet", "macaw", "ara", "cockatiel", "calopsitte", "senegal", "sénégal" }, whole = true },
   { "owl", { "owl", "chouette", "hibou", "grand-duc" }, whole = true },
   { "frog", { "frog", "toad", "grenouille", "crapaud" }, whole = true },
+  { "panda", { "panda" }, whole = true }, -- Bébé panda / Panda Cub (seen a lot, 2026-11-13)
 }
 -- A mage's mascot reacts to magic: spells found by name (any rank, any language)
 D.MASCOT_MAGIC_SPELLS = {
@@ -563,6 +564,97 @@ local LINES = {
         fr = "{pet} se gonfle d'un coup, deux fois sa taille, et vous regarde comme si c'était suffisant pour faire fuir l'ennemi." },
     },
   },
+  -- The panda cub (2026-11-13): round, clumsy, always rolling over, black eye patches,
+  -- thick fur that's coarser than it looks. Likes fruit (no bamboo in the game).
+  -- French: "panda" is masculine (il, lui).
+  panda = {
+    idle = {
+      { draft = true,
+        en = "{pet} trips over its own paws, rolls over once, then sits up as if it had meant to.",
+        fr = "{pet} trébuche sur ses propres pattes, fait une roulade, puis se rassoit comme si c'était fait exprès." },
+      { draft = true,
+        en = "{pet} sits down on its bottom, hind legs stretched out in front, and looks at you, very pleased with itself.",
+        fr = "{pet} s'assoit sur son derrière, les pattes arrière tendues devant lui, et vous regarde, très content de lui." },
+      { draft = true, when = { moving = true },
+        en = "{pet} trots after you with its rolling gait, all round and in no hurry.",
+        fr = "{pet} trottine derrière vous de sa démarche chaloupée, tout rond et sans se presser." },
+      { draft = true,
+        en = "{pet} scratches its ear with a hind paw, loses its balance and ends up on its back.",
+        fr = "{pet} se gratte l'oreille avec une patte arrière, perd l'équilibre et finit sur le dos." },
+      { draft = true, maxBand = 1,
+        en = "{pet} watches you from behind its black eye patches, not yet sure what to make of you.",
+        fr = "{pet} vous observe derrière ses taches noires, sans trop savoir encore quoi penser de vous." },
+      { draft = true, minBand = 3, when = { still = true },
+        en = "{pet} wraps both front paws around your leg and won't let go.",
+        fr = "{pet} s'agrippe à votre jambe de ses deux pattes avant et ne veut plus la lâcher." },
+    },
+    idleGrass = {
+      { draft = true, when = GRASS,
+        en = "{pet} rolls in the grass, all four paws in the air, and gets up covered in bits of green.",
+        fr = "{pet} se roule dans l'herbe, les quatre pattes en l'air, et se relève couvert de brins verts." },
+    },
+    rain = {
+      { draft = true,
+        en = "The rain starts. {pet} shakes its head, then decides it doesn't mind: its fur is thick.",
+        fr = "La pluie commence. {pet} secoue la tête, puis décide que ça lui est égal : sa fourrure est épaisse." },
+    },
+    afterRain = {
+      { draft = true,
+        en = "{pet} has found a patch of mud. Its white fur is a lot less white now.",
+        fr = "{pet} a trouvé un coin de boue. Sa fourrure blanche l'est beaucoup moins, maintenant." },
+    },
+    cold = {
+      { draft = true,
+        en = "In its thick fur, {pet} doesn't seem to mind the cold. It huddles against you anyway, in case you do.",
+        fr = "Dans sa fourrure épaisse, {pet} ne semble pas craindre le froid. Il se blottit quand même contre vous, au cas où vous, vous auriez froid." },
+    },
+    sit = {
+      { draft = true,
+        en = "As soon as you sit down, {pet} climbs onto your lap, heavier than it looks, and settles there with a sigh.",
+        fr = "Dès que vous vous asseyez, {pet} grimpe sur vos genoux, plus lourd qu'il n'en a l'air, et s'y installe avec un soupir." },
+    },
+    afkLap = {
+      { draft = true,
+        en = "When you come back, {pet} is asleep on your lap, on its back, paws in the air.",
+        fr = "À votre retour, {pet} dort sur vos genoux, sur le dos, les pattes en l'air." },
+    },
+    campfire = {
+      { draft = true,
+        en = "{pet} sits by the fire, round as a ball, and its eyelids slowly droop.",
+        fr = "{pet} s'assoit près du feu, rond comme une boule, et ses paupières tombent doucement." },
+    },
+    cuddle = {
+      { draft = true, maxBand = 1,
+        en = "{pet} lets you stroke it, then pushes your hand away with a paw, very gently.",
+        fr = "{pet} se laisse caresser, puis repousse votre main d'un coup de patte, tout doucement." },
+      { draft = true, minBand = 2, maxBand = 2,
+        en = "{pet}'s fur is coarser than you'd think, and very warm underneath.",
+        fr = "Le pelage de {pet} est plus rêche qu'on ne l'imagine, et tout chaud en dessous." },
+      { draft = true, minBand = 3,
+        en = "{pet} rolls onto its back so you can scratch its round belly.",
+        fr = "{pet} se roule sur le dos pour que vous lui grattiez son ventre tout rond." },
+    },
+    newPlace = {
+      { draft = true,
+        en = "{pet} explores this new place at its own pace, sniffs everything, then sits down in the middle of the path to think it over.",
+        fr = "{pet} explore ce nouvel endroit à son rythme, renifle tout, puis s'assoit au milieu du chemin pour réfléchir." },
+    },
+    nap = {
+      { draft = true,
+        en = "{pet} falls asleep before you, curled up against you, snoring very softly.",
+        fr = "{pet} s'endort avant vous, roulé en boule contre vous, avec un tout petit ronflement." },
+    },
+    danger = {
+      { draft = true,
+        en = "{pet} hides behind your legs, and only its black ears stick out.",
+        fr = "{pet} se cache derrière vos jambes, et seules ses oreilles noires dépassent." },
+    },
+    meal_fruit = {
+      { draft = true,
+        en = "{pet} holds a piece of your {item} in both paws and nibbles it very seriously.",
+        fr = "{pet} tient un morceau de votre {item} entre ses deux pattes et le grignote très sérieusement." },
+    },
+  },
 }
 
 -- A mage's mascot: magic rubs off on it as the bond grows. These lines are added to
@@ -630,6 +722,12 @@ local MAGE = {
         fr = "À peine avez-vous disparu que {pet} vous rejoint d'un coup d'aile, comme si vous jouiez à cache-cache." } } },
   },
   kind = {
+    panda = {
+      spell_polymorph = {
+        { draft = true,
+          en = "{pet} looks at the sheep, then at you, then rolls onto its back. Apparently that's its answer to everything.",
+          fr = "{pet} regarde le mouton, puis vous, puis se roule sur le dos. Apparemment, c'est sa réponse à tout." } },
+    },
     frog = {
       spell_polymorph = {
         { draft = true,
