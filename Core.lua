@@ -1363,6 +1363,7 @@ end
 local function OnPetDied()
   pet.stats.deaths = pet.stats.deaths + 1
   state.meal = nil
+  state.petFightAt = nil -- (its fight is over: the "left combat" signal may never come)
   local delta = 0
   if Ready("death", D.LOSS.death.cooldown) then
     Mark("death")
@@ -1808,6 +1809,8 @@ end
 local function CheckSoloWin()
   if not (M.petSolo or KT.DraftsOn()) or not PetAlive() then return end
   local start = state.petFightAt
+  -- a fight from long ago: its end was missed (the pet died or was dismissed mid-fight)
+  if start and GetTime() - start > 300 then state.petFightAt = nil return end
   if not start or state.meleeOn or state.shooting then return end
   if state.actedAt and state.actedAt >= start - 2 then return end
   if not Ready("petSolo", D.PET_SOLO_COOLDOWN) then return end
@@ -1818,7 +1821,29 @@ local function CheckSoloWin()
   After(1, function() if pet then Say(afk and "petSoloAfk" or "petSolo", nil, got) end end)
 end
 
-function H.CHAT_MSG_COMBAT_XP_GAIN()
+-- Experience from a kill ("X dies, you gain N experience"), not from a quest or a new
+-- place: those come through the same event ("Experience gained: N.").
+-- The game's texts for experience without a kill: we recognise them by their fixed
+-- beginning (if a text is missing, the message counts as a kill, as before).
+local otherXPPrefixes
+local function IsKillXP(msg)
+  if not otherXPPrefixes then
+    otherXPPrefixes = {}
+    for _, g in ipairs({ "COMBATLOG_XPGAIN_FIRSTPERSON_UNNAMED", "COMBATLOG_XPGAIN_QUEST",
+      "COMBATLOG_XPGAIN_FIRSTPERSON_UNNAMED_GROUP", "COMBATLOG_XPGAIN_FIRSTPERSON_UNNAMED_RAID" }) do
+      local fmt = _G[g]
+      local prefix = type(fmt) == "string" and fmt:match("^(.-)%%")
+      if prefix and prefix ~= "" then otherXPPrefixes[#otherXPPrefixes + 1] = prefix end
+    end
+  end
+  for _, p in ipairs(otherXPPrefixes) do
+    if msg:sub(1, #p) == p then return false end
+  end
+  return true
+end
+
+function H.CHAT_MSG_COMBAT_XP_GAIN(msg)
+  if type(msg) ~= "string" or not IsKillXP(msg) then return end
   if PetAlive() then
     OnKill()
     CheckSoloWin()
