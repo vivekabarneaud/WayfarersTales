@@ -194,7 +194,7 @@ local function Check(when, ctx)
   if when.npcSex and when.npcSex ~= ctx.npcSex then return false, "npc" end
   if when.npcID and not InList(when.npcID, ctx.npcID) then return false, "npc" end
   -- how many times you came back to this NPC (a visit = after more than 30 minutes away,
-  -- D.NPC_VISIT_GAPS for some NPCs), and how long since the visit before this one
+  -- or each death for the spirit healer), and how long since the visit before this one
   if when.visitsAtLeast and (ctx.npcVisits or 0) < when.visitsAtLeast then return false, "npc" end
   if when.visitsBelow and (ctx.npcVisits or 0) >= when.visitsBelow then return false, "npc" end
   if when.sinceBelow and not (ctx.npcSince and ctx.npcSince < when.sinceBelow) then return false, "npc" end

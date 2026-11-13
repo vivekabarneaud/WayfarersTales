@@ -964,9 +964,8 @@ D.MOMENTS.questAccept_2159 = { -- Livraison à Dolanaar (Teldrassil): leaving Sh
 ---------------------------------------------------------------------------
 D.NPC_LINE_CD = 1200 -- the same NPC gets a line at most every 20 minutes
 D.NPC_VISIT_GAP = 1800 -- back after more than this many seconds away: a new visit (lines by number of visits)
--- NPCs with their own rhythm: the spirit healer (6491) is a new visit at each death
-D.NPC_VISIT_GAPS = { [6491] = 120 }
-D.NPC_LINE_CDS = { [6491] = 120 }
+-- (the spirit healer, role "spirit_healer": a new visit and a line at each death instead)
+D.NPC_CLOSE_VISIT = 600 -- dying again within 10 minutes of the last visit: a "back already?" line
 D.NPCS = {
   [3589] = { race = "NightElf", role = "bowyer" },          -- Keina, Aldrassil: bows and arrows
   [6091] = { race = "NightElf", role = "food" },            -- Dellylah, Aldrassil: food and drink
@@ -1365,32 +1364,71 @@ for _, line in ipairs(NPC_DUNGAR_VISITS) do table.insert(D.MOMENTS.npc, line) en
 -- The spirit healer (2026-11-13), when you talk to it as a ghost. What we know: huge wings,
 -- it floats, a ring of light, a soft voice, intimidating but beautiful; "Your time has not
 -- yet come... but it won't be free". Same NPC id at every graveyard; female model but named
--- "Gardien" in French, so no pronouns. Each death is a new visit (D.NPC_VISIT_GAPS).
+-- "Gardien" in French, so no pronouns. Each death is a new visit; dying again soon after gets its own lines.
 D.NPCS[6491] = { role = "spirit_healer" }
+local CLOSE = D.NPC_CLOSE_VISIT
 local NPC_SPIRIT_HEALER = {
-  { draft = true, when = { npcID = 6491, visitsBelow = 2 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsBelow = 2 },
     en = "The Spirit Healer towers over you, wings spread, floating just above the ground. It's terrifying, and yet so beautiful you can't look away.",
     fr = "Le Gardien des âmes vous domine de toute sa hauteur, ailes déployées, flottant juste au-dessus du sol. C'est terrifiant, et pourtant si beau que vous n'arrivez pas à détourner le regard." },
-  { draft = true, when = { npcID = 6491, visitsBelow = 2 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsBelow = 2 },
     en = "A voice so soft, from a being so imposing. You'd almost forget where you are.",
     fr = "Une voix si douce, venant d'un être si imposant. Vous en oublieriez presque où vous êtes." },
-  { draft = true, when = { npcID = 6491, visitsAtLeast = 2, visitsBelow = 5 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 2, visitsBelow = 5 },
     en = "The Spirit Healer again. The wings, the light, that soft voice... you're starting to know this place a little too well.",
     fr = "Encore le Gardien des âmes. Les ailes, la lumière, cette voix douce… Vous commencez à connaître cet endroit un peu trop bien." },
-  { draft = true, when = { npcID = 6491, visitsAtLeast = 2, visitsBelow = 5 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 2, visitsBelow = 5 },
     en = "Back before the Spirit Healer, head a little low. You'd hoped not to see those wings again so soon.",
     fr = "De retour devant le Gardien des âmes, la tête un peu basse. Vous espériez ne pas revoir ces ailes de sitôt." },
-  { draft = true, when = { npcID = 6491, visitsAtLeast = 5, visitsBelow = 15 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 5, visitsBelow = 15 },
     en = "The Spirit Healer floats there, as calm as ever. You could swear there's a hint of weariness in that soft voice.",
     fr = "Le Gardien des âmes flotte là, toujours aussi calme. Vous jureriez percevoir une pointe de lassitude dans sa voix douce." },
-  { draft = true, when = { npcID = 6491, visitsAtLeast = 5, visitsBelow = 15 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 5, visitsBelow = 15 },
     en = "You know the routine by now: the grey world, the wings, the soft voice. And the price.",
     fr = "Vous connaissez la routine, maintenant : le monde gris, les ailes, la voix douce. Et le prix." },
-  { draft = true, when = { npcID = 6491, visitsAtLeast = 15 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 15 },
     en = "The Spirit Healer again. At this point, you're practically a regular of the afterlife.",
     fr = "Encore le Gardien des âmes. À ce stade, vous êtes {un habitué|une habituée|un·e habitué·e} de l'au-delà." },
-  { draft = true, when = { npcID = 6491, visitsAtLeast = 15 },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 15 },
     en = "Your time hasn't come yet, the soft voice says once more. You're starting to suspect it's losing patience.",
     fr = "Votre temps n'est pas encore venu, répète la voix douce. Vous commencez à soupçonner qu'elle perd patience." },
+  -- dying again soon after the last visit
+  { draft = true, when = { npcID = 6491, sinceBelow = CLOSE },
+    en = "Back already? The Spirit Healer hasn't even had time to fold those great wings.",
+    fr = "Déjà de retour ? Le Gardien des âmes n'a même pas eu le temps de replier ses grandes ailes." },
+  { draft = true, when = { npcID = 6491, sinceBelow = CLOSE },
+    en = "You've barely left, and here you are again. Even the soft voice sounds a little surprised.",
+    fr = "Vous venez à peine de partir, et vous revoilà. Même la voix douce semble un peu surprise." },
+  { draft = true, when = { npcID = 6491, sinceBelow = CLOSE },
+    en = "Your time hasn't come yet, apparently. You seem to be doing your very best to prove otherwise.",
+    fr = "Votre temps n'est pas encore venu, paraît-il. Vous semblez pourtant faire tout votre possible pour prouver le contraire." },
+  { draft = true, when = { npcID = 6491, sinceBelow = CLOSE },
+    en = "The same wings, the same soft voice, only minutes later. Perhaps it's time to catch your breath.",
+    fr = "Les mêmes ailes, la même voix douce, quelques minutes à peine plus tard. Il est peut-être temps de souffler un peu." },
+  -- more by number of visits
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsBelow = 2 },
+    en = "In this grey world, only the Spirit Healer seems to shine.",
+    fr = "Dans ce monde gris, seul le Gardien des âmes semble briller." },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsBelow = 2 },
+    en = "In the ring of light, beneath those immense wings, you feel tiny.",
+    fr = "Dans le cercle de lumière, sous ces ailes immenses, vous vous sentez minuscule." },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "Those wings again. It would almost be comforting, if it weren't for the reason you're here.",
+    fr = "Ces ailes, encore. Ce serait presque rassurant, si ce n'était pour la raison de votre présence ici." },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "'It won't be free.' You remember the price from last time.",
+    fr = "« Ce ne sera pas gratuit. » Vous vous souvenez du prix, la dernière fois." },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "The Spirit Healer floats, serene. You, on the other hand, are starting to find these visits a little embarrassing.",
+    fr = "Le Gardien des âmes flotte, serein. Vous, en revanche, commencez à trouver ces visites un peu gênantes." },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "By now, you'd recognize that soft voice anywhere. Not exactly something to brag about.",
+    fr = "Désormais, vous reconnaîtriez cette voix douce entre mille. Pas vraiment de quoi se vanter." },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 15 },
+    en = "If the afterlife kept a guest book, your name would fill whole pages.",
+    fr = "Si l'au-delà tenait un registre des visiteurs, votre nom en remplirait des pages entières." },
+  { draft = true, when = { npcID = 6491, sinceAtLeast = CLOSE, visitsAtLeast = 15 },
+    en = "The Spirit Healer barely needs to speak anymore. You know the words, and the price, by heart.",
+    fr = "Le Gardien des âmes n'a presque plus besoin de parler. Vous connaissez les mots, et le prix, par cœur." },
 }
 for _, line in ipairs(NPC_SPIRIT_HEALER) do table.insert(D.MOMENTS.npc, line) end

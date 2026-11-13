@@ -716,19 +716,28 @@ local function NPCLine(info)
   local known = info and info.id and D.NPCS[info.id]
   local state = S.State()
   if not known or not state then return false end
-  -- visits: coming back after more than 30 minutes away counts as a new visit
-  -- (some NPCs have their own gap: D.NPC_VISIT_GAPS); since = seconds since you last saw them
+  -- visits: coming back after more than 30 minutes away counts as a new visit; for the
+  -- spirit healer, each death is a new visit (one line per death).
+  -- since = seconds since you last saw them, at the start of this visit
+  local healer = known.role == "spirit_healer"
+  local now = time()
   state.npcVisits = state.npcVisits or {}
-  local v = state.npcVisits[info.id] or { n = 0, last = 0 }
-  local since = v.last > 0 and (time() - v.last) or nil
-  if time() - v.last > (D.NPC_VISIT_GAPS[info.id] or D.NPC_VISIT_GAP) then v.n = v.n + 1 end
-  v.last = time()
-  state.npcVisits[info.id] = v
   state.npcLine = state.npcLine or {}
-  if time() - (state.npcLine[info.id] or 0) < (D.NPC_LINE_CDS[info.id] or D.NPC_LINE_CD) then return false end
+  local v = state.npcVisits[info.id] or { n = 0, last = 0 }
+  local newVisit
+  if healer then newVisit = v.last < (state.diedAt or 0) or now - v.last > D.NPC_VISIT_GAP
+  else newVisit = now - v.last > D.NPC_VISIT_GAP end
+  if newVisit then
+    v.n, v.since = v.n + 1, v.last > 0 and (now - v.last) or nil
+  end
+  v.last = now
+  state.npcVisits[info.id] = v
+  local lineAt = state.npcLine[info.id] or 0
+  if healer then
+    if not newVisit and lineAt >= (state.diedAt or 0) then return false end -- already had this death's line
+  elseif now - lineAt < D.NPC_LINE_CD then return false end
   if Play("npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race, npcRole = known.role,
-    npcSex = info.sex, npcID = info.id, npcVisits = v.n, npcSince = since,
-    ghostOK = known.role == "spirit_healer" }) then
+    npcSex = info.sex, npcID = info.id, npcVisits = v.n, npcSince = v.since, ghostOK = healer }) then
     state.npcLine[info.id] = time()
     return true
   end
@@ -738,7 +747,7 @@ end
 local f = CreateFrame("Frame")
 for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED",
-  "QUEST_ACCEPTED", "QUEST_TURNED_IN", "UI_INFO_MESSAGE" }) do
+  "QUEST_ACCEPTED", "QUEST_TURNED_IN", "UI_INFO_MESSAGE", "PLAYER_DEAD" }) do
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
@@ -776,6 +785,9 @@ f:SetScript("OnEvent", function(_, event, ...)
       end
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
+    elseif event == "PLAYER_DEAD" then
+      local st = S.State()
+      if st then st.diedAt = time() end -- (the spirit healer: one visit per death)
     elseif event == "CINEMATIC_STOP" then
       if waitingBirth then
         waitingBirth = false
