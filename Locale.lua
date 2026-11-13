@@ -860,6 +860,7 @@ L.EL_TIP = {
   inn     = "+ The inn keeps you snug",
   water   = "- The water chills you",
   wet     = "- Your wet clothes chill you",
+  dead    = "- The chill of death: thirst, hunger and energy are on hold",
   rising  = "Rising, towards: %s",
   falling = "Falling, towards: %s",
   steady  = "Steady: %s",

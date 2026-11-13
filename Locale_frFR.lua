@@ -849,6 +849,7 @@ L.EL_TIP = {
   inn     = "+ L'auberge vous garde au chaud",
   water   = "- L'eau vous refroidit",
   wet     = "- Vos vêtements mouillés vous refroidissent",
+  dead    = "- Le froid de la mort : soif, faim et énergie sont en suspens",
   rising  = "En hausse, vers : %s",
   falling = "En baisse, vers : %s",
   steady  = "Stable : %s",

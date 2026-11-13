@@ -580,6 +580,9 @@ D.MOMENTS = {
     { en = "You gasp, alive again. Everything feels a little too bright.", fr = "Vous inspirez brusquement, de nouveau en vie. Tout paraît un peu trop lumineux." },
     { en = "Life rushes back into your limbs, cold and tingling.", fr = "La vie revient dans vos membres, froide et fourmillante." },
     { en = "You take a deep breath. You're still here.", fr = "Vous prenez une grande inspiration. Vous êtes toujours là." },
+    { draft = true, when = { airAbove = 12 }, -- (2026-11-13: death is cold, the warmth comes back if the air is mild)
+      en = "Warmth slowly spreads back through your body, all the way to your fingertips.",
+      fr = "La chaleur se répand de nouveau dans votre corps, jusqu'au bout des doigts." },
   },
   -- Back to life at the spirit healer (with resurrection sickness)
   reviveSick = {
@@ -591,6 +594,9 @@ D.MOMENTS = {
     { draft = true,
       en = "Your legs tremble under your weight. You feel twenty years older.",
       fr = "Vos jambes tremblent sous votre poids. Vous avez l'impression d'avoir vieilli de vingt ans." },
+    { draft = true, when = { airAbove = 12 }, -- (2026-11-13: death is cold, the warmth comes back if the air is mild)
+      en = "Warmth slowly spreads back through your body, all the way to your fingertips.",
+      fr = "La chaleur se répand de nouveau dans votre corps, jusqu'au bout des doigts." },
   },
   -- A fight while still sick from the spirit healer (once per sickness)
   sickFight = {

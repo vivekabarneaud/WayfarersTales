@@ -22,8 +22,13 @@ local TEMP_HALFLIFE = 45  -- seconds for your body to get halfway to what it fee
 local EFFORT_WALK, EFFORT_FIGHT = 8, 12
 local TEMP_LINE_GAP = 240 -- seconds between two "getting cold / warm again" lines (the
                           -- body changes fast now: walking and stopping can flip it)
+-- Dead: thirst, hunger and energy stop, but death feels cold: your body slides down to
+-- this (cold, not freezing) at the usual pace, and warms back up the same way after.
+local DEAD_TEMP = 28
+local REVIVE_QUIET = 180  -- seconds after coming back without "warm again" or "still cold" lines
 
 local state               -- this character's saved values
+local deadCold, revivedAt -- cooled down by death / back to life since (GetTime)
 local swimStart
 local sitting, napping    -- sat down (X key, /sit) and napping (/sleep), until you move
 local footSince, stopSince -- moving on foot since (GetTime), stopped since
@@ -272,7 +277,13 @@ local function CheckStates(env)
   local prev = state.tempState or "ok"
   local ts = TempState(state.temp, prev)
   local tempKind = TEMP_RANK[ts] < 0 and "cold" or "hot"
-  if ts ~= prev then
+  -- just back to life, warming up from death: no "warm again" or "still cold" line (the
+  -- revive line says it), unless it gets colder still
+  if revivedAt and GetTime() - revivedAt >= REVIVE_QUIET then revivedAt = nil end
+  local quiet = revivedAt and TEMP_RANK[ts] <= 0 and TEMP_RANK[ts] >= TEMP_RANK[prev]
+  if quiet then
+    state.tempState = ts
+  elseif ts ~= prev then
     local r, pr = TEMP_RANK[ts], TEMP_RANK[prev]
     -- (freezing and overheating always speak up; the milder changes wait a little
     -- between two lines, the state still changes)
@@ -340,7 +351,17 @@ end
 
 function E.Tick()
   if not state or not KT.ModuleOn("elements") then return end
-  if UnitIsDeadOrGhost("player") then return end
+  if UnitIsDeadOrGhost("player") then
+    -- dead: nothing drops, but you cool down to DEAD_TEMP (never warmer), without a word
+    if state.temp > DEAD_TEMP then
+      state.temp = state.temp + (DEAD_TEMP - state.temp) * (1 - math.exp(-TICK / TEMP_HALFLIFE))
+    end
+    state.tempState = TempState(state.temp, state.tempState)
+    E.effortNow, deadCold, revivedAt = 0, true, nil
+    E.energyWhy, E.energyTempWhy, E.energySick = nil, nil, nil
+    return
+  end
+  if deadCold then deadCold, revivedAt = nil, GetTime() end
   local env = KT.World.Snapshot()
   local dt = TICK
   -- on foot and moving (for the warmth of effort): not on a mount, a flight or swimming
@@ -595,7 +616,12 @@ function E.BarTip(key)
   if not state or not env or not T then return nil end
   local out = {}
   local function add(text, c) out[#out + 1] = { text, c[1], c[2], c[3] } end
-  if key == "temp" then
+  if key == "temp" and UnitIsDeadOrGhost("player") then
+    add(T.dead, DOWN)
+    local target = math.min(state.temp, DEAD_TEMP)
+    add(string.format(state.temp - target > 1 and T.falling or T.steady,
+      L.EL_TEMP_STATES[TempState(target, state.tempState)] or ""), NEUTRAL)
+  elseif key == "temp" then
     add(string.format(T.air, E.FormatAir(env.air or 15)), NEUTRAL)
     -- (now: what your body has taken in so far; max: where it's heading if you keep going)
     local max, now = Effort(env), E.effortNow or 0
