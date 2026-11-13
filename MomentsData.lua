@@ -964,6 +964,9 @@ D.MOMENTS.questAccept_2159 = { -- Livraison à Dolanaar (Teldrassil): leaving Sh
 ---------------------------------------------------------------------------
 D.NPC_LINE_CD = 1200 -- the same NPC gets a line at most every 20 minutes
 D.NPC_VISIT_GAP = 1800 -- back after more than this many seconds away: a new visit (lines by number of visits)
+-- NPCs with their own rhythm: the spirit healer (6491) is a new visit at each death
+D.NPC_VISIT_GAPS = { [6491] = 120 }
+D.NPC_LINE_CDS = { [6491] = 120 }
 D.NPCS = {
   [3589] = { race = "NightElf", role = "bowyer" },          -- Keina, Aldrassil: bows and arrows
   [6091] = { race = "NightElf", role = "food" },            -- Dellylah, Aldrassil: food and drink
@@ -1358,3 +1361,36 @@ local NPC_DUNGAR_VISITS = {
     fr = "{npc} ne vous demande presque plus où vous allez : il connaît vos routes par cœur. Entre deux envols, vous vous sentez un peu chez vous ici." },
 }
 for _, line in ipairs(NPC_DUNGAR_VISITS) do table.insert(D.MOMENTS.npc, line) end
+
+-- The spirit healer (2026-11-13), when you talk to it as a ghost. What we know: huge wings,
+-- it floats, a ring of light, a soft voice, intimidating but beautiful; "Your time has not
+-- yet come... but it won't be free". Same NPC id at every graveyard; female model but named
+-- "Gardien" in French, so no pronouns. Each death is a new visit (D.NPC_VISIT_GAPS).
+D.NPCS[6491] = { role = "spirit_healer" }
+local NPC_SPIRIT_HEALER = {
+  { draft = true, when = { npcID = 6491, visitsBelow = 2 },
+    en = "The Spirit Healer towers over you, wings spread, floating just above the ground. It's terrifying, and yet so beautiful you can't look away.",
+    fr = "Le Gardien des âmes vous domine de toute sa hauteur, ailes déployées, flottant juste au-dessus du sol. C'est terrifiant, et pourtant si beau que vous n'arrivez pas à détourner le regard." },
+  { draft = true, when = { npcID = 6491, visitsBelow = 2 },
+    en = "A voice so soft, from a being so imposing. You'd almost forget where you are.",
+    fr = "Une voix si douce, venant d'un être si imposant. Vous en oublieriez presque où vous êtes." },
+  { draft = true, when = { npcID = 6491, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "The Spirit Healer again. The wings, the light, that soft voice... you're starting to know this place a little too well.",
+    fr = "Encore le Gardien des âmes. Les ailes, la lumière, cette voix douce… Vous commencez à connaître cet endroit un peu trop bien." },
+  { draft = true, when = { npcID = 6491, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "Back before the Spirit Healer, head a little low. You'd hoped not to see those wings again so soon.",
+    fr = "De retour devant le Gardien des âmes, la tête un peu basse. Vous espériez ne pas revoir ces ailes de sitôt." },
+  { draft = true, when = { npcID = 6491, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "The Spirit Healer floats there, as calm as ever. You could swear there's a hint of weariness in that soft voice.",
+    fr = "Le Gardien des âmes flotte là, toujours aussi calme. Vous jureriez percevoir une pointe de lassitude dans sa voix douce." },
+  { draft = true, when = { npcID = 6491, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "You know the routine by now: the grey world, the wings, the soft voice. And the price.",
+    fr = "Vous connaissez la routine, maintenant : le monde gris, les ailes, la voix douce. Et le prix." },
+  { draft = true, when = { npcID = 6491, visitsAtLeast = 15 },
+    en = "The Spirit Healer again. At this point, you're practically a regular of the afterlife.",
+    fr = "Encore le Gardien des âmes. À ce stade, vous êtes {un habitué|une habituée|un·e habitué·e} de l'au-delà." },
+  { draft = true, when = { npcID = 6491, visitsAtLeast = 15 },
+    en = "Your time hasn't come yet, the soft voice says once more. You're starting to suspect it's losing patience.",
+    fr = "Votre temps n'est pas encore venu, répète la voix douce. Vous commencez à soupçonner qu'elle perd patience." },
+}
+for _, line in ipairs(NPC_SPIRIT_HEALER) do table.insert(D.MOMENTS.npc, line) end

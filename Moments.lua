@@ -39,9 +39,9 @@ local RHYTHM_CD = { [1] = 1.5, [2] = 1, [3] = 0.6 }
 local ticking = false -- true while Tick runs (moments on a timer, not reactions)
 
 -- Can moment `key` play now? (its own timer, the gap since the last line, its chance)
-local function Ready(key)
+local function Ready(key, ghostOK)
   local state = S.State()
-  if not state or not S.CanSpeak() then return nil end
+  if not state or not S.CanSpeak(ghostOK) then return nil end
   local rule = D.MOMENT_RULES[key]
   if not rule then return nil end
   state.moments = state.moments or {}
@@ -79,7 +79,7 @@ end
 
 -- extra = more facts for the conditions (e.g. the NPC you're dealing with)
 function Mo.Play(key, vars, extra)
-  local rule, state = Ready(key)
+  local rule, state = Ready(key, extra and extra.ghostOK)
   if not rule then return false end
   local ctx = S.Context()
   for k, v in pairs(extra or {}) do ctx[k] = v end
@@ -717,15 +717,18 @@ local function NPCLine(info)
   local state = S.State()
   if not known or not state then return false end
   -- visits: coming back after more than 30 minutes away counts as a new visit
+  -- (some NPCs have their own gap: D.NPC_VISIT_GAPS); since = seconds since you last saw them
   state.npcVisits = state.npcVisits or {}
   local v = state.npcVisits[info.id] or { n = 0, last = 0 }
-  if time() - v.last > D.NPC_VISIT_GAP then v.n = v.n + 1 end
+  local since = v.last > 0 and (time() - v.last) or nil
+  if time() - v.last > (D.NPC_VISIT_GAPS[info.id] or D.NPC_VISIT_GAP) then v.n = v.n + 1 end
   v.last = time()
   state.npcVisits[info.id] = v
   state.npcLine = state.npcLine or {}
-  if time() - (state.npcLine[info.id] or 0) < D.NPC_LINE_CD then return false end
+  if time() - (state.npcLine[info.id] or 0) < (D.NPC_LINE_CDS[info.id] or D.NPC_LINE_CD) then return false end
   if Play("npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race, npcRole = known.role,
-    npcSex = info.sex, npcID = info.id, npcVisits = v.n }) then
+    npcSex = info.sex, npcID = info.id, npcVisits = v.n, npcSince = since,
+    ghostOK = known.role == "spirit_healer" }) then
     state.npcLine[info.id] = time()
     return true
   end
