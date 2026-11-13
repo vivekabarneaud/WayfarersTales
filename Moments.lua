@@ -695,7 +695,40 @@ local function LogNPC(kind)
     db.npcs = db.npcs or {}
     db.npcs[npcID] = e
   end
-  return { id = tonumber(npcID), name = e.name, sex = e.sex }
+  return { id = tonumber(npcID), name = e.name, sex = e.sex, kind = kind }
+end
+
+-- What an NPC does for you, for the generic visit lines: an innkeeper (noted, or by name),
+-- else the window they just opened, else their noted role, else the window they opened before.
+local SERVICE_OF_KIND = { bank = "banker", flight = "flight_master", auction = "auctioneer",
+  trainer = "trainer", vendor = "vendor" }
+local function ServiceOfRole(role)
+  if not role then return nil end
+  if role == "innkeeper" or role == "banker" or role == "flight_master" or role == "auctioneer" then return role end
+  if role:find("^trainer") then return "trainer" end
+  if role:find("^vendor") or role == "food" or role == "bowyer" or role == "armorer" then return "vendor" end
+end
+local function NpcService(info, known, state)
+  local name = info.name or ""
+  if known.role == "innkeeper" or name:find("^Aubergiste ") or name:find("l'aubergiste$")
+    or name:find("^Innkeeper ") then return "innkeeper" end
+  return SERVICE_OF_KIND[info.kind or ""] or ServiceOfRole(known.role)
+    or SERVICE_OF_KIND[state.npcServices[info.id] or ""]
+end
+
+-- NPCs with visit lines of their own (Allison, Dungar...): they keep those, no generic ones
+local ownVisits
+local function HasOwnVisits(id)
+  if not ownVisits then
+    ownVisits = {}
+    for _, l in ipairs(D.MOMENTS.npc) do
+      local w = l.when
+      if w and w.npcID and (w.visitsAtLeast or w.visitsBelow) then
+        for _, x in ipairs(type(w.npcID) == "table" and w.npcID or { w.npcID }) do ownVisits[x] = true end
+      end
+    end
+  end
+  return ownVisits[id]
 end
 
 -- A line about the NPC you're dealing with, if we know their race and role (D.NPCS).
@@ -723,12 +756,17 @@ local function NPCLine(info)
   local now = time()
   state.npcVisits = state.npcVisits or {}
   state.npcLine = state.npcLine or {}
+  state.npcServices = state.npcServices or {} -- the service window each NPC opened (bank, flight...)
+  if info.kind and SERVICE_OF_KIND[info.kind] then state.npcServices[info.id] = info.kind end
   local v = state.npcVisits[info.id] or { n = 0, last = 0 }
   local newVisit
   if healer then newVisit = v.last < (state.diedAt or 0) or now - v.last > D.NPC_VISIT_GAP
   else newVisit = now - v.last > D.NPC_VISIT_GAP end
   if newVisit then
     v.n, v.since = v.n + 1, v.last > 0 and (now - v.last) or nil
+    -- a generic "you're a regular" line this visit? (decided once per visit, half the time;
+    -- NPCs with visit lines of their own keep those)
+    v.generic = not healer and v.n >= 2 and not HasOwnVisits(info.id) and math.random() < D.NPC_GENERIC_CHANCE
   end
   v.last = now
   state.npcVisits[info.id] = v
@@ -736,9 +774,11 @@ local function NPCLine(info)
   if healer then
     if not newVisit and lineAt >= (state.diedAt or 0) then return false end -- already had this death's line
   elseif now - lineAt < D.NPC_LINE_CD then return false end
-  if Play("npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race, npcRole = known.role,
-    npcSex = info.sex, npcID = info.id, npcVisits = v.n, npcSince = v.since, ghostOK = healer }) then
+  if Play(v.generic and "npcVisit" or "npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race,
+    npcRole = known.role, npcSex = info.sex, npcID = info.id, npcVisits = v.n, npcSince = v.since,
+    npcService = NpcService(info, known, state), ghostOK = healer }) then
     state.npcLine[info.id] = time()
+    v.generic = nil
     return true
   end
   return false

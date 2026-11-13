@@ -49,6 +49,7 @@ D.MOMENT_RULES = {
   fishFirst       = { cd = 0,    chance = 1,   gap = 0 },
   fishJunk        = { cd = 600,  chance = 1,   gap = 0 },
   npc             = { cd = 120,  chance = 1,   gap = 20 },
+  npcVisit        = { cd = 120,  chance = 1,   gap = 20, shares = "npc" }, -- generic "you're a regular" lines (by role)
   questAccept_2159 = { cd = 0,   chance = 1,   gap = 0 },
   questDone_22     = { cd = 0,   chance = 1,   gap = 0 },
   questWanted      = { cd = 30,  chance = 1,   gap = 0 },  -- you take a wanted poster
@@ -1438,3 +1439,125 @@ local NPC_SPIRIT_HEALER = {
     fr = "Le Gardien des âmes n'a presque plus besoin de parler. Vous connaissez les mots, et le prix, par cœur." },
 }
 for _, line in ipairs(NPC_SPIRIT_HEALER) do table.insert(D.MOMENTS.npc, line) end
+
+-- Named NPCs from the NPC log (2026-11-13): "you're a regular" lines as you come back
+-- (D.MOMENTS.npcVisit, half the visits, from the 2nd one). The role is what they do for
+-- you (from the window they open); innkeepers are noted here or found by their name.
+D.NPC_GENERIC_CHANCE = 0.5
+D.NPCS[2409]   = { role = "flight_master" } -- Felicia Maline, Darkshire
+D.NPCS[8719]   = { role = "auctioneer" }    -- Commissaire-priseur Fitch, Stormwind
+D.NPCS[1286]   = { role = "vendor" }        -- Edna Mullby, Trade District
+D.NPCS[1285]   = { role = "vendor" }        -- Thurman Mullby, Trade District
+D.NPCS[3518]   = { role = "vendor" }        -- Thomas Miller, Trade District
+D.NPCS[1325]   = { role = "vendor" }        -- Jasper Fel, SI:7
+D.NPCS[332]    = {}                         -- Master Mathias Shaw, SI:7
+D.NPCS[5482]   = {}                         -- Stephen Ryback, Old Town
+D.NPCS[5515]   = { role = "trainer" }       -- Einris Brightspear, Dwarven District
+D.NPCS[2879]   = { role = "trainer" }       -- Karrina Mekenda, Dwarven District
+D.NPCS[3087]   = { role = "trainer" }       -- Crystal Boughman, Lakeshire
+D.NPCS[1680]   = { role = "trainer" }       -- Matthew Hooper, Lakeshire
+D.NPCS[790]    = { role = "vendor" }        -- Karen Taylor, Lakeshire
+D.NPCS[791]    = { role = "vendor" }        -- Lindsay Ashlock, Lakeshire
+D.NPCS[1678]   = { role = "vendor" }        -- Vernon Hale, Lakeshire
+D.NPCS[253092] = {}                         -- Alba Lunepâle, Sentinel Hill
+D.NPCS[8931]   = { role = "innkeeper" }     -- Innkeeper Heather, Sentinel Hill
+D.NPCS[8934]   = { role = "vendor" }        -- Christopher Hewen, Sentinel Hill
+D.NPCS[523]    = { role = "flight_master" } -- Thor, Sentinel Hill
+D.NPCS[274]    = { role = "vendor" }        -- Barkeep Hann, Darkshire
+
+local function V(lo, hi, extra)
+  local w = { visitsAtLeast = lo, visitsBelow = hi }
+  for k, x in pairs(extra or {}) do w[k] = x end
+  return w
+end
+local CITY = { city = true }
+D.MOMENTS.npcVisit = {
+  -- any named NPC
+  { draft = true, when = V(2, 5),
+    en = "{npc} recognizes you at a glance and gives you a small nod.",
+    fr = "{npc} vous reconnaît d'un coup d'œil et vous adresse un petit signe de tête." },
+  { draft = true, when = V(2, 5),
+    en = "{npc} seems to remember you. A glance, a half-smile: you're no longer quite a stranger here.",
+    fr = "{npc} semble se souvenir de vous. Un regard, un demi-sourire : vous n'êtes plus tout à fait {un étranger|une étrangère|une personne étrangère} ici." },
+  { draft = true, when = V(2, 5),
+    en = "You and {npc} exchange a quick nod, like people who've already met.",
+    fr = "{npc} et vous échangez un bref signe de tête, comme des gens qui se sont déjà croisés." },
+  { draft = true, when = V(5, 15),
+    en = "{npc} greets you before you've said a word. You're becoming a regular.",
+    fr = "{npc} vous salue avant même que vous n'ayez dit un mot. Vous devenez {un habitué|une habituée|un·e habitué·e}." },
+  { draft = true, when = V(5, 15),
+    en = "{npc} remembers you, and it shows: no need to explain anything anymore.",
+    fr = "{npc} se souvient de vous, et ça se voit : plus besoin de rien expliquer." },
+  { draft = true, when = V(5, 15, CITY),
+    en = "In a city this big, being recognized by {npc} feels surprisingly good.",
+    fr = "Dans une ville aussi grande, être {reconnu|reconnue|reconnu·e} par {npc}, ça fait étonnamment du bien." },
+  { draft = true, when = V(15),
+    en = "{npc} greets you like an old acquaintance. You've lost count of your visits; {npc} clearly hasn't.",
+    fr = "{npc} vous accueille comme une vieille connaissance. Vous avez perdu le compte de vos visites ; visiblement, pas {npc}." },
+  { draft = true, when = V(15),
+    en = "{npc} is one of the familiar faces of your journey now, and you're one of theirs.",
+    fr = "{npc} fait maintenant partie des visages familiers de votre voyage. Et vous, des siens." },
+  { draft = true, when = V(15, nil, CITY),
+    en = "Among all these strangers, {npc} has become a landmark, and you, a familiar face.",
+    fr = "Au milieu de tous ces inconnus, {npc} fait figure de repère. Et vous, de visage familier." },
+  -- innkeepers
+  { draft = true, when = V(2, 5, { service = "innkeeper" }),
+    en = "{npc} recognizes you, and the inn suddenly feels a little more welcoming.",
+    fr = "{npc} vous reconnaît, et l'auberge vous paraît soudain un peu plus accueillante." },
+  { draft = true, when = V(5, 15, { service = "innkeeper" }),
+    en = "{npc} hardly needs to ask anymore: food, drink, a place to rest. You know how things work here.",
+    fr = "{npc} n'a presque plus besoin de demander : à manger, à boire, un coin pour se reposer. Vous connaissez la maison." },
+  { draft = true, when = V(15, nil, { service = "innkeeper" }),
+    en = "To {npc}, you're no longer just passing through. This inn feels a bit like home.",
+    fr = "Pour {npc}, vous n'êtes plus {un voyageur de passage|une voyageuse de passage|une personne de passage}. Cette auberge, c'est un peu chez vous." },
+  -- bankers
+  { draft = true, when = V(2, 5, { service = "banker" }),
+    en = "{npc} recognizes you, and already seems to know where your things are kept.",
+    fr = "{npc} vous reconnaît et semble déjà savoir où sont rangées vos affaires." },
+  { draft = true, when = V(5, 15, { service = "banker" }),
+    en = "{npc} greets you with a knowing look: one of the regulars who trust the bank with their treasures.",
+    fr = "{npc} vous accueille d'un regard entendu : vous faites partie des habitués qui confient leurs trésors à la banque." },
+  { draft = true, when = V(15, nil, { service = "banker" }),
+    en = "You and {npc} have been through a lot of deposits together. Your treasures could hardly be in better hands.",
+    fr = "{npc} et vous, ça fait un paquet de dépôts. Vos trésors ne pourraient guère être entre de meilleures mains." },
+  -- flight masters
+  { draft = true, when = V(2, 5, { service = "flight_master" }),
+    en = "{npc} recognizes you: the traveller who's always off somewhere.",
+    fr = "{npc} vous reconnaît : vous êtes {ce voyageur|cette voyageuse|cette personne} toujours en partance." },
+  { draft = true, when = V(5, 15, { service = "flight_master" }),
+    en = "{npc} greets you like a regular of the skies and is already getting a mount ready.",
+    fr = "{npc} vous accueille comme {un habitué|une habituée|un·e habitué·e} des airs et prépare déjà une monture." },
+  { draft = true, when = V(15, nil, { service = "flight_master" }),
+    en = "{npc} barely needs to ask where you're headed. You've crossed these skies so many times.",
+    fr = "{npc} n'a presque plus besoin de vous demander votre destination. Vous avez tant de fois traversé ces cieux." },
+  -- trainers
+  { draft = true, when = V(2, 5, { service = "trainer" }),
+    en = "{npc} recognizes you and looks at you with interest: the student is back.",
+    fr = "{npc} vous reconnaît et vous observe avec intérêt : l'élève est de retour." },
+  { draft = true, when = V(5, 15, { service = "trainer" }),
+    en = "{npc} greets you with a nod. Let's see what you've learned since last time.",
+    fr = "{npc} vous accueille d'un hochement de tête. Voyons ce que vous avez appris depuis la dernière fois." },
+  { draft = true, when = V(15, nil, { service = "trainer" }),
+    en = "{npc} has watched you grow, lesson after lesson. There's something like pride in that look.",
+    fr = "{npc} vous a {vu|vue|vu·e} progresser, leçon après leçon. Il y a comme de la fierté dans ce regard." },
+  -- vendors
+  { draft = true, when = V(2, 5, { service = "vendor" }),
+    en = "{npc} recognizes a returning customer and gives you a warm smile.",
+    fr = "{npc} reconnaît {un client|une cliente|une personne} qui revient et vous adresse un sourire engageant." },
+  { draft = true, when = V(5, 15, { service = "vendor" }),
+    en = "{npc} greets you like a loyal customer. It's always nice to be expected.",
+    fr = "{npc} vous accueille comme {un client fidèle|une cliente fidèle|un·e client·e fidèle}. C'est toujours agréable d'être {attendu|attendue|attendu·e}." },
+  { draft = true, when = V(15, nil, { service = "vendor" }),
+    en = "At this point, {npc} probably knows what you're going to buy before you do.",
+    fr = "À ce stade, {npc} sait sans doute ce que vous allez acheter avant vous." },
+  -- auctioneers
+  { draft = true, when = V(2, 5, { service = "auctioneer" }),
+    en = "Between two auctions, {npc} recognizes you with a quick glance.",
+    fr = "Entre deux enchères, {npc} vous reconnaît d'un coup d'œil." },
+  { draft = true, when = V(5, 15, { service = "auctioneer" }),
+    en = "{npc} greets you like one of the auction house regulars.",
+    fr = "{npc} vous salue comme l'{un|une|un·e} des habitués de l'hôtel des ventes." },
+  { draft = true, when = V(15, nil, { service = "auctioneer" }),
+    en = "{npc} knows you well by now: always buying, selling, and coming back.",
+    fr = "{npc} vous connaît bien, maintenant : vous êtes toujours là, à acheter, vendre et revenir." },
+}
