@@ -249,6 +249,7 @@ D.DEFAULTS = {
   showHeart = false, -- the heart next to the pet's happiness icon (the minimap button does the job now)
   showThermo = true,
   bodyFlash = true,        -- screen edges light up when you get cold, hot, hungry, thirsty, tired
+  foodTips = true,         -- food and drink tooltips: hunger, thirst, warmth
   thermoAngle = 15,
   bodyStyle = "none",      -- body comfort by your portrait: none / icons / bars
   sensesRhythm = 2,        -- how often immersion lines appear (0-3)
@@ -285,11 +286,29 @@ D.FOOD_WORDS = {
 -- Drinks, so a looted water bottle doesn't make your pet drool.
 D.DRINKS = { [159] = true, [1179] = true, [1205] = true, [1708] = true, [1645] = true, [8766] = true, [252031] = true }
 
--- Food and drinks that cool you down or warm you up: degrees of felt air while you have
--- them, fading over 5 minutes once you stop (Elements.lua).
-D.FOOD_TEMP = {
-  [1179] = -6, -- Ice Cold Milk
-  [3663] = 6,  -- Murloc Fin Soup: a hot soup, with strong spices
+-- What food and drinks do for your body (Elements.lua, and their tooltips):
+--   nourish: how fast it fills hunger while you eat (0-3; a food: 2, a drink: 0)
+--   hydrate: how fast it fills thirst (0-3; a drink: 2, a food: 0)
+--   temp:    degrees of felt air while you have it (cool < 0 < warm), fading over 5
+--            minutes once you stop
+-- First the defaults, then words in the item's name (D.FOOD_TRAITS, in order: a later
+-- match wins for nourish / hydrate, temp adds up), then the item's own values (D.FOOD_PROPS).
+D.FOOD_TRAITS = {
+  { { "pomme", "apple", "melon", "banane", "banana", "orange", "pêche", "peach", "baie", "berry",
+      "berries", "raisin", "grape", "poire", "pear", "prune", "plum", "citron", "lemon", "fruit" },
+    { nourish = 1, hydrate = 1 } },                               -- fruit: light, a little juicy
+  { { "rôti", "roast", "steak", "jarret", "shank", "haunch", "côtelette", "gigot" },
+    { nourish = 3 } },                                             -- hearty meat
+  { { "soupe", "soup", "bouillon", "broth", "chowder", "potage" },
+    { hydrate = 1, temp = 3 } },                                   -- soup: hot, and it quenches a little
+  { { "ragoût", "ragout", "stew", "goulash" }, { nourish = 3, temp = 3 } }, -- stew: hot and filling
+  { { "épicé", "spiced", "spicy", "piment", "chili" }, { temp = 2 } },      -- spices warm you
+  { { "lait", "milk" }, { nourish = 1 } },                                  -- milk feeds a little
+  { { "glacé", "ice cold", "frozen", "frosty" }, { temp = -3 } },           -- iced
+}
+D.FOOD_PROPS = {
+  [1179] = { temp = -6 },             -- Ice Cold Milk
+  [3663] = { hydrate = 1, temp = 6 }, -- Murloc Fin Soup: a hot soup, with strong spices
 }
 
 ---------------------------------------------------------------------------

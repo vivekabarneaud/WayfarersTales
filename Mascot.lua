@@ -1172,7 +1172,7 @@ local function NameHas(words)
   return false
 end
 
-local function Say(event, vars, important)
+local function Say(event, vars, important, delta)
   if not cur or not KT.ModuleOn("mascot") then return false end
   local db = KT.GetDB()
   if not important and (db.settings.chatty or 2) == 0 then return false end
@@ -1226,7 +1226,7 @@ local function Say(event, vars, important)
   vars = vars or {}
   vars.pet = Ma.Name(cur)
   if ctx and ctx.cloak then vars.cloak = vars.cloak or ctx.cloak end
-  KT.NarrateText("mascot", "mascot:" .. event, fr and line.fr or line.en, vars, important)
+  KT.NarrateText("mascot", "mascot:" .. event, fr and line.fr or line.en, vars, important, delta)
   return true
 end
 
@@ -1342,8 +1342,7 @@ local function Tick()
     FirstMemory(cur, "firstCampfire")
     if Ready(cur, "campfire", 3000) then
       Mark(cur, "campfire")
-      Gain(cur, "campfire")
-      Say("campfire")
+      Say("campfire", nil, nil, Gain(cur, "campfire"))
     end
   end
   wasSeated = env.seatedAtFire
@@ -1355,8 +1354,7 @@ local function Tick()
     FirstMemory(cur, "firstNap")
     if Ready(cur, "nap", 3000) then
       Mark(cur, "nap")
-      Gain(cur, "nap")
-      Say("nap", nil, true)
+      Say("nap", nil, true, Gain(cur, "nap"))
     end
   end
   wasNapping = napping
@@ -1460,11 +1458,13 @@ local function OnEmote(text, sender, guid)
   if not affection then return end
   cur.stats.cuddles = cur.stats.cuddles + 1
   FirstMemory(cur, "firstCuddle")
+  -- it always reacts; the affection only grows every 15 minutes (like a hunter pet)
+  local got = 0
   if Ready(cur, "cuddle", D.MASCOT_CUDDLE_CD) then
-    Mark(cur, "cuddle")
-    Gain(cur, "cuddle")
-    Say("cuddle", nil, true)
+    got = Gain(cur, "cuddle")
+    if got > 0 then Mark(cur, "cuddle") end
   end
+  Say("cuddle", nil, true, got)
 end
 
 ---------------------------------------------------------------------------

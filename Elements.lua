@@ -168,12 +168,43 @@ end
 
 local FLIGHT_WIND = 8 -- degrees colder on a flight path: the wind up there
 
--- Hot and cold food and drinks (D.FOOD_TEMP): degrees of felt air while you have them,
--- fading over FOOD_TEMP_FADE seconds once you stop.
+-- What a food or drink does for your body: { nourish, hydrate, temp } (see D.FOOD_TRAITS
+-- in Data.lua), or nil if it isn't a food or drink (or its name isn't loaded yet).
+local propsCache = {}
+function E.FoodProps(id)
+  if not id then return nil end
+  if propsCache[id] then return propsCache[id] end
+  if not (KT.IsFoodItem and KT.IsFoodItem(id)) then return nil end
+  local name = C_Item and C_Item.GetItemNameByID and C_Item.GetItemNameByID(id)
+  if not name and GetItemInfo then name = GetItemInfo(id) end
+  if not name then return nil end -- not loaded yet: try again next time
+  local drink = KT.IsDrink and KT.IsDrink(id)
+  local p = { name = name, nourish = drink and 0 or 2, hydrate = drink and 2 or 0, temp = 0 }
+  local lower = name:lower()
+  for _, t in ipairs(D.FOOD_TRAITS) do
+    for _, w in ipairs(t[1]) do
+      if lower:find(w, 1, true) then
+        if t[2].nourish then p.nourish = t[2].nourish end
+        if t[2].hydrate then p.hydrate = t[2].hydrate end
+        p.temp = p.temp + (t[2].temp or 0)
+        break
+      end
+    end
+  end
+  if drink then p.hydrate = math.max(p.hydrate, 2) end -- (a lemonade is still a drink)
+  for k, v in pairs(D.FOOD_PROPS[id] or {}) do p[k] = v end
+  propsCache[id] = p
+  return p
+end
+
+-- Hot and cold food and drinks: degrees of felt air while you have them, fading over
+-- FOOD_TEMP_FADE seconds once you stop.
 local FOOD_TEMP_FADE = 300
 local foodTemp           -- { deg, name, stopAt (nil while you're still eating or drinking) }
-local consumeSince       -- eating or drinking since (GetTime)
-local foodLine           -- a line waiting for a quiet moment ("foodCoolHeat"...)
+local eatSince, drinkSince -- eating / drinking since (GetTime)
+local eatProps, drinkProps -- what you're having (E.FoodProps), nil while not known: defaults
+local FOOD_DEFAULT, DRINK_DEFAULT = { nourish = 2, hydrate = 0, temp = 0 }, { nourish = 0, hydrate = 2, temp = 0 }
+local foodLine           -- a line waiting for a quiet moment ("foodCoolHeat_1179"...)
 local function FoodTempNow()
   if not foodTemp then return 0 end
   if not foodTemp.stopAt then return foodTemp.deg end
@@ -448,27 +479,36 @@ function E.Tick()
 
   -- What you eat or drink: cooling or warming (the item leaves your bags around the
   -- moment you start, so we look for it during the first seconds)
-  if env.eating or env.drinking then
-    consumeSince = consumeSince or now
-    if (not foodTemp or foodTemp.stopAt) and now - consumeSince <= 12 then
-      local d = env.drinking and KT.LastDrink and KT.LastDrink(12)
-      local f = env.eating and KT.LastFood and KT.LastFood(12)
-      local deg = (d and D.FOOD_TEMP[d] or 0) + (f and D.FOOD_TEMP[f] or 0)
-      if deg ~= 0 then
-        local id = (d and D.FOOD_TEMP[d]) and d or f
-        foodTemp = { deg = deg, name = GetItemInfo and GetItemInfo(id) }
-        -- a line only when it matters: relief in the heat, a shiver in the cold, warmth in the cold
-        -- (each item has its own lines: foodCoolHeat_1179...; none yet = no line)
-        local r = TEMP_RANK[state.tempState or "ok"] or 0
-        local pool = (deg < 0 and r > 0 and "foodCoolHeat") or (deg < 0 and r < 0 and "foodCoolCold")
-          or (deg > 0 and r < 0 and "foodWarmCold")
-        foodLine = pool and D.BODY_LINES and D.BODY_LINES[pool .. "_" .. id] and (pool .. "_" .. id) or nil
-      end
+  -- (what it is also sets how fast it fills hunger and thirst, below)
+  local found -- the id of an item we just recognized
+  if env.eating then
+    eatSince = eatSince or now
+    if not eatProps and now - eatSince <= 12 then
+      local f = KT.LastFood and KT.LastFood(12)
+      eatProps = f and E.FoodProps(f)
+      if eatProps then found = f end
     end
-  else
-    consumeSince = nil
-    if foodTemp and not foodTemp.stopAt then foodTemp.stopAt = now end
+  else eatSince, eatProps = nil, nil end
+  if env.drinking then
+    drinkSince = drinkSince or now
+    if not drinkProps and now - drinkSince <= 12 then
+      local d = KT.LastDrink and KT.LastDrink(12)
+      drinkProps = d and E.FoodProps(d)
+      if drinkProps then found = d end
+    end
+  else drinkSince, drinkProps = nil, nil end
+  local foundProps = found and E.FoodProps(found)
+  if foundProps and foundProps.temp ~= 0 then
+    local deg = foundProps.temp
+    foodTemp = { deg = deg, name = foundProps.name }
+    -- a line only when it matters: relief in the heat, a shiver in the cold, warmth in the
+    -- cold, sweat in the heat (each item has its own lines: foodCoolHeat_1179...; none = no line)
+    local r = TEMP_RANK[state.tempState or "ok"] or 0
+    local pool = (deg < 0 and r > 0 and "foodCoolHeat") or (deg < 0 and r < 0 and "foodCoolCold")
+      or (deg > 0 and r < 0 and "foodWarmCold") or (deg > 0 and r > 0 and "foodWarmHeat")
+    foodLine = pool and D.BODY_LINES and D.BODY_LINES[pool .. "_" .. found] and (pool .. "_" .. found) or nil
   end
+  if not (env.eating or env.drinking) and foodTemp and not foodTemp.stopAt then foodTemp.stopAt = now end
   if foodLine then
     if not (env.eating or env.drinking) and not (foodTemp and foodTemp.stopAt and now - foodTemp.stopAt < 30) then
       foodLine = nil -- too late
@@ -513,8 +553,13 @@ function E.Tick()
   if sweaty and stopSince and now - stopSince > 60 then sweaty = nil end
 
   -- Thirst: ~2h15 from full to empty in mild air, faster in the heat and in combat
-  if env.drinking then
-    state.thirst = Clamp(state.thirst + 2 * dt)
+  -- (eating and drinking fill you at the pace of what you're having: E.FoodProps)
+  local eat = env.eating and (eatProps or FOOD_DEFAULT)
+  local drink = env.drinking and (drinkProps or DRINK_DEFAULT)
+  local quench = (eat and eat.hydrate or 0) + (drink and drink.hydrate or 0)
+  local feed = (eat and eat.nourish or 0) + (drink and drink.nourish or 0)
+  if quench > 0 then
+    state.thirst = Clamp(state.thirst + quench * dt)
   else
     local rate = 100 / 8100 * (1 + 0.04 * heat)
     if env.combat then rate = rate * 1.3 end
@@ -522,8 +567,8 @@ function E.Tick()
   end
 
   -- Hunger: ~2h from full to empty, faster in combat and when you're cold
-  if env.eating then
-    state.hunger = Clamp(state.hunger + 2 * dt)
+  if feed > 0 then
+    state.hunger = Clamp(state.hunger + feed * dt)
   else
     local rate = 100 / 7200
     if env.combat then rate = rate * 1.3 end
@@ -1124,3 +1169,54 @@ f:SetScript("OnEvent", function(_, event)
 end)
 
 function E.GetState() return state end
+
+---------------------------------------------------------------------------
+-- Food and drink tooltips: what it does for you (hunger, thirst, warmth), as little
+-- squares 1 to 3 and degrees. Body tab option (on by default).
+---------------------------------------------------------------------------
+
+local SQUARE = "|TInterface\Buttons\WHITE8X8:7:7:0:0:8:8:0:8:0:8:%d:%d:%d|t"
+local function Squares(n, c)
+  local out = {}
+  for i = 1, 3 do
+    local r, g, b = 70, 70, 70
+    if i <= n then r, g, b = math.floor(c[1] * 255), math.floor(c[2] * 255), math.floor(c[3] * 255) end
+    out[#out + 1] = string.format(SQUARE, r, g, b)
+  end
+  return table.concat(out, " ")
+end
+
+local function AddFoodTip(tt, id)
+  local db = KT.GetDB and KT.GetDB()
+  if not tt or not id or not db or not db.settings.foodTips or not KT.ModuleOn("elements") then return end
+  local p = E.FoodProps(id)
+  if not p then return end
+  local parts = {}
+  if p.nourish > 0 then parts[#parts + 1] = L.FOOD_TIP_HUNGER .. " " .. Squares(p.nourish, E.BAR_COLORS.hunger) end
+  if p.hydrate > 0 then parts[#parts + 1] = L.FOOD_TIP_THIRST .. " " .. Squares(p.hydrate, E.BAR_COLORS.thirst) end
+  if p.temp ~= 0 then
+    local t = (p.temp < 0 and "-" or "+") .. E.FormatDelta(math.abs(p.temp)):sub(2)
+    parts[#parts + 1] = (p.temp < 0 and "|cff7fbfff" or "|cffff9933") .. t .. "|r"
+  end
+  if #parts == 0 then return end
+  tt:AddLine(table.concat(parts, "    "), 0.85, 0.85, 0.85)
+  tt:Show() -- (resize to fit the new line)
+end
+
+if TooltipDataProcessor and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Item then
+  TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tt, data)
+    if tt ~= GameTooltip and tt ~= ItemRefTooltip then return end
+    local ok, err = pcall(AddFoodTip, tt, data and data.id)
+    if not ok and KT.LogError then KT.LogError("food tooltip", err) end
+  end)
+else
+  for _, tt in ipairs({ GameTooltip, ItemRefTooltip }) do
+    if tt and tt.HookScript then
+      tt:HookScript("OnTooltipSetItem", function(self)
+        local _, link = self:GetItem()
+        local ok, err = pcall(AddFoodTip, self, link and tonumber(link:match("item:(%d+)")))
+        if not ok and KT.LogError then KT.LogError("food tooltip", err) end
+      end)
+    end
+  end
+end

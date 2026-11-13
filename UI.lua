@@ -965,7 +965,7 @@ local function BuildBody(parent)
   page:Add(top, 8)
   page.here = Para(page, "GameFontHighlight", 10)
 
-  local set = Box(page.p, 118)
+  local set = Box(page.p, 144)
   BoxLabel(set, 10, -10, "UI_OPT_BODYSTYLE")
   page.bodyStyle = Segmented(set, 10, -30, {
     { "none", function() return L.UI_BODYSTYLE.none end },
@@ -982,6 +982,7 @@ local function BuildBody(parent)
   page.flash = CheckBox(set, 6, -84, "bodyFlash", "UI_OPT_FLASH", function()
     if KT.Elements and api.GetDB().settings.bodyFlash then KT.Elements.Flash("cold", 2) end
   end)
+  page.foodTips = CheckBox(set, 6, -110, "foodTips", "UI_OPT_FOODTIPS")
   page.settings = page:Add(set, 10)
   page.guide = GuideBox(page)
   return page
@@ -1016,6 +1017,7 @@ local function RefreshBody(page)
     page.bodyStyle:Select(db.settings.bodyStyle or "none")
     page.thermo:Refresh()
     page.flash:Refresh()
+    page.foodTips:Refresh()
   end
   page:Layout()
 end

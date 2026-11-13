@@ -1474,6 +1474,7 @@ function KT.LastConsumable(maxAge)
   if f and GetTime() - f.t <= (maxAge or 5) then return f.id, f.link end
 end
 KT.IsDrink = function(id) return IsDrink(id) end
+KT.IsFoodItem = function(id) return IsFoodItem(id) end -- (food and drinks: the "Food & Drink" items)
 
 local function DiffBags()
   bagPending = false
@@ -2136,15 +2137,15 @@ end
 -- journal, never the same line twice in a row). important = shown even at chattiness 0.
 -- NarrateText: same, with a ready-made text (Senses brings its own lines).
 -- Both take their arguments in the same order: (module, what, vars, important).
-function KT.NarrateText(module, key, text, vars, important)
+function KT.NarrateText(module, key, text, vars, important, delta) -- delta: affection gained (+1...)
   if not KT.ModuleOn(module) then return end
   if not important and db.settings.chatty == 0 then return end
   text = Fill(text, vars or {})
   text = text:gsub("^%l", string.upper) -- ("l'aubergiste Allison vous..." starts a line)
-  AddJournal(module, key, text)
+  AddJournal(module, key, text, delta)
   local color = db.settings.label and MSG_COLOR or EmoteColor()
   text = text:gsub("|r", "|r" .. color)
-  local line = color .. text .. "|r"
+  local line = color .. text .. "|r" .. GainText(delta)
   After(0.25, function() PetLine(line) end)
 end
 

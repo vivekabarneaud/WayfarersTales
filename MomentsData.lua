@@ -827,7 +827,18 @@ D.BODY_LINES = {
       en = "You stop, and the sweat cools on your skin at once. A shiver runs through you.",
       fr = "Vous vous arrêtez, et la sueur refroidit aussitôt sur votre peau. Un frisson vous parcourt." },
   },
-  -- a cold drink (D.FOOD_TEMP) while you're hot / while you're cold
+  -- cooling or warming food and drinks (D.FOOD_PROPS), one item each: <pool>_<itemID>
+  foodWarmCold_3663 = { -- Murloc Fin Soup, in the cold
+    { draft = true, always = true,
+      en = "Spicy and steaming, the murloc fin soup warms you from the inside. The cold suddenly feels further away.",
+      fr = "Épicée et fumante, la soupe aux ailerons de murloc vous réchauffe de l'intérieur. Le froid vous semble soudain plus lointain." },
+  },
+  foodWarmHeat_3663 = { -- Murloc Fin Soup, in the heat
+    { draft = true, always = true,
+      en = "A spicy soup in this heat… Sweat beads on your forehead.",
+      fr = "Une soupe épicée par cette chaleur… La sueur perle sur votre front." },
+  },
+  -- Ice Cold Milk, while you're hot / while you're cold
   foodCoolHeat_1179 = { -- (lines for one item: <pool>_<itemID>)
     { draft = true, always = true,
       en = "The ice-cold milk runs down your throat. For a moment, the heat loosens its grip.",
