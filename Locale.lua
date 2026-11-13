@@ -832,8 +832,12 @@ L.EL_NEED_STATES  = { ok = "Fine", thirstyLight = "A little thirsty", thirsty = 
 L.UI_OPT_THERMO   = "Show the thermometer by the minimap"
 L.UI_OPT_FLASH    = "Screen edges light up (cold, heat, hunger, thirst, tiredness)"
 L.UI_OPT_FOODTIPS = "Food and drink tooltips: hunger, thirst, warmth"
-L.FOOD_TIP_HUNGER = "Hunger"
-L.FOOD_TIP_THIRST = "Thirst"
+L.FOOD_TIP = { -- (tooltip words: rank 1-3; warmth: mild, strong)
+  nourish = { "Light", "Filling", "Hearty" },
+  hydrate = { "Hydrating", "Thirst-quenching", "Very thirst-quenching" },
+  cool = { "Refreshing", "Icy" },
+  warm = { "Warming", "Very warming" },
+}
 L.UI_OPT_GENDER   = "Your character (for grammar in French)"
 L.UI_GENDER_AUTO  = "Auto"
 L.UI_GENDER_M     = "Male"

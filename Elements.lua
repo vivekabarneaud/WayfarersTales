@@ -1171,35 +1171,28 @@ end)
 function E.GetState() return state end
 
 ---------------------------------------------------------------------------
--- Food and drink tooltips: what it does for you (hunger, thirst, warmth), as little
--- squares 1 to 3 and degrees. Body tab option (on by default).
+-- Food and drink tooltips: what it does for you, in words ("Copieux · Hydratant ·
+-- Réchauffant"), coloured like the Body bars. Body tab option (on by default).
 ---------------------------------------------------------------------------
 
-local SQUARE = "|TInterface\Buttons\WHITE8X8:7:7:0:0:8:8:0:8:0:8:%d:%d:%d|t"
-local function Squares(n, c)
-  local out = {}
-  for i = 1, 3 do
-    local r, g, b = 70, 70, 70
-    if i <= n then r, g, b = math.floor(c[1] * 255), math.floor(c[2] * 255), math.floor(c[3] * 255) end
-    out[#out + 1] = string.format(SQUARE, r, g, b)
-  end
-  return table.concat(out, " ")
-end
+local function Hex(c) return string.format("|cff%02x%02x%02x", math.floor(c[1] * 255), math.floor(c[2] * 255), math.floor(c[3] * 255)) end
+local COOL, WARM = { 0.5, 0.75, 1 }, { 1, 0.6, 0.2 }
 
 local function AddFoodTip(tt, id)
   local db = KT.GetDB and KT.GetDB()
   if not tt or not id or not db or not db.settings.foodTips or not KT.ModuleOn("elements") then return end
   local p = E.FoodProps(id)
-  if not p then return end
+  local W = L.FOOD_TIP
+  if not p or not W then return end
   local parts = {}
-  if p.nourish > 0 then parts[#parts + 1] = L.FOOD_TIP_HUNGER .. " " .. Squares(p.nourish, E.BAR_COLORS.hunger) end
-  if p.hydrate > 0 then parts[#parts + 1] = L.FOOD_TIP_THIRST .. " " .. Squares(p.hydrate, E.BAR_COLORS.thirst) end
-  if p.temp ~= 0 then
-    local t = (p.temp < 0 and "-" or "+") .. E.FormatDelta(math.abs(p.temp)):sub(2)
-    parts[#parts + 1] = (p.temp < 0 and "|cff7fbfff" or "|cffff9933") .. t .. "|r"
+  if p.nourish > 0 then parts[#parts + 1] = Hex(E.BAR_COLORS.hunger) .. W.nourish[math.min(p.nourish, 3)] .. "|r" end
+  if p.hydrate > 0 then parts[#parts + 1] = Hex(E.BAR_COLORS.thirst) .. W.hydrate[math.min(p.hydrate, 3)] .. "|r" end
+  if p.temp ~= 0 then -- mild (up to 3°C) or strong
+    local strong = math.abs(p.temp) > 3 and 2 or 1
+    parts[#parts + 1] = p.temp < 0 and (Hex(COOL) .. W.cool[strong] .. "|r") or (Hex(WARM) .. W.warm[strong] .. "|r")
   end
   if #parts == 0 then return end
-  tt:AddLine(table.concat(parts, "    "), 0.85, 0.85, 0.85)
+  tt:AddLine(table.concat(parts, "  ·  "))
   tt:Show() -- (resize to fit the new line)
 end
 

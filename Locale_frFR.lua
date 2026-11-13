@@ -821,8 +821,12 @@ L.EL_NEED_STATES  = { ok = "Ça va", thirstyLight = "Légère soif", thirsty = "
 L.UI_OPT_THERMO   = "Afficher le thermomètre près de la minicarte"
 L.UI_OPT_FLASH    = "Bords de l'écran lumineux (froid, chaleur, faim, soif, fatigue)"
 L.UI_OPT_FOODTIPS = "Infobulles des nourritures et boissons : faim, soif, chaleur"
-L.FOOD_TIP_HUNGER = "Faim"
-L.FOOD_TIP_THIRST = "Soif"
+L.FOOD_TIP = { -- (mots des infobulles : rang 1-3 ; chaleur : douce, forte)
+  nourish = { "Léger", "Nourrissant", "Copieux" },
+  hydrate = { "Hydratant", "Désaltérant", "Très désaltérant" },
+  cool = { "Rafraîchissant", "Glacé" },
+  warm = { "Réchauffant", "Très réchauffant" },
+}
 L.UI_OPT_GENDER   = "Votre personnage (pour les accords)"
 L.UI_GENDER_AUTO  = "Auto"
 L.UI_GENDER_M     = "Masculin"
