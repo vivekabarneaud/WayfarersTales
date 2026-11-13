@@ -344,7 +344,7 @@ function E.Tick()
   local env = KT.World.Snapshot()
   local dt = TICK
   -- on foot and moving (for the warmth of effort): not on a mount, a flight or swimming
-  local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
+  local moving = KT.Moving()
   env.taxi = (UnitOnTaxi and UnitOnTaxi("player")) or false -- on a flight path: windy and cold
   env.mounted = (IsMounted and IsMounted()) or env.taxi
   env.onFoot = moving and not env.mounted and not env.swimming or false
@@ -482,12 +482,12 @@ function E.Tick()
     state.energy = Clamp(state.energy + recover * dt)
   elseif env.resting then
     -- in town: you get your breath back, up to 60 (above that, it holds)
-    why = "town"
+    why = state.energy < D.SIT_ENERGY_CAP and "town" or "hold"
     if state.energy < D.SIT_ENERGY_CAP then
       state.energy = math.min(D.SIT_ENERGY_CAP, state.energy + 0.05 * dt)
     end
   elseif sitting then
-    why = "sit"
+    why = state.energy < D.SIT_ENERGY_CAP and "sit" or "hold"
     if state.energy < D.SIT_ENERGY_CAP then
       state.energy = math.min(D.SIT_ENERGY_CAP, state.energy + D.SIT_RATE * dt)
     end
@@ -603,7 +603,7 @@ function E.BarTip(key)
       add(string.format(T.walk, E.FormatDelta(now), E.FormatDelta(max)), UP)
     elseif now >= 0.5 then
       add(string.format(T.fading, E.FormatDelta(now)), UP)
-    elseif not (KT.Senses and KT.Senses.Moving and KT.Senses.Moving()) then
+    elseif not KT.Moving() then
       add(T.still, NEUTRAL)
     end
     if env.taxi then add(T.wind, DOWN) end
@@ -618,8 +618,8 @@ function E.BarTip(key)
   elseif key == "energy" then
     local why = E.energyWhy
     if why and T.energy[why] then
-      local good = why ~= "walk" and why ~= "ride" and why ~= "fight" and why ~= "swim" and why ~= "still"
-      add(T.energy[why], good and UP or why == "still" and NEUTRAL or DOWN)
+      local good = why ~= "walk" and why ~= "ride" and why ~= "fight" and why ~= "swim" and why ~= "still" and why ~= "hold"
+      add(T.energy[why], good and UP or (why == "still" or why == "hold") and NEUTRAL or DOWN)
     end
     if E.energyTempWhy then add(T.energy[E.energyTempWhy], DOWN) end
   else

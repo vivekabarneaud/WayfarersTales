@@ -860,6 +860,7 @@ L.EL_TIP = {
     town    = "+ En ville : vous reprenez votre souffle, jusqu'à 60 %",
     sit     = "+ Une pause assise : vous récupérez jusqu'à 60 %",
     still   = "Vous ne bougez pas : la fatigue n'avance plus",
+    hold    = "Votre énergie se maintient : pour mieux vous reposer, une auberge, un feu de camp ou une sieste",
     walk    = "- Marcher vous fatigue",
     ride    = "- Même en selle, la route vous fatigue",
     fight   = "- Le combat vous fatigue plus vite",

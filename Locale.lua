@@ -871,6 +871,7 @@ L.EL_TIP = {
     town    = "+ In town: you get your breath back, up to 60%",
     sit     = "+ Sitting down: you recover up to 60%",
     still   = "Standing still: you're not getting more tired",
+    hold    = "Your energy holds: for more rest, an inn, a campfire or a nap",
     walk    = "- Walking tires you",
     ride    = "- Even on a mount, the road tires you",
     fight   = "- Fighting tires you faster",

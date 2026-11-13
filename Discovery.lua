@@ -185,7 +185,6 @@ end
 
 local function Head(t) return "|cffffd100" .. t .. "|r" end
 local function Grey(t) return "|cffaaaaaa" .. t .. "|r" end
-local function Pink(t) return "|cffff8fb1" .. t .. "|r" end
 
 local function ItemName(id)
   local name = C_Item and C_Item.GetItemNameByID and C_Item.GetItemNameByID(id)

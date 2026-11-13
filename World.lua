@@ -125,14 +125,15 @@ function W.AirTemp(env)
   return c
 end
 
--- At the fire: the one-minute "stay seated" buff (the game only gives it right next to
--- a fire), and after it ends, as long as you don't move. Walking away loses it.
+-- At the fire: from the moment you get the one-minute "stay seated" buff (the game only
+-- gives it right next to a fire), and as long as you don't move. Walking away loses it,
+-- even if that buff is still on you (only a new one, sitting by a fire again, counts).
 -- ("Campfire nearby" alone reaches far: it only means a fire somewhere around.)
-local atFire = false
+local atFire, wasSeated = false, false
 function W.AtFire(env)
-  local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
-  if env.seatedAtFire then atFire = true
-  elseif moving or not env.nearFire then atFire = false end
+  if env.seatedAtFire and not wasSeated then atFire = true
+  elseif KT.Moving() or not env.nearFire then atFire = false end
+  wasSeated = env.seatedAtFire
   return atFire
 end
 

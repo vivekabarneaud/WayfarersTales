@@ -247,6 +247,14 @@ local lastShownAt = 0
 -- so two of them never show up at the same moment.
 function KT.LineGapOK() return time() - lastShownAt >= D.LINE_GAP end
 
+-- Are you walking / riding? (one answer for every module) The game may hide some numbers
+-- in combat ("secret values" that can't be compared): then we just say no.
+function KT.Moving()
+  if not GetUnitSpeed then return false end
+  local ok, moving = pcall(function() return (GetUnitSpeed("player") or 0) > 0 end)
+  return ok and moving or false
+end
+
 local function AddJournal(module, key, text, delta)
   lastShownAt = time()
   local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
@@ -431,7 +439,7 @@ local function Say(poolKey, vars, delta, important)
   if not pool then return end
   if type(pool[1]) == "table" then pool = pool[Band()] or pool[1] end -- banded pool
   -- lines starting with "~" only fit while you stand still ("...you don't dare move")
-  local moving = IsPlayerMoving and IsPlayerMoving()
+  local moving = KT.Moving()
   local filtered
   for i, l in ipairs(pool) do
     if type(l) == "string" and l:sub(1, 1) == "~" then
@@ -1102,9 +1110,9 @@ local function IdleMoment()
     pool = "idleSwimming"
   elseif IsResting() and math.random() < 0.5 then
     pool = "idleResting"
-  elseif not pet.archetype and IsPlayerMoving and IsPlayerMoving() and math.random() < 0.5 then
+  elseif not pet.archetype and KT.Moving() and math.random() < 0.5 then
     pool = "idleWalking" -- lines about walking only while you walk
-  elseif not pet.archetype and not IsIndoors() and not IsResting() and not (IsPlayerMoving and IsPlayerMoving())
+  elseif not pet.archetype and not IsIndoors() and not IsResting() and not KT.Moving()
     and math.random() < 0.3 then
     pool = "idleFind" -- something found outside: a stick, a pebble, a feather...
   elseif hour and (hour >= 21 or hour < 6) and not IsIndoors() and math.random() < 0.4 then
@@ -1224,7 +1232,7 @@ local function OnPlayerEat(itemID, link)
     if state.meal == thisMeal then
       state.meal = nil
       -- lying down only if you're not walking away
-      local walking = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
+      local walking = KT.Moving()
       if pet and Chance(0.5) then Say(walking and "mealExpiredMoving" or "mealExpired") end
     end
   end)

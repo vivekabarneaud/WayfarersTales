@@ -84,13 +84,8 @@ function S.Crowd()
   return nil, players, talk
 end
 
--- Are you walking / riding? The game may hide some numbers in combat ("secret
--- values" that can't be compared): then we just say no.
-function S.Moving()
-  if not GetUnitSpeed then return false end
-  local ok, moving = pcall(function() return (GetUnitSpeed("player") or 0) > 0 end)
-  return ok and moving or false
-end
+-- Are you walking / riding? (KT.Moving in Core.lua: one answer for every module)
+function S.Moving() return KT.Moving() end
 
 function S.Context()
   local ctx = KT.World.Snapshot()

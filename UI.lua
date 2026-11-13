@@ -21,28 +21,6 @@ local function IsWarlock() return select(2, UnitClass("player")) == "WARLOCK" en
 -- Building blocks
 ---------------------------------------------------------------------------
 
-local function CreateTextPage(parent)
-  local page = CreateFrame("Frame", nil, parent)
-  page:SetAllPoints()
-  local scroll = CreateFrame("ScrollFrame", nil, page, "UIPanelScrollFrameTemplate")
-  scroll:SetPoint("TOPLEFT", 6, -6)
-  scroll:SetPoint("BOTTOMRIGHT", -28, 6)
-  local child = CreateFrame("Frame", nil, scroll)
-  child:SetSize(CONTENT_WIDTH, 10)
-  scroll:SetScrollChild(child)
-  local fs = child:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-  fs:SetPoint("TOPLEFT", 0, 0)
-  fs:SetWidth(CONTENT_WIDTH)
-  fs:SetJustifyH("LEFT")
-  fs:SetJustifyV("TOP")
-  fs:SetSpacing(2)
-  function page:SetContent(text)
-    fs:SetText(text)
-    child:SetHeight(fs:GetStringHeight() + 20)
-  end
-  return page
-end
-
 -- Text that must change when the language changes: remember which L key it shows.
 local labelled = {}
 local function Label(widget, key)
