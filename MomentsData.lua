@@ -1314,3 +1314,24 @@ local NPC_ALLISON_VISITS = {
     fr = "{npc} n'a presque plus besoin de vous demander ce que vous prendrez. À la Rose dorée, vous commencez à vous sentir un peu chez vous." },
 }
 for _, line in ipairs(NPC_ALLISON_VISITS) do table.insert(D.MOMENTS.npc, line) end
+
+-- Dungar Longdrink (Stormwind flight master, 2026-11-13): he gets to know you, visit after
+-- visit, like Allison. What we know: big pilot goggles, his gryphon business is doing well.
+local NPC_DUNGAR_VISITS = {
+  { draft = true, when = { npcID = 352, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "{npc} recognizes you and pushes his big goggles up onto his forehead, with a small nod.",
+    fr = "{npc} vous reconnaît et remonte ses grosses lunettes sur son front, avec un petit signe de tête." },
+  { draft = true, when = { npcID = 352, visitsAtLeast = 2, visitsBelow = 5 },
+    en = "{npc} gives you a merchant's smile: a customer who comes back is good for business.",
+    fr = "{npc} vous adresse un sourire de commerçant : un client qui revient, c'est bon pour les affaires." },
+  { draft = true, when = { npcID = 352, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "{npc} greets you like a regular of the skies: you've barely arrived and he's already getting your flight ready.",
+    fr = "{npc} vous accueille comme {un habitué|une habituée|un·e habitué·e} des airs : vous êtes à peine là qu'il prépare déjà votre vol." },
+  { draft = true, when = { npcID = 352, visitsAtLeast = 5, visitsBelow = 15 },
+    en = "{npc} looks delighted to see you again. With customers like you, his gryphons never sit idle.",
+    fr = "{npc} a l'air ravi de vous revoir. Avec {des clients comme vous|des clientes comme vous|une clientèle comme vous}, ses griffons ne chôment pas." },
+  { draft = true, when = { npcID = 352, visitsAtLeast = 15 },
+    en = "{npc} hardly asks where you're headed anymore: he knows your routes by heart. Between two flights, you feel a little at home here.",
+    fr = "{npc} ne vous demande presque plus où vous allez : il connaît vos routes par cœur. Entre deux envols, vous vous sentez un peu chez vous ici." },
+}
+for _, line in ipairs(NPC_DUNGAR_VISITS) do table.insert(D.MOMENTS.npc, line) end
