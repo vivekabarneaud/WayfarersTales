@@ -430,6 +430,19 @@ local function Say(poolKey, vars, delta, important)
   local pool = WithDrafts(key, M[key])
   if not pool then return end
   if type(pool[1]) == "table" then pool = pool[Band()] or pool[1] end -- banded pool
+  -- lines starting with "~" only fit while you stand still ("...you don't dare move")
+  local moving = IsPlayerMoving and IsPlayerMoving()
+  local filtered
+  for i, l in ipairs(pool) do
+    if type(l) == "string" and l:sub(1, 1) == "~" then
+      if not filtered then filtered = {} for j = 1, i - 1 do filtered[j] = pool[j] end end
+      if not moving then filtered[#filtered + 1] = l:sub(2) end
+    elseif filtered then
+      filtered[#filtered + 1] = l
+    end
+  end
+  pool = filtered or pool
+  if #pool == 0 then return end
   vars = vars or {}
   vars.pet = vars.pet or (pet and pet.name) or "?"
   local color = db.settings.label and MSG_COLOR or EmoteColor()

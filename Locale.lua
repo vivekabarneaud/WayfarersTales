@@ -638,7 +638,7 @@ M.idle = {
   {
     "{pet} rubs against your leg affectionately.",
     "{pet} looks up at you with total trust.",
-    "{pet} presses so close to you that you don't dare move. Worth it.",
+    "~{pet} presses so close to you that you don't dare move. Worth it.", -- (~ = only while you stand still)
   },
 }
 -- outdoors only: your pet brings you something it found (Core: IdleMoment)

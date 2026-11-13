@@ -790,7 +790,7 @@ for _, ev in ipairs({ "PLAYER_LOGIN", "ZONE_CHANGED_NEW_AREA", "ZONE_CHANGED", "
   "PLAYER_CONTROL_GAINED", -- e.g. landing after a flight path
   "PLAYER_UPDATE_RESTING", -- stepping into an inn's rest area
   "NAME_PLATE_UNIT_ADDED", "PLAYER_TARGET_CHANGED", -- dangerous creatures nearby
-  "CHAT_MSG_SAY", "CHAT_MSG_YELL", "CHAT_MSG_TEXT_EMOTE", "CHAT_MSG_EMOTE" }) do
+  "CHAT_MSG_SAY", "CHAT_MSG_TEXT_EMOTE", "CHAT_MSG_EMOTE" }) do -- (not yells: they carry far beyond the room)
   pcall(f.RegisterEvent, f, ev)
 end
 pcall(f.RegisterEvent, f, "WEATHER_CHANGED")

@@ -562,8 +562,8 @@ S.zones = {
         fr = "Vous savez que l'Arbre n'a jamais reçu la bénédiction des grands dragons. En écoutant le vent dans ses branches, votre cœur se serre : c'est votre foyer, et l'idée qu'il puisse un jour se corrompre vous est insupportable.",
         when = { indoors = false, race = "NightElf" } },
       { draft = true, -- for night elves: the corruption is already creeping in
-        en = "A strange breeze passes through the branches. It smells sour, almost... corrupted. You clench your fists: nothing will stop you from protecting your home.",
-        fr = "Une brise étrange traverse les branches. Elle sent quelque chose d'aigre, presque… corrompu. Vous serrez les poings : rien ne vous empêchera de protéger votre foyer.",
+        en = "A strange breeze passes through the branches. It smells sour, almost... corrupted. You clench your fists: you will protect your home, whatever happens.",
+        fr = "Une brise étrange traverse les branches. Elle sent quelque chose d'aigre, presque… corrompu. Vous serrez les poings : vous protégerez votre foyer, quoi qu'il arrive.",
         when = { indoors = false, race = "NightElf" } },
     },
   },
@@ -652,8 +652,8 @@ S.zones = {
   [1436] = { -- Westfall (the farmland landscape already has its own lines)
     ambient = {
       { draft = true, check = "Confrérie Défias",
-        en = "The wind lifts the dust of the abandoned fields. This is where the Defias Brotherhood found refuge: stonemasons who rebuilt Stormwind and were never paid. Looking at these empty farms, you can almost understand their anger.",
-        fr = "Le vent soulève la poussière des champs abandonnés. C'est ici que la Confrérie Défias a trouvé refuge : des tailleurs de pierre qui ont rebâti Hurlevent sans jamais être payés. Devant ces fermes vides, vous comprendriez presque leur colère.",
+        en = "The wind lifts the dust of the abandoned fields. This is where the Defias Brotherhood found refuge: stonemasons who rebuilt Stormwind and were never paid. Looking at these empty farms, you understand their anger.",
+        fr = "Le vent soulève la poussière des champs abandonnés. C'est ici que la Confrérie Défias a trouvé refuge : des tailleurs de pierre qui ont rebâti Hurlevent sans jamais être payés. Devant ces fermes vides, vous comprenez leur colère.",
         when = { indoors = false, notRace = "Human" } },
       { draft = true,
         en = "The farms here were abandoned one by one. You can't help wondering what became of the people who lived in them.",

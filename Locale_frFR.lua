@@ -632,7 +632,7 @@ M.idle = {
   {
     "{pet} vient se frotter affectueusement contre votre jambe.",
     "{pet} lève vers vous un regard plein de confiance.",
-    "{pet} se serre si près de vous que vous n'osez plus bouger. Ça vaut le coup.",
+    "~{pet} se serre si près de vous que vous n'osez plus bouger. Ça vaut le coup.", -- (~ = seulement à l'arrêt)
   },
 }
 -- dehors seulement : votre familier vous rapporte une trouvaille (Core : IdleMoment)

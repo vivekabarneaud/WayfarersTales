@@ -335,6 +335,8 @@ D.MOMENTS = {
     { en = "Stone dust clings to your hands.", fr = "De la poussière de pierre vous colle aux mains." },
     { en = "Your arms ache a little from swinging the pick.", fr = "Vos bras sont un peu endoloris d'avoir manié la pioche." },
     { en = "Little chips of rock lie scattered at your feet.", fr = "De petits éclats de roche jonchent le sol à vos pieds." },
+    { draft = true, -- (noted 2026-11-13, the Deadmines)
+      en = "Your arms are still buzzing from the jolts of the pick.", fr = "Vos bras bourdonnent encore des chocs de la pioche." },
   },
   skin = {
     { en = "You wipe your knife clean before putting it away.", fr = "Vous essuyez votre couteau avant de le ranger." },
@@ -374,7 +376,7 @@ D.MOMENTS = {
     { en = "The sounds of the outside fade as you step inside.", fr = "Les bruits du dehors s'estompent quand vous entrez.", when = { calm = true } },
     { en = "Inside, everything is calm and quiet.", fr = "À l'intérieur, tout est calme et paisible.", when = { calm = true } },
     { en = "You step into the bustle: voices everywhere, people coming and going.", fr = "Vous entrez dans l'agitation : des voix de partout, des allées et venues.",
-      when = { crowd = { "lively", "crowded" } } },
+      when = { crowd = "crowded" } }, -- (lively was too easy: a few players nearby, maybe outside)
     { en = "It's packed in here. You have to squeeze your way through.", fr = "C'est bondé ici. Il faut jouer des coudes pour avancer.", when = { crowd = "crowded" } },
     { en = "Your eyes take a moment to adjust to the dimmer light.", fr = "Vos yeux mettent un instant à s'habituer à la pénombre.",
       when = { night = false, notBiomes = NO_DARK } },
@@ -1150,13 +1152,13 @@ local NPC_TELDRASSIL = {
 }
 for _, line in ipairs(NPC_TELDRASSIL) do table.insert(D.MOMENTS.npc, line) end
 
-D.NPCS[5483] = { race = "Human", role = "vendor_cooking" } -- Erika Tate, Old Town: "if you want to haggle, go find a goblin"
+D.NPCS[5483] = { race = "Human", role = "vendor_cooking" } -- Erika Tate, Old Town: no haggling with her (her own words: go find a goblin)
 D.NPCS[352]  = { race = "Human", role = "flight_master" }  -- Dungar Longdrink, Trade District: big pilot goggles, business is good
 
 local NPC_STORMWIND_2 = {
   { draft = true,
-    en = "\"If you want to haggle, go find a goblin.\" {npc} doesn't joke about her prices, and says so plainly.",
-    fr = "« Si vous voulez marchander, allez donc voir un gobelin. » {npc} ne plaisante pas avec ses prix, et le dit sans détour.",
+    en = "{npc} doesn't joke about her prices: no haggling here.",
+    fr = "{npc} ne plaisante pas avec ses prix : ici, on ne marchande pas.",
     when = { npcID = 5483 } },
   { draft = true,
     en = "{npc} greets you from behind his big pilot goggles, clearly delighted: his gryphon business is doing well.",
