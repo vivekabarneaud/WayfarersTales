@@ -1587,9 +1587,9 @@ function H.ADDON_LOADED(name)
 end
 
 ---------------------------------------------------------------------------
--- Weather recorder: writes to the saved file what C_Weather says, but only for
--- weather types not identified yet (see D.WEATHER_CONFIRMED in SensesData.lua),
--- so we can learn which numbers mean rain, snow or sandstorm.
+-- Weather recorder (dev only): writes to the saved file every change of what C_Weather
+-- says, to learn which numbers mean snow or sandstorm, and which rain intensity
+-- comes with thunder.
 ---------------------------------------------------------------------------
 
 local function Serialize(v, depth)
@@ -1617,12 +1617,8 @@ local function RecordWeather(reason, extra)
   local value = table.concat(parts, ", ")
   if value == lastWeather and not extra then return end
   lastWeather = value
-  -- only weather types we haven't identified yet are worth writing down
-  local w = r[1] and r[2]
-  if type(w) == "table" and D.WEATHER_TYPES and D.WEATHER_CONFIRMED
-    and D.WEATHER_CONFIRMED[D.WEATHER_TYPES[w.type] or ""] then
-    return
-  end
+  -- every change is written down, known types too: rain intensity tells storms apart
+  -- (thunder heard with rain at 0.987, 2026-11-13: is there a threshold?)
   local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
   local h, m = GetGameTime()
   db.weatherLog = db.weatherLog or {}
