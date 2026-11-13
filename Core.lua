@@ -1970,6 +1970,24 @@ SlashCmdList.WAYFARERSTALES = function(msg)
     ToggleTester()
   elseif cmd == "welcome" or cmd == "bienvenue" then
     Welcome(true)
+  elseif cmd == "auras" then
+    -- every buff on you, with its details (to find out what the game tells us, e.g.
+    -- how close a campfire really is): ID, name, time left, who gave it, hidden values
+    local x, y
+    if C_Map and C_Map.GetBestMapForUnit and C_Map.GetPlayerMapPosition then
+      local okP, pos = pcall(C_Map.GetPlayerMapPosition, C_Map.GetBestMapForUnit("player") or 0, "player")
+      if okP and pos then x, y = pos.x, pos.y end
+    end
+    Print(string.format("Buffs (%s):", x and string.format("%.1f, %.1f", x * 100, y * 100) or "?"))
+    for i = 1, 40 do
+      local ok, a = pcall(C_UnitAuras.GetAuraDataByIndex, "player", i, "HELPFUL")
+      if not ok or not a then break end
+      local left = (a.expirationTime and a.expirationTime > 0) and string.format("%ds", a.expirationTime - GetTime()) or "-"
+      local pts = {}
+      for _, p in ipairs(a.points or {}) do pts[#pts + 1] = tostring(p) end
+      Print(string.format("%s %s | %s | from %s | values: %s", tostring(a.spellId), tostring(a.name), left,
+        tostring(a.sourceUnit or "?"), #pts > 0 and table.concat(pts, ", ") or "-"))
+    end
   elseif cmd == "flash" then
     -- try the screen-edge flash: /wt flash cold|hot|hunger|thirst|tired [1-3]
     local kind, level = (arg or ""):match("^(%a*)%s*(%d?)")
