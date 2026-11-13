@@ -242,21 +242,20 @@ local NEED_FLASH = { thirst = "thirst", hunger = "hunger", energy = "tired" }
 -- Messages when things change
 ---------------------------------------------------------------------------
 
--- Relief: eating, drinking or resting brought a need back to fine. A reaction to what you
--- just did, so it doesn't wait for the gap after other lines (the meal brings plenty of
--- them); a meal or drink more than a minute ago: the state changes silently. One line
--- at most, even if you ate and drank together.
-local ateAt, drankAt -- GetTime() you last ate / drank
-local function CheckRelief()
+-- Relief: eating, drinking or resting brought a need back to fine. A reaction to what
+-- you're doing, so it doesn't wait for the gap after other lines (a meal brings plenty
+-- of them); one line at most, even if you eat and drink together. (Hunger and thirst
+-- only fill while you eat or drink, so that's always when they get back to fine;
+-- otherwise, e.g. back from a long time away, the state changes silently.)
+local function CheckRelief(env)
   local said = false
   for _, n in ipairs(NEEDS) do
     local sk = n.key .. "State"
     local p = state[sk] or "ok"
     if p ~= "ok" and NeedState(state[n.key], p, n.states) == "ok" then
       state[sk] = "ok"
-      local at = (n.key == "thirst" and drankAt) or (n.key == "hunger" and ateAt) or nil
-      local fresh = n.key == "energy" or (at ~= nil and GetTime() - at < 60)
-      if fresh and not said then
+      local now = n.key == "energy" or (n.key == "thirst" and env.drinking) or (n.key == "hunger" and env.eating)
+      if now and not said then
         Say(n.relief, nil, true)
         said = true
       end
@@ -265,9 +264,7 @@ local function CheckRelief()
 end
 
 local function CheckStates(env)
-  if env.eating then ateAt = GetTime() end
-  if env.drinking then drankAt = GetTime() end
-  CheckRelief()
+  CheckRelief(env)
   -- another line just played: wait (states stay as they were, so the change is
   -- noticed again on a later tick)
   if not KT.LineGapOK() then return end
