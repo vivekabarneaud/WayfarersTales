@@ -38,6 +38,7 @@ end
 
 -- How many people around: nearby player name plates + people talking near you.
 -- Returns "quiet" / "lively" / "crowded", or nil when we can't tell.
+local CROWD_LIVELY, CROWD_CROWDED = 10, 25 -- players around (name plates reach ~40-60 m)
 function S.Crowd()
   local now = GetTime()
   for i = #chatter, 1, -1 do
@@ -77,10 +78,16 @@ function S.Crowd()
     end
   end
   local talk = #chatter
-  if players >= 8 or talk >= 6 then return "crowded", players, talk end
-  if players >= 3 or talk >= 2 then return "lively", players, talk end
-  -- "quiet" only if we can actually see the people around (friendly name plates on)
-  if platesOn and players == 0 and talk == 0 then return "quiet", players, talk end
+  -- With name plates on, the players around decide (the game is busy: a few players
+  -- around is normal). Without them, the people talking near you are all we have.
+  if platesOn then
+    if players >= CROWD_CROWDED then return "crowded", players, talk end
+    if players >= CROWD_LIVELY then return "lively", players, talk end
+    if players == 0 and talk == 0 then return "quiet", players, talk end
+    return nil, players, talk
+  end
+  if talk >= 6 then return "crowded", players, talk end
+  if talk >= 2 then return "lively", players, talk end
   return nil, players, talk
 end
 
