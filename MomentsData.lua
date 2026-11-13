@@ -88,6 +88,8 @@ D.MOMENT_RULES = {
   craftFirst_boom = { cd = 600,  chance = 1,   gap = 20, shares = "craftFirst" },
   revive          = { cd = 0,    chance = 1,   gap = 0 },
   reviveSick      = { cd = 0,    chance = 1,   gap = 0, shares = "revive" },
+  sickFight       = { cd = 0,    chance = 1,   gap = 0 },   -- a fight while still sick (once per sickness)
+  sickEnd         = { cd = 0,    chance = 1,   gap = 10 },  -- resurrection sickness wears off
 }
 
 -- Each profession's own lines use the timer of the general ones
@@ -583,6 +585,27 @@ D.MOMENTS = {
   reviveSick = {
     { en = "Everything feels heavy and slow. Coming back this way has a price.", fr = "Tout vous paraît lourd et lent. Revenir de cette façon a un prix." },
     { en = "Your limbs feel like lead, and every movement is an effort.", fr = "Vos membres pèsent comme du plomb, et chaque geste vous coûte." },
+    { draft = true, -- (2026-11-13)
+      en = "You're back, but part of you seems to have stayed on the other side.",
+      fr = "Vous voilà de retour, mais une part de vous semble être restée de l'autre côté." },
+    { draft = true,
+      en = "Your legs tremble under your weight. You feel twenty years older.",
+      fr = "Vos jambes tremblent sous votre poids. Vous avez l'impression d'avoir vieilli de vingt ans." },
+  },
+  -- A fight while still sick from the spirit healer (once per sickness)
+  sickFight = {
+    { draft = true,
+      en = "You take a fighting stance, and your whole body protests. You're really not up to this.",
+      fr = "Vous vous mettez en garde, et tout votre corps proteste. Vous n'êtes vraiment pas en état." },
+  },
+  -- Resurrection sickness wears off
+  sickEnd = {
+    { draft = true,
+      en = "The heaviness finally leaves your limbs. You're yourself again.",
+      fr = "La lourdeur quitte enfin vos membres. Vous redevenez vous-même." },
+    { draft = true,
+      en = "Your strength comes back all at once, like a colour returning.",
+      fr = "Vos forces reviennent d'un coup, comme une couleur qui réapparaît." },
   },
 }
 

@@ -98,6 +98,17 @@ function W.HasAura(spellID, byName)
   return false
 end
 
+-- Is there a debuff on you with this spell ID (or the same name)? E.g. resurrection sickness.
+function W.HasDebuff(spellID)
+  local name = SpellName(spellID)
+  for i = 1, 40 do
+    local ok, data = pcall(C_UnitAuras.GetAuraDataByIndex, "player", i, "HARMFUL")
+    if not ok or not data then break end
+    if data.spellId == spellID or (name and data.name == name) then return true end
+  end
+  return false
+end
+
 function W.IsNight()
   local h = GetGameTime()
   return h ~= nil and (h >= 21 or h < 6)
@@ -154,6 +165,7 @@ function W.Snapshot()
     sub = GetSubZoneText(),
     afk = UnitIsAFK("player") and true or false,
     seatedAtFire = W.HasAura(D.AURA_CAMP_WELCOME), -- the 60s "stay seated" campfire buff
+    resSick = W.HasDebuff(D.AURA_RES_SICKNESS), -- resurrection sickness (after the spirit healer)
     eating = W.HasAura(D.SPELL_FOOD_AURA, true),
     drinking = W.HasAura(D.SPELL_DRINK_AURA, true),
   }

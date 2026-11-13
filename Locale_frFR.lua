@@ -867,6 +867,7 @@ L.EL_TIP = {
     swim    = "- Nager vous fatigue plus vite",
     cold    = "- Le froid vous fatigue plus vite",
     heat    = "- La chaleur vous fatigue plus vite",
+    sick    = "- Le mal de résurrection vous fatigue plus vite",
   },
 }
 L.EL_MOVE_HINT    = "Clic : détails. Maj + glisser : déplacer."
@@ -880,7 +881,7 @@ L.EL_GUIDE = table.concat({
   "|cffff8fb1Humidité|r  Nager vous trempe. Vous séchez avec le temps, plus vite à la chaleur ou près d'un feu.",
   "|cffff8fb1Soif|r  Monte doucement avec le temps, plus vite dans les zones chaudes et en combat. Boire n'importe quoi vous désaltère.",
   "|cffff8fb1Faim|r  Monte en deux heures environ, plus vite en combat ou quand vous avez froid. Manger vous rassasie.",
-  "|cffff8fb1Énergie|r  Après quelques heures d'aventure, la fatigue arrive, plus tôt quand vous avez froid ou trop chaud. Reposez-vous dans une auberge ou en ville, au coin du feu, ou somnolez un moment.",
+  "|cffff8fb1Énergie|r  Après quelques heures d'aventure, la fatigue arrive, plus tôt quand vous avez froid, trop chaud, ou encore le mal de résurrection. Reposez-vous dans une auberge ou en ville, au coin du feu, ou somnolez un moment.",
   "|cffff8fb1Thermomètre|r  Le bouton près de la minicarte indique la température de l'air. Votre corps la suit, mais bouger, l'eau, un feu ou une auberge changent votre ressenti.",
   "|cffff8fb1Bords de l'écran|r  Ils s'illuminent un instant quand quelque chose empire : bleu pour le froid, orange pour la chaleur, rouge pour la faim et la soif, sombre pour la fatigue. Désactivable dans l'onglet Corps.",
 }, "\n")

@@ -878,6 +878,7 @@ L.EL_TIP = {
     swim    = "- Swimming tires you faster",
     cold    = "- The cold tires you faster",
     heat    = "- The heat tires you faster",
+    sick    = "- Resurrection sickness tires you faster",
   },
 }
 L.EL_MOVE_HINT    = "Click: details. Shift + drag: move."
@@ -891,7 +892,7 @@ L.EL_GUIDE = table.concat({
   "|cffff8fb1Wetness|r  Swimming soaks you. You dry off over time, faster in the heat or by a fire.",
   "|cffff8fb1Thirst|r  Slowly grows over time, faster in hot zones and in combat. Drinking anything quenches it.",
   "|cffff8fb1Hunger|r  Grows over about two hours, faster in combat or when you're cold. Eating fills you up.",
-  "|cffff8fb1Energy|r  After a few hours of adventuring you get tired, sooner when you're cold or too hot. Rest at an inn or in a city, sit by a campfire, or doze off.",
+  "|cffff8fb1Energy|r  After a few hours of adventuring you get tired, sooner when you're cold, too hot, or still sick from a resurrection at the spirit healer. Rest at an inn or in a city, sit by a campfire, or doze off.",
   "|cffff8fb1Thermometer|r  The button by the minimap shows the air temperature. Your body follows it, but moving, being wet, a fire or an inn change how you feel.",
   "|cffff8fb1Screen edges|r  They light up for a moment when something gets worse: blue for the cold, orange for the heat, red for hunger and thirst, dark for tiredness. You can turn this off in the Body tab.",
 }, "\n")

@@ -135,15 +135,7 @@ end
 -- What happens to you
 ---------------------------------------------------------------------------
 
-local function HasDebuff(spellID)
-  local name = SpellName(spellID)
-  for i = 1, 40 do
-    local ok, data = pcall(C_UnitAuras.GetAuraDataByIndex, "player", i, "HARMFUL")
-    if not ok or not data then break end
-    if data.spellId == spellID or (name and data.name == name) then return true end
-  end
-  return false
-end
+local HasDebuff = W.HasDebuff -- (World.lua)
 
 local function Revive()
   Play(HasDebuff(D.AURA_RES_SICKNESS) and "reviveSick" or "revive")
@@ -585,6 +577,8 @@ end
 ---------------------------------------------------------------------------
 
 local stillSince, quietDone, taxiSince, lastNight, lastIndoors, wasDead
+local wasSick, sickEndAt -- resurrection sickness: on you last time / just wore off (GetTime)
+local sickFought         -- the "you're not up to fighting" line already played this sickness
 
 local function Tick()
   if not S.State() then return end
@@ -599,6 +593,16 @@ local function Tick()
     return
   end
   wasDead = dead
+
+  -- resurrection sickness wearing off (if another line just played, it waits a little)
+  local sick = not dead and HasDebuff(D.AURA_RES_SICKNESS)
+  if sick and not wasSick then sickFought = nil end
+  if wasSick and not sick and not dead then sickEndAt = now end
+  wasSick = sick
+  if sickEndAt then
+    if now - sickEndAt > 60 then sickEndAt = nil
+    elseif Play("sickEnd") then sickEndAt = nil end
+  end
   if dead then stillSince = nil return end
 
   -- landing after a long flight
@@ -762,6 +766,11 @@ f:SetScript("OnEvent", function(_, event, ...)
       wasDrinking = W.HasAura(D.SPELL_DRINK_AURA, true)
     elseif event == "PLAYER_REGEN_DISABLED" then
       fightStart = GetTime()
+      -- fighting while still sick from the spirit healer (once per sickness)
+      if not sickFought and HasDebuff(D.AURA_RES_SICKNESS) then
+        sickFought = true
+        After(1, function() Play("sickFight") end, "sickFight")
+      end
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
     elseif event == "CINEMATIC_STOP" then

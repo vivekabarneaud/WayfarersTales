@@ -471,7 +471,7 @@ function E.Tick()
   -- Standing still only stops the drop.
   if (moving or env.combat) and (sitting or napping) then E.StandUp() end
   -- (why: what's happening to your energy right now, for the Body tab's tooltip)
-  local recover, why, tempWhy = 0, nil, nil
+  local recover, why, tempWhy, sickWhy = 0, nil, nil, nil
   local function rest(rate, key) if rate > recover then recover, why = rate, key end end
   if env.seatedAtFire then rest(0.15, "fire") end
   if env.afk then rest(0.1, "afk") end
@@ -503,9 +503,11 @@ function E.Tick()
     if ts == "cold" or ts == "hot" then rate = rate * 1.15
     elseif ts == "freezing" or ts == "overheat" then rate = rate * 1.3 end
     if ts ~= "ok" then tempWhy = TEMP_RANK[ts] < 0 and "cold" or "heat" end
+    -- resurrection sickness (after the spirit healer): you tire faster
+    if env.resSick then rate = rate * 1.5; sickWhy = true end
     state.energy = Clamp(state.energy - rate * dt)
   end
-  E.energyWhy, E.energyTempWhy = why, tempWhy
+  E.energyWhy, E.energyTempWhy, E.energySick = why, tempWhy, sickWhy
   E.tempTarget = target
 
   -- Which gauges are moving right now, and the colour of their glow:
@@ -622,6 +624,7 @@ function E.BarTip(key)
       add(T.energy[why], good and UP or (why == "still" or why == "hold") and NEUTRAL or DOWN)
     end
     if E.energyTempWhy then add(T.energy[E.energyTempWhy], DOWN) end
+    if E.energySick then add(T.energy.sick, DOWN) end
   else
     return nil
   end
