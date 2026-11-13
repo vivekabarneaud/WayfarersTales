@@ -636,6 +636,7 @@ function E.BarTip(key)
     end
     if env.taxi then add(T.wind, DOWN) end
     if env.atFire then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
+    if env.hotSpot then add(T.forge, UP) end
     if env.indoors and env.resting then add(T.inn, UP) end
     if env.swimming then add(T.water, DOWN)
     elseif state.wet > 30 then add(T.wet, DOWN) end
@@ -729,6 +730,7 @@ function E.HereText()
   if env.indoors then parts[#parts + 1] = L.EL_INDOORS end
   if env.night then parts[#parts + 1] = L.EL_NIGHT end
   if env.atFire then parts[#parts + 1] = L.EL_FIRE elseif env.nearFire then parts[#parts + 1] = L.EL_FIRE_NEAR end
+  if env.hotSpot then parts[#parts + 1] = L.EL_FORGE end
   if env.swimming then parts[#parts + 1] = L.EL_SWIMMING end
   return string.format(L.EL_HERE, table.concat(parts, ", "))
 end

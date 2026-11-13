@@ -845,6 +845,7 @@ L.EL_INDOORS      = "indoors"
 L.EL_NIGHT        = "night"
 L.EL_FIRE         = "by the fire"
 L.EL_FIRE_NEAR    = "a fire somewhere nearby"
+L.EL_FORGE        = "the heat of the forges"
 L.EL_SWIMMING     = "in the water"
 L.EL_HERE         = "Here: %s"
 -- Body tab, hovering the temperature and energy bars: what's pushing them right now
@@ -857,6 +858,7 @@ L.EL_TIP = {
   wind    = "- The wind of the flight chills you",
   fire    = "+ The fire warms you",
   smoke   = "+ A fire somewhere nearby warms the air a little",
+  forge   = "+ The heat of the forges and the molten metal",
   inn     = "+ The inn keeps you snug",
   water   = "- The water chills you",
   wet     = "- Your wet clothes chill you",

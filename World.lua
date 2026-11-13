@@ -119,6 +119,9 @@ end
 -- (but stays the same all day for a given zone) + indoors / fire.
 -- The real weather (snow, rain...) will be added here once we know its format.
 local BASE_C = { [-2] = -8, [-1] = 3, [0] = 14, [1] = 25, [2] = 35 }
+-- sub-zones hotter than the rest of their zone: degrees added, and at least as hot as a
+-- scorching zone (35°C). By the sub-zone's name, French and English.
+local HOT_SPOTS = { ["La Grande Forge"] = 8, ["The Great Forge"] = 8 }
 
 function W.AirTemp(env)
   local c = BASE_C[env.temp or 0] or 14
@@ -129,6 +132,10 @@ function W.AirTemp(env)
   c = c + 4 * math.cos((hour - 15) / 24 * 2 * math.pi)       -- warmest ~15h, coolest ~3h
   if env.rain and not env.indoors then c = c - (1 + 3 * env.rain) end -- rain cools the air (up to -4°C)
   if env.indoors then c = c + (18 - c) * 0.6 end             -- roofs soften everything
+  -- places hotter than their zone (the Great Forge's lava and furnaces), whatever the hour
+  local hot = env.sub and HOT_SPOTS[env.sub]
+  if hot then c = math.max(c + hot, BASE_C[2]) end
+  env.hotSpot = hot and true or nil
   -- right at a fire: much warmer, mild even in the snow; a fire somewhere around
   -- (the wide "Campfire nearby" aura): only a little smoke and warmth in the air
   if env.atFire then c = math.max(c + 6, 18)

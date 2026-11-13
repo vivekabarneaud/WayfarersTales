@@ -834,6 +834,7 @@ L.EL_INDOORS      = "à l'intérieur"
 L.EL_NIGHT        = "nuit"
 L.EL_FIRE         = "au coin du feu"
 L.EL_FIRE_NEAR    = "un feu quelque part pas loin"
+L.EL_FORGE        = "la chaleur des forges"
 L.EL_SWIMMING     = "dans l'eau"
 L.EL_HERE         = "Ici : %s"
 -- Onglet Corps, au survol des barres de température et d'énergie
@@ -846,6 +847,7 @@ L.EL_TIP = {
   wind    = "- Le vent du vol vous refroidit",
   fire    = "+ Le feu vous réchauffe",
   smoke   = "+ Un feu quelque part pas loin réchauffe un peu l'air",
+  forge   = "+ La chaleur des forges et du métal en fusion",
   inn     = "+ L'auberge vous garde au chaud",
   water   = "- L'eau vous refroidit",
   wet     = "- Vos vêtements mouillés vous refroidissent",
