@@ -170,7 +170,7 @@ function E.Target(env, still)
   if env.swimming then target = target - 10 end
   if state.wet > 30 then target = target - 15 * (state.wet / 100) end
   if env.indoors and env.resting then target = 50 + (target - 50) * 0.5 end -- inns are cosy
-  if env.nearFire then target = math.max(target, 56) end -- a fire warms you to cosy, never scorches
+  if env.atFire then target = math.max(target, 56) end -- at a fire: cosy whatever the climate, never scorching
   return Clamp(target)
 end
 
@@ -302,7 +302,7 @@ local function CheckStates(env)
   end
 
   -- Little moments
-  if env.nearFire and not lastEnv.nearFire and state.temp < 40 and Ready("fireWarm", 1200) then
+  if env.atFire and not lastEnv.atFire and state.temp < 40 and Ready("fireWarm", 1200) then
     Mark("fireWarm")
     Say("fireWarm")
   end
@@ -365,7 +365,7 @@ function E.Tick()
     end
     local dry = 0.15 + 0.012 * heat
     if env.indoors then dry = dry + 0.1 end
-    if env.nearFire then dry = dry + 0.8 end
+    if env.atFire then dry = dry + 0.8 elseif env.nearFire then dry = dry + 0.1 end
     if env.taxi then dry = dry + 0.5 end -- the wind of a flight
     state.wet = Clamp(state.wet - dry * dt)
     if state.soaked and state.wet <= 5 and env.taxi then
@@ -585,7 +585,7 @@ function E.BarTip(key)
       add(T.still, NEUTRAL)
     end
     if env.taxi then add(T.wind, DOWN) end
-    if env.nearFire then add(T.fire, UP) end
+    if env.atFire then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
     if env.indoors and env.resting then add(T.inn, UP) end
     if env.swimming then add(T.water, DOWN)
     elseif state.wet > 30 then add(T.wet, DOWN) end
@@ -677,7 +677,7 @@ function E.HereText()
   local parts = { E.FormatAir(env.air or 15), L.EL_CLIMATE[env.temp or 0] or "?" }
   if env.indoors then parts[#parts + 1] = L.EL_INDOORS end
   if env.night then parts[#parts + 1] = L.EL_NIGHT end
-  if env.nearFire then parts[#parts + 1] = L.EL_FIRE end
+  if env.atFire then parts[#parts + 1] = L.EL_FIRE elseif env.nearFire then parts[#parts + 1] = L.EL_FIRE_NEAR end
   if env.swimming then parts[#parts + 1] = L.EL_SWIMMING end
   return string.format(L.EL_HERE, table.concat(parts, ", "))
 end

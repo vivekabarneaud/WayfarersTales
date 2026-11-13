@@ -831,7 +831,8 @@ L.EL_THERMO_HINT  = "Clic : confort du corps. Clic droit : °C / °F. Glisser : 
 L.EL_CLIMATE      = { [-2] = "climat glacial", [-1] = "climat froid", [0] = "climat doux", [1] = "climat chaud", [2] = "climat brûlant" }
 L.EL_INDOORS      = "à l'intérieur"
 L.EL_NIGHT        = "nuit"
-L.EL_FIRE         = "près d'un feu"
+L.EL_FIRE         = "au coin du feu"
+L.EL_FIRE_NEAR    = "un feu quelque part pas loin"
 L.EL_SWIMMING     = "dans l'eau"
 L.EL_HERE         = "Ici : %s"
 -- Onglet Corps, au survol des barres de température et d'énergie
@@ -843,6 +844,7 @@ L.EL_TIP = {
   still   = "Vous ne bougez pas : votre corps revient vers la température de l'air",
   wind    = "- Le vent du vol vous refroidit",
   fire    = "+ Le feu vous réchauffe",
+  smoke   = "+ Un feu quelque part pas loin réchauffe un peu l'air",
   inn     = "+ L'auberge vous garde au chaud",
   water   = "- L'eau vous refroidit",
   wet     = "- Vos vêtements mouillés vous refroidissent",
@@ -869,7 +871,7 @@ L.EL_TIP = {
 L.EL_MOVE_HINT    = "Clic : détails. Maj + glisser : déplacer."
 L.EL_OFF          = "Le module de confort du corps est désactivé. Vous pouvez le réactiver dans l'onglet Options."
 L.EL_PAGE_INTRO   = "Ce que ressent votre personnage. Purement cosmétique : rien ici ne change vos caractéristiques."
-L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp, une auberge, un toit au-dessus de la tête, ou continuer à bouger.\nSe rafraîchir : rentrer à l'intérieur, attendre la nuit, se baigner.\nSe sécher : le temps, et bien plus vite près d'un feu.\nLa soif : buvez n'importe quoi. Elle monte plus vite quand il fait chaud.\nLa faim : asseyez-vous et mangez.\nL'énergie : reposez-vous à l'intérieur sans bouger (une auberge, une maison en ville), asseyez-vous au coin du feu, ou faites une sieste (/sleep). Flâner en ville ou s'asseoir ailleurs aide un peu (jusqu'à 60 %) ; rester immobile évite juste de se fatiguer.\nLa pluie vous trempe dehors, et rafraîchit l'air."
+L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp (en vous asseyant tout près), une auberge, un toit au-dessus de la tête, ou continuer à bouger.\nSe rafraîchir : rentrer à l'intérieur, attendre la nuit, se baigner.\nSe sécher : le temps, et bien plus vite près d'un feu.\nLa soif : buvez n'importe quoi. Elle monte plus vite quand il fait chaud.\nLa faim : asseyez-vous et mangez.\nL'énergie : reposez-vous à l'intérieur sans bouger (une auberge, une maison en ville), asseyez-vous au coin du feu, ou faites une sieste (/sleep). Flâner en ville ou s'asseoir ailleurs aide un peu (jusqu'à 60 %) ; rester immobile évite juste de se fatiguer.\nLa pluie vous trempe dehors, et rafraîchit l'air."
 L.EL_GUIDE = table.concat({
   "|cffffd100Confort du corps (Elements)|r",
   "Votre personnage ressent le froid, la chaleur, l'eau, la soif, la faim et la fatigue, et vous le dit dans le chat. L'onglet Corps montre les détails. (Dans les Options, vous pouvez aussi afficher des icônes ou des barres près de votre portrait.)",

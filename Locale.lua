@@ -842,7 +842,8 @@ L.EL_THERMO_HINT  = "Click: body comfort. Right-click: °C / °F. Drag: move."
 L.EL_CLIMATE      = { [-2] = "freezing climate", [-1] = "cold climate", [0] = "mild climate", [1] = "warm climate", [2] = "scorching climate" }
 L.EL_INDOORS      = "indoors"
 L.EL_NIGHT        = "night"
-L.EL_FIRE         = "near a fire"
+L.EL_FIRE         = "by the fire"
+L.EL_FIRE_NEAR    = "a fire somewhere nearby"
 L.EL_SWIMMING     = "in the water"
 L.EL_HERE         = "Here: %s"
 -- Body tab, hovering the temperature and energy bars: what's pushing them right now
@@ -854,6 +855,7 @@ L.EL_TIP = {
   still   = "Standing still: your body settles back to the air",
   wind    = "- The wind of the flight chills you",
   fire    = "+ The fire warms you",
+  smoke   = "+ A fire somewhere nearby warms the air a little",
   inn     = "+ The inn keeps you snug",
   water   = "- The water chills you",
   wet     = "- Your wet clothes chill you",
@@ -880,7 +882,7 @@ L.EL_TIP = {
 L.EL_MOVE_HINT    = "Click: details. Shift + drag: move."
 L.EL_OFF          = "The body comfort module is turned off. You can turn it back on in the Options tab."
 L.EL_PAGE_INTRO   = "How your character feels. Pure flavor: nothing here changes your stats."
-L.EL_PAGE_TIPS    = "Warm up: a campfire, an inn, any roof over your head, or keep moving.\nCool down: get indoors, wait for the night, take a swim.\nDry off: time, and much faster by a fire.\nThirst: drink anything. It drops faster in the heat.\nHunger: sit down and eat.\nEnergy: rest indoors without moving (an inn, a house in town), sit by a campfire, or take a nap (/sleep). Walking around town or sitting down elsewhere helps a little (up to 60%); standing still just stops it dropping.\nRain soaks you outdoors, and cools the air."
+L.EL_PAGE_TIPS    = "Warm up: a campfire (sit right by it), an inn, any roof over your head, or keep moving.\nCool down: get indoors, wait for the night, take a swim.\nDry off: time, and much faster by a fire.\nThirst: drink anything. It drops faster in the heat.\nHunger: sit down and eat.\nEnergy: rest indoors without moving (an inn, a house in town), sit by a campfire, or take a nap (/sleep). Walking around town or sitting down elsewhere helps a little (up to 60%); standing still just stops it dropping.\nRain soaks you outdoors, and cools the air."
 L.EL_GUIDE = table.concat({
   "|cffffd100Body comfort (Elements)|r",
   "Your character feels the cold, the heat, the water, thirst, hunger and tiredness, and tells you about it in the chat. The Body tab shows the details. (In Options, you can also show icons or bars by your portrait.)",

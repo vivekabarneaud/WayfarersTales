@@ -118,8 +118,22 @@ function W.AirTemp(env)
   c = c + 4 * math.cos((hour - 15) / 24 * 2 * math.pi)       -- warmest ~15h, coolest ~3h
   if env.rain and not env.indoors then c = c - (1 + 3 * env.rain) end -- rain cools the air (up to -4°C)
   if env.indoors then c = c + (18 - c) * 0.6 end             -- roofs soften everything
-  if env.nearFire then c = c + 6 end
+  -- right at a fire: much warmer, mild even in the snow; a fire somewhere around
+  -- (the wide "Campfire nearby" aura): only a little smoke and warmth in the air
+  if env.atFire then c = math.max(c + 6, 18)
+  elseif env.nearFire then c = c + 2 end
   return c
+end
+
+-- At the fire: the one-minute "stay seated" buff (the game only gives it right next to
+-- a fire), and after it ends, as long as you don't move. Walking away loses it.
+-- ("Campfire nearby" alone reaches far: it only means a fire somewhere around.)
+local atFire = false
+function W.AtFire(env)
+  local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
+  if env.seatedAtFire then atFire = true
+  elseif moving or not env.nearFire then atFire = false end
+  return atFire
 end
 
 -- Everything about "here and now" in one table.
@@ -133,7 +147,7 @@ function W.Snapshot()
     night = W.IsNight(),
     resting = IsResting() and true or false,
     swimming = IsSwimming() and true or false,
-    nearFire = W.HasAura(D.AURA_CAMP_NEAR),
+    nearFire = W.HasAura(D.AURA_CAMP_NEAR), -- a fire somewhere around (wide range): see atFire
     combat = UnitAffectingCombat("player") and true or false,
     zone = GetRealZoneText(),
     sub = GetSubZoneText(),
@@ -145,6 +159,7 @@ function W.Snapshot()
   -- rain (only once its weather type is confirmed): 0 to 1
   local wok, w = pcall(function() return KT.Senses and KT.Senses.Weather and KT.Senses.Weather() end)
   if wok and w and w.confirmed and w.name == "rain" then env.rain = tonumber(w.intensity) or 0.5 end
+  env.atFire = W.AtFire(env)
   env.air = W.AirTemp(env)
   -- your position on the zone map, in % like the coordinates under the minimap
   local raw = W.MapID()
