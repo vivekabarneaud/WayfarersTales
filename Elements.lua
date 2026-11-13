@@ -28,6 +28,8 @@ local swimStart
 local sitting, napping    -- sat down (X key, /sit) and napping (/sleep), until you move
 local footSince, stopSince -- moving on foot since (GetTime), stopped since
 local sweaty              -- warm from a long walk in the cold: stopping will chill you
+local flightCold          -- the "wind bites up here" line already played on this flight
+local flightDried, landedAt -- dried off by the wind during this flight (said after landing)
 local lastEnv = {}
 local tip                 -- the hover panel with bars (created on first hover)
 
@@ -159,8 +161,11 @@ local function Effort(env)
   return e
 end
 
+local FLIGHT_WIND = 8 -- degrees colder on a flight path: the wind up there
+
 function E.Target(env, still)
   local felt = (env.air or 15) + (still and 0 or Effort(env))
+  if env.taxi then felt = felt - FLIGHT_WIND end
   local target = 50 + (felt - 20) * 2.2   -- 20°C feels just right, standing still
   if env.swimming then target = target - 10 end
   if state.wet > 30 then target = target - 15 * (state.wet / 100) end
@@ -252,13 +257,20 @@ local function CheckStates(env)
     local severe = math.abs(r) >= 2
     if r ~= 0 and math.abs(r) > math.abs(pr) and r * pr >= 0 then
       if severe or Ready("tempLine", TEMP_LINE_GAP) then
-        Say(ts .. "Enter", nil, true)
+        -- getting cold on a flight: the wind up there (once per flight)
+        if env.taxi and r < 0 and not flightCold then
+          flightCold = true
+          Say("flightCold", nil, true)
+        else
+          Say(ts .. "Enter", nil, true)
+        end
         Mark("tempLine")
         E.Flash(tempKind, math.abs(r) + 1)
       end
       Mark("tempRemind")
     elseif ts == "ok" and Ready("tempLine", TEMP_LINE_GAP) then
-      Say(pr < 0 and "warmBack" or "coolBack", nil, true)
+      -- the wind of a flight bringing you back from the heat
+      Say(pr < 0 and "warmBack" or (env.taxi and "flightCool") or "coolBack", nil, true)
       Mark("tempLine")
     end
     state.tempState = ts
@@ -311,7 +323,8 @@ function E.Tick()
   local dt = TICK
   -- on foot and moving (for the warmth of effort): not on a mount, a flight or swimming
   local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
-  env.mounted = (IsMounted and IsMounted()) or (UnitOnTaxi and UnitOnTaxi("player")) or false
+  env.taxi = (UnitOnTaxi and UnitOnTaxi("player")) or false -- on a flight path: windy and cold
+  env.mounted = (IsMounted and IsMounted()) or env.taxi
   env.onFoot = moving and not env.mounted and not env.swimming or false
 
   -- Back after a long time away: warmed up, dried off, fed, rested.
@@ -353,10 +366,26 @@ function E.Tick()
     local dry = 0.15 + 0.012 * heat
     if env.indoors then dry = dry + 0.1 end
     if env.nearFire then dry = dry + 0.8 end
+    if env.taxi then dry = dry + 0.5 end -- the wind of a flight
     state.wet = Clamp(state.wet - dry * dt)
-    if state.soaked and state.wet <= 5 and KT.LineGapOK() then
+    if state.soaked and state.wet <= 5 and env.taxi then
+      state.soaked, flightDried = nil, true -- (said once you've landed)
+    elseif state.soaked and state.wet <= 5 and KT.LineGapOK() then
       state.soaked = nil
       Say("dry")
+    end
+  end
+
+  -- Landing after a flight: dried off by the wind? (a few seconds after landing, so
+  -- the landing line goes first)
+  local now = GetTime()
+  if lastEnv.taxi and not env.taxi then landedAt, flightCold = now, nil end
+  if flightDried and not env.taxi and landedAt then
+    if now - landedAt > 60 then
+      flightDried = nil
+    elseif now - landedAt >= 5 and KT.LineGapOK() then
+      flightDried = nil
+      Say("flightDry")
     end
   end
 
@@ -369,7 +398,6 @@ function E.Tick()
   E.effortNow = (E.effortNow or 0) + (Effort(env) - (E.effortNow or 0)) * follow
 
   -- How long you've been walking (a stop of a few seconds doesn't count)
-  local now = GetTime()
   if env.onFoot then
     footSince, stopSince = footSince or now, nil
   else -- stopped, or riding
@@ -556,6 +584,7 @@ function E.BarTip(key)
     elseif not (KT.Senses and KT.Senses.Moving and KT.Senses.Moving()) then
       add(T.still, NEUTRAL)
     end
+    if env.taxi then add(T.wind, DOWN) end
     if env.nearFire then add(T.fire, UP) end
     if env.indoors and env.resting then add(T.inn, UP) end
     if env.swimming then add(T.water, DOWN)

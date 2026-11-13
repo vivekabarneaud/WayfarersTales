@@ -852,6 +852,7 @@ L.EL_TIP = {
   fight   = "+ Fighting heats you up (%s, up to %s)",
   fading  = "+ The warmth from moving is fading (%s)",
   still   = "Standing still: your body settles back to the air",
+  wind    = "- The wind of the flight chills you",
   fire    = "+ The fire warms you",
   inn     = "+ The inn keeps you snug",
   water   = "- The water chills you",
@@ -883,7 +884,7 @@ L.EL_PAGE_TIPS    = "Warm up: a campfire, an inn, any roof over your head, or ke
 L.EL_GUIDE = table.concat({
   "|cffffd100Body comfort (Elements)|r",
   "Your character feels the cold, the heat, the water, thirst, hunger and tiredness, and tells you about it in the chat. The Body tab shows the details. (In Options, you can also show icons or bars by your portrait.)",
-  "|cffff8fb1Cold & heat|r  Each zone has its own climate. Nights are colder outside. Campfires, inns and roofs warm you up; being wet chills you. Moving warms you too (walking a little, fighting more), and you cool down again soon after you stop.",
+  "|cffff8fb1Cold & heat|r  Each zone has its own climate. Nights are colder outside. Campfires, inns and roofs warm you up; being wet chills you. Moving warms you too (walking a little, fighting more), and you cool down again soon after you stop. On a flight, the wind chills you (and dries you off).",
   "|cffff8fb1Wetness|r  Swimming soaks you. You dry off over time, faster in the heat or by a fire.",
   "|cffff8fb1Thirst|r  Slowly grows over time, faster in hot zones and in combat. Drinking anything quenches it.",
   "|cffff8fb1Hunger|r  Grows over about two hours, faster in combat or when you're cold. Eating fills you up.",

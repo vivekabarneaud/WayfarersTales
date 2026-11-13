@@ -841,6 +841,7 @@ L.EL_TIP = {
   fight   = "+ Le combat vous échauffe (%s, jusqu'à %s)",
   fading  = "+ La chaleur de l'effort retombe (%s)",
   still   = "Vous ne bougez pas : votre corps revient vers la température de l'air",
+  wind    = "- Le vent du vol vous refroidit",
   fire    = "+ Le feu vous réchauffe",
   inn     = "+ L'auberge vous garde au chaud",
   water   = "- L'eau vous refroidit",
@@ -872,7 +873,7 @@ L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp, une auberge, un toit au-de
 L.EL_GUIDE = table.concat({
   "|cffffd100Confort du corps (Elements)|r",
   "Votre personnage ressent le froid, la chaleur, l'eau, la soif, la faim et la fatigue, et vous le dit dans le chat. L'onglet Corps montre les détails. (Dans les Options, vous pouvez aussi afficher des icônes ou des barres près de votre portrait.)",
-  "|cffff8fb1Froid et chaleur|r  Chaque zone a son climat. Les nuits sont plus fraîches dehors. Feux de camp, auberges et toits vous réchauffent ; être mouillé vous refroidit. Bouger vous réchauffe aussi (marcher un peu, combattre davantage), et la chaleur retombe vite une fois à l'arrêt.",
+  "|cffff8fb1Froid et chaleur|r  Chaque zone a son climat. Les nuits sont plus fraîches dehors. Feux de camp, auberges et toits vous réchauffent ; être mouillé vous refroidit. Bouger vous réchauffe aussi (marcher un peu, combattre davantage), et la chaleur retombe vite une fois à l'arrêt. En vol, le vent vous refroidit (et vous sèche).",
   "|cffff8fb1Humidité|r  Nager vous trempe. Vous séchez avec le temps, plus vite à la chaleur ou près d'un feu.",
   "|cffff8fb1Soif|r  Monte doucement avec le temps, plus vite dans les zones chaudes et en combat. Boire n'importe quoi vous désaltère.",
   "|cffff8fb1Faim|r  Monte en deux heures environ, plus vite en combat ou quand vous avez froid. Manger vous rassasie.",

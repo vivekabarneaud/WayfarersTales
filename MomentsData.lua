@@ -773,6 +773,23 @@ D.BODY_LINES = {
       en = "Despite the cold, all this walking has warmed you up. A drop of sweat runs down your back.",
       fr = "Malgré le froid, vous avez chaud à force de marcher. Une goutte de sueur vous coule dans le dos." },
   },
+  -- Flight paths (noted 2026-11-13): the wind up there feels 8°C colder and dries you.
+  -- The mount isn't named (gryphon, hippogryph, wyvern, bat... depending on where you are).
+  flightCold = { -- getting cold during a flight (once per flight)
+    { draft = true, always = true,
+      en = "Up here, the wind bites. You hunch down to give it less to grab.",
+      fr = "Là-haut, le vent mord. Vous vous recroquevillez pour lui offrir moins de prise." },
+  },
+  flightCool = { -- back to comfortable during a flight, after the heat
+    { draft = true, always = true,
+      en = "The wind of the flight cools you down. After the heat below, what a relief.",
+      fr = "Le vent du vol vous rafraîchit. Après la chaleur d'en bas, quel soulagement." },
+  },
+  flightDry = { -- landed dry after taking off soaked
+    { draft = true, always = true,
+      en = "The wind dried your clothes during the flight.",
+      fr = "Le vent a séché vos vêtements pendant le vol." },
+  },
   effortChill = {
     { draft = true, always = true, when = { shifted = false },
       en = "You stop, and the sweat cools on your skin at once. A shiver runs through you.",
