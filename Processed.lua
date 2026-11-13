@@ -30,12 +30,17 @@ D.PROCESSED = {
     ["2026-11-11 15:04"] = true, ["2026-11-11 15:05"] = true, -- Argus, his quest
     ["2026-11-11 20:17"] = true, ["2026-11-12 16:33"] = true, ["2026-11-12 16:46"] = true, -- test, quests 144, 145
     ["2026-11-12 16:49"] = true, ["2026-11-12 16:50"] = true, -- Darkshire inn + Trelayne, cheese
+    ["2026-11-12 17:23"] = true, ["2026-11-12 17:33"] = true, ["2026-11-12 17:34"] = true, -- murloc loot, soup, goulash
+    ["2026-11-13 11:14"] = true, -- mining arms
   },
   flagsAt = {
     ["2026-11-11 08:45"] = true, ["2026-11-11 09:15"] = true, ["2026-11-11 09:21"] = true, -- mail, bomb, canals
     ["2026-11-11 09:25"] = true, ["2026-11-11 09:42"] = true, ["2026-11-11 09:54"] = true, -- auction, drink, meal
     ["2026-11-11 10:04"] = true, -- pet licks crumbs of a fish
     ["2026-11-11 15:07"] = true, ["2026-11-11 15:16"] = true, -- pet solo wording, Aubergiste Allison
+    ["2026-11-11 19:27"] = true, ["2026-11-11 20:05"] = true, ["2026-11-11 20:29"] = true, -- still line, bustle, Dolanaar
+    ["2026-11-12 16:45"] = true, ["2026-11-12 17:35"] = true, -- bustle, "food"
+    ["2026-11-13 10:38"] = true, ["2026-11-13 11:19"] = true, -- Westfall Defias, Erika
   },
   -- errors logged by versions older than this were fixed (secret values, v0.31)
   errorsBefore = "0.31.0",

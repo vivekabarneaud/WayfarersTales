@@ -190,3 +190,21 @@ No errors, no flagged lines.
 | 16:49 | Note | Darkshire's inn, Taverne du Corbeau écarlate: not gloomy, warm and lively | todo | Inn line, to discuss (TODO.md) |
 | 16:49 | NPC | Trelayne l'aubergiste (6790), Darkshire: female human, nice | done | `D.NPCS` innkeeper + line (draft) |
 | 16:50 | Bug | Poppo asked to share a cheese (Dalaran piquant) though he doesn't like cheese; idea: he sniffs it and makes a face | done | The "sniff and back away" lines already existed, but a food the pet had eaten once skipped the dislike check. Fixed: the disliked food always gets the sniff, never a request |
+
+## 2026-11-13 — Redridge, Westfall, Stormwind, the Deadmines (Poppo's hunter), report of 2026-11-13
+
+Flight wind and the screen-edge flash: tested OK.
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 11-11 19:27 | Flag | Poppo "presses so close that you don't dare move" while moving | done | Pet lines can be marked still-only (`~` at the start, in Locale); this one no longer plays while you move |
+| 11-11 20:05 | Flag | "Vous entrez dans l'agitation" in Lakeshire's inn, not that busy | done | That line now needs a real crowd (8+ players or 6+ people talking), not just "lively" (3 players, maybe outside the walls); yells no longer count as people talking nearby |
+| 11-12 16:45 | Flag | Same line in Darkshire's town hall | done | Same fix |
+| 11-11 20:29 | Flag | Dolanaar: "rien ne vous empêchera de protéger votre foyer" reads strangely | done | Now "vous protégerez votre foyer, quoi qu'il arrive" (draft) |
+| 11-13 10:38 | Flag | Westfall Defias line: "vous comprendriez presque" → "vous comprenez" | done | Reworded as suggested (draft) |
+| 11-13 11:19 | Flag | Erika Tate: shouldn't quote the NPC's exact words | done | Now "ne plaisante pas avec ses prix : ici, on ne marchande pas" (draft) |
+| 11-12 17:35 | Flag | "Poppo mange votre food" | todo | Feed Pet item missed (see 2026-11-12); watching whether it happens again (TODO.md) |
+| 11-12 17:23 | Idea | A line when looting a murloc or other kinds of enemies (Maître des flots murloc mineur, 548) | todo | TODO.md |
+| 11-12 17:33 | Idea | Murloc fin soup is spicy and warm: it could warm you up | todo | TODO.md: hot dishes warm you |
+| 11-12 17:34 | Idea | Quest 92 gives Redridge Goulash: warm and comforting, but spider meat! | todo | TODO.md: a line for its first taste |
+| 11-13 11:14 | Idea | Mining: "vos bras bourdonnent des chocs" | done | Mining line (draft): "Vos bras bourdonnent encore des chocs de la pioche." |
