@@ -26,6 +26,8 @@ D.MASCOT_KINDS = {
   { "owl", { "owl", "chouette", "hibou", "grand-duc" }, whole = true },
   { "frog", { "frog", "toad", "grenouille", "crapaud" }, whole = true },
   { "panda", { "panda" }, whole = true }, -- Bébé panda / Panda Cub (seen a lot, 2026-11-13)
+  -- every chicken: Poulet des prairies, Coq d'Ancona, the clockwork chicken... (2026-11-13)
+  { "chicken", { "chicken", "poulet", "poule", "hen", "coq", "rooster" }, whole = true },
 }
 -- A mage's mascot reacts to magic: spells found by name (any rank, any language)
 D.MASCOT_MAGIC_SPELLS = {
@@ -655,6 +657,110 @@ local LINES = {
         fr = "{pet} tient un morceau de votre {item} entre ses deux pattes et le grignote très sérieusement." },
     },
   },
+  -- Chickens (2026-11-13): every chicken shares these (Poulet des prairies, Coq d'Ancona,
+  -- the clockwork chicken...). French: "poulet" is masculine (il, lui). Red comb seen on
+  -- the Poulet des prairies. Likes bread (crumbs).
+  -- notPetType = 10: not for a clockwork chicken (feathers, worms, sleep, eating...);
+  -- notName: not for a rooster (brooding); onlyName: only for a rooster (crowing).
+  chicken = {
+    idle = {
+      { draft = true,
+        en = "{pet} pecks at the ground in quick little jabs, convinced there's treasure down there.",
+        fr = "{pet} picore le sol à petits coups secs, persuadé d'y trouver un trésor." },
+      { draft = true,
+        en = "{pet} scratches the dirt with one foot, then the other, steps back and inspects the result.",
+        fr = "{pet} gratte la terre d'une patte, puis de l'autre, recule d'un pas et inspecte le résultat." },
+      { draft = true, when = { moving = true },
+        en = "{pet} hurries after you, head bobbing back and forth with every step.",
+        fr = "{pet} vous suit d'un pas pressé, la tête qui avance et recule à chaque enjambée." },
+      { draft = true, notPetType = 10,
+        en = "{pet} fluffs up its feathers, shakes from head to tail, and goes sleek again.",
+        fr = "{pet} gonfle ses plumes, se secoue de la tête à la queue, et redevient tout lisse." },
+      { draft = true, notPetType = 10,
+        en = "{pet} lets out a string of little clucks, as if commenting on everything it sees.",
+        fr = "{pet} pousse une série de petits gloussements, comme s'il commentait tout ce qu'il voit." },
+      { draft = true, maxBand = 1,
+        en = "{pet} looks at you with one eye, then the other, head tilted. It hasn't decided yet whether you can be trusted.",
+        fr = "{pet} vous observe d'un œil, puis de l'autre, en penchant la tête. Il n'a pas encore décidé si vous étiez fiable." },
+      { draft = true, minBand = 3, notPetType = 10, notName = { "coq", "rooster" }, when = { still = true },
+        en = "{pet} settles at your feet and fluffs up its feathers, like a hen on her eggs.",
+        fr = "{pet} s'installe à vos pieds et gonfle ses plumes, comme une poule qui couve." },
+      { draft = true, notPetType = 10, when = { night = true },
+        en = "It's night, and {pet} has only one idea: find a perch and sleep.",
+        fr = "Il fait nuit, et {pet} n'a qu'une idée : trouver un perchoir et y dormir." },
+    },
+    idleGrass = {
+      { draft = true, notPetType = 10, when = GRASS,
+        en = "{pet} half-disappears into the tall grass; only its red comb sticks out.",
+        fr = "{pet} disparaît à moitié dans l'herbe haute ; seule sa crête rouge dépasse." },
+    },
+    dawn = {
+      { draft = true, onlyName = { "coq", "rooster" },
+        en = "At dawn, {pet} draws itself up and lets out a cock-a-doodle-doo loud enough to wake the whole neighbourhood.",
+        fr = "À l'aube, {pet} se dresse sur ses ergots et lance un cocorico à réveiller tout le voisinage." },
+    },
+    rain = {
+      { draft = true,
+        en = "The rain starts. {pet} pulls its head in and looks deeply offended.",
+        fr = "La pluie commence. {pet} rentre la tête dans les épaules et prend un air profondément offensé." },
+    },
+    afterRain = {
+      { draft = true, notPetType = 10,
+        en = "{pet} pecks at the worms the rain brought out. For it, the shower was worth it.",
+        fr = "{pet} picore les vers que la pluie a fait sortir. Pour lui, l'averse en valait la peine." },
+    },
+    cold = {
+      { draft = true, notPetType = 10,
+        en = "{pet} fluffs up every feather against the cold, round as a ball of yarn. You hold it close to warm it.",
+        fr = "{pet} gonfle toutes ses plumes contre le froid, rond comme une pelote. Vous le prenez contre vous pour le réchauffer." },
+    },
+    sit = {
+      { draft = true, notPetType = 10, notName = { "coq", "rooster" },
+        en = "As soon as you sit down, {pet} settles against your leg as if brooding... nothing at all.",
+        fr = "Dès que vous vous asseyez, {pet} se cale contre votre jambe et s'y installe pour couver… rien du tout." },
+    },
+    afkLap = {
+      { draft = true, notPetType = 10,
+        en = "When you come back, {pet} is asleep against you, head tucked under its wing.",
+        fr = "À votre retour, {pet} dort contre vous, la tête sous l'aile." },
+    },
+    campfire = {
+      { draft = true, notPetType = 10,
+        en = "{pet} keeps well away from the fire. A chicken near a campfire: it doesn't like the sound of that.",
+        fr = "{pet} se tient à bonne distance du feu. Un poulet près d'un feu de camp, ça ne lui dit rien qui vaille." },
+    },
+    cuddle = {
+      { draft = true, maxBand = 1, notPetType = 10,
+        en = "{pet} lets you brush its feathers, then walks three steps away, clucking indignantly.",
+        fr = "{pet} se laisse effleurer, puis s'éloigne de trois pas en gloussant, vexé." },
+      { draft = true, minBand = 2, maxBand = 2, notPetType = 10,
+        en = "{pet} stays under your hand and makes a small, contented trill.",
+        fr = "{pet} reste sous votre main et pousse un petit roucoulement satisfait." },
+      { draft = true, minBand = 3,
+        en = "{pet} crouches down as soon as you reach out, so you can stroke its back.",
+        fr = "{pet} s'accroupit dès que vous tendez la main, pour que vous puissiez lui caresser le dos." },
+    },
+    newPlace = {
+      { draft = true, notPetType = 10,
+        en = "{pet} explores this new place, pecking at anything that sticks out, then comes back to you cackling.",
+        fr = "{pet} explore ce nouvel endroit en picorant tout ce qui dépasse, puis revient vers vous en caquetant." },
+    },
+    nap = {
+      { draft = true, notPetType = 10,
+        en = "{pet} snuggles against you, head under its wing. Soon, not a single cluck.",
+        fr = "{pet} se cale contre vous, la tête sous l'aile. Bientôt, plus un gloussement." },
+    },
+    danger = {
+      { draft = true, notPetType = 10,
+        en = "{pet} squawks in panic and flaps its wings in every direction. Not very discreet.",
+        fr = "{pet} pousse des caquètements affolés et bat des ailes dans tous les sens. Pas très discret." },
+    },
+    meal_bread = {
+      { draft = true, notPetType = 10,
+        en = "You crumble a little of your {item} for {pet}, who pecks up every crumb at top speed.",
+        fr = "Vous émiettez un peu de votre {item} pour {pet}, qui picore chaque miette à toute vitesse." },
+    },
+  },
 }
 
 -- A mage's mascot: magic rubs off on it as the bond grows. These lines are added to
@@ -722,6 +828,12 @@ local MAGE = {
         fr = "À peine avez-vous disparu que {pet} vous rejoint d'un coup d'aile, comme si vous jouiez à cache-cache." } } },
   },
   kind = {
+    chicken = {
+      spell_polymorph = {
+        { draft = true,
+          en = "{pet} looks the sheep up and down, as if to say it would never have let anyone do that to it.",
+          fr = "{pet} toise le mouton, l'air de dire qu'il n'aurait jamais laissé personne lui faire ça." } },
+    },
     panda = {
       spell_polymorph = {
         { draft = true,
@@ -1048,6 +1160,18 @@ end
 -- Lines and the bond
 ---------------------------------------------------------------------------
 
+local MECHANICAL = 10 -- pet type of clockwork mascots
+
+-- Does the mascot's name contain one of these words? (onlyName / notName on a line:
+-- e.g. a rooster doesn't brood, only a rooster crows at dawn)
+local function NameHas(words)
+  local n = ((cur and cur.name) or ""):lower()
+  for _, w in ipairs(words) do
+    if n:find(w, 1, true) then return true end
+  end
+  return false
+end
+
 local function Say(event, vars, important)
   if not cur or not KT.ModuleOn("mascot") then return false end
   local db = KT.GetDB()
@@ -1059,6 +1183,9 @@ local function Say(event, vars, important)
   local own = cur.kind and LINES[cur.kind] and LINES[cur.kind][event]
   if own then
     Add(own)
+    -- a clockwork version of a mascot with a personality (the clockwork chicken) keeps
+    -- its clicks and whirs too (its personality lines skip what a machine can't do)
+    if cur.petType == MECHANICAL then Add(FAMILY[MECHANICAL] and FAMILY[MECHANICAL][event]) end
   else
     local fam = FAMILY[cur.petType or 0]
     Add(fam and fam[event])
@@ -1080,6 +1207,7 @@ local function Say(event, vars, important)
   for _, line in ipairs(list) do
     if band >= (line.minBand or 1) and band <= (line.maxBand or 3)
       and (not line.draft or testing) and line.notPetType ~= cur.petType
+      and (not line.onlyName or NameHas(line.onlyName)) and not (line.notName and NameHas(line.notName))
       and (not (line.en or ""):find("{place}", 1, true) or (vars and vars.place)) then
       local ok = true
       if line.when and KT.Senses and KT.Senses.Check then
@@ -1127,6 +1255,7 @@ end
 
 local lastPlaces, wasSeated, wasNapping, wasRain, minuteAcc, lastTick
 local wasSit, wasCold, wasEating, wasAFK, afkOnLap, rainSince, rainEnded
+local wasNight, dawnAt
 
 local function PlaceCount()
   if not (KT.Discovery and KT.Discovery.Counts) then return nil end
@@ -1259,6 +1388,19 @@ local function Tick()
     elseif not env.indoors and not env.combat and KT.LineGapOK() and Ready(cur, "afterRain", 1800) then
       if Say("afterRain") then Mark(cur, "afterRain") end
       rainEnded = nil
+    end
+  end
+
+  -- dawn, outdoors (a rooster crows): a few seconds after the dawn line itself
+  local night = KT.World.IsNight()
+  if wasNight and not night and not env.indoors and not IsInInstance() then dawnAt = now end
+  wasNight = night
+  if dawnAt and now - dawnAt >= 10 then
+    if now - dawnAt > 120 then
+      dawnAt = nil
+    elseif not env.combat and KT.LineGapOK() then
+      dawnAt = nil
+      if Ready(cur, "dawn", 3600) and Say("dawn") then Mark(cur, "dawn") end
     end
   end
 
