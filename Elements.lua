@@ -185,7 +185,7 @@ local FLASH_COLOR = {
   hunger = { 0.85, 0.1, 0.08 }, thirst = { 0.85, 0.1, 0.08 },
   tired = { 0, 0, 0 },        -- the edges darken, like heavy eyelids
 }
-local FLASH_ALPHA = { 0.2, 0.35, 0.55 } -- by level: a little, yes, a lot
+local FLASH_ALPHA = { 0.25, 0.5, 0.65 } -- by level: a little, yes, a lot
 local FLASH_IN, FLASH_HOLD, FLASH_OUT = 0.4, 0.3, 1.2
 local flash
 
