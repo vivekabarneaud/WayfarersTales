@@ -248,6 +248,7 @@ D.DEFAULTS = {
   minimapAngle = 200,
   showHeart = false, -- the heart next to the pet's happiness icon (the minimap button does the job now)
   showThermo = true,
+  bodyFlash = true,        -- screen edges light up when you get cold, hot, hungry, thirsty, tired
   thermoAngle = 15,
   bodyStyle = "none",      -- body comfort by your portrait: none / icons / bars
   sensesRhythm = 2,        -- how often immersion lines appear (0-3)

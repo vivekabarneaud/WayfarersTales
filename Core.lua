@@ -1957,6 +1957,10 @@ SlashCmdList.WAYFARERSTALES = function(msg)
     ToggleTester()
   elseif cmd == "welcome" or cmd == "bienvenue" then
     Welcome(true)
+  elseif cmd == "flash" then
+    -- try the screen-edge flash: /wt flash cold|hot|hunger|thirst|tired [1-3]
+    local kind, level = (arg or ""):match("^(%a*)%s*(%d?)")
+    if KT.Elements then KT.Elements.Flash(kind ~= "" and kind or "cold", tonumber(level) or 2) end
   elseif cmd == "nope" then
     -- flag the latest journal line as wrong/odd, with an optional comment (/wt nope too long)
     local note = (msg or ""):match("^%S*%s*(.-)%s*$")

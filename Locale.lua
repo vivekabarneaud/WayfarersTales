@@ -829,6 +829,7 @@ L.EL_NEED_STATES  = { ok = "Fine", thirstyLight = "A little thirsty", thirsty = 
   peckish = "Peckish", hungry = "Hungry", starving = "Starving",
   tiredLight = "A little tired", tired = "Tired", exhausted = "Exhausted" }
 L.UI_OPT_THERMO   = "Show the thermometer by the minimap"
+L.UI_OPT_FLASH    = "Screen edges light up (cold, heat, hunger, thirst, tiredness)"
 L.UI_OPT_GENDER   = "Your character (for grammar in French)"
 L.UI_GENDER_AUTO  = "Auto"
 L.UI_GENDER_M     = "Male"
@@ -847,16 +848,17 @@ L.EL_HERE         = "Here: %s"
 L.EL_MOVE_HINT    = "Click: details. Shift + drag: move."
 L.EL_OFF          = "The body comfort module is turned off. You can turn it back on in the Options tab."
 L.EL_PAGE_INTRO   = "How your character feels. Pure flavor: nothing here changes your stats."
-L.EL_PAGE_TIPS    = "Warm up: a campfire, an inn, any roof over your head.\nCool down: get indoors, wait for the night, take a swim.\nDry off: time, and much faster by a fire.\nThirst: drink anything. It drops faster in the heat.\nHunger: sit down and eat.\nEnergy: rest indoors without moving (an inn, a house in town), sit by a campfire, or take a nap (/sleep). Walking around town or sitting down elsewhere helps a little (up to 60%); standing still just stops it dropping.\nRain soaks you outdoors, and cools the air."
+L.EL_PAGE_TIPS    = "Warm up: a campfire, an inn, any roof over your head, or keep moving.\nCool down: get indoors, wait for the night, take a swim.\nDry off: time, and much faster by a fire.\nThirst: drink anything. It drops faster in the heat.\nHunger: sit down and eat.\nEnergy: rest indoors without moving (an inn, a house in town), sit by a campfire, or take a nap (/sleep). Walking around town or sitting down elsewhere helps a little (up to 60%); standing still just stops it dropping.\nRain soaks you outdoors, and cools the air."
 L.EL_GUIDE = table.concat({
   "|cffffd100Body comfort (Elements)|r",
   "Your character feels the cold, the heat, the water, thirst, hunger and tiredness, and tells you about it in the chat. The Body tab shows the details. (In Options, you can also show icons or bars by your portrait.)",
-  "|cffff8fb1Cold & heat|r  Each zone has its own climate. Nights are colder outside. Campfires, inns and roofs warm you up; being wet chills you.",
+  "|cffff8fb1Cold & heat|r  Each zone has its own climate. Nights are colder outside. Campfires, inns and roofs warm you up; being wet chills you. Moving warms you too (walking a little, fighting more), and you cool down again soon after you stop.",
   "|cffff8fb1Wetness|r  Swimming soaks you. You dry off over time, faster in the heat or by a fire.",
   "|cffff8fb1Thirst|r  Slowly grows over time, faster in hot zones and in combat. Drinking anything quenches it.",
   "|cffff8fb1Hunger|r  Grows over about two hours, faster in combat or when you're cold. Eating fills you up.",
-  "|cffff8fb1Energy|r  After a few hours of adventuring you get tired. Rest at an inn or in a city, sit by a campfire, or doze off.",
-  "|cffff8fb1Thermometer|r  The button by the minimap shows the air temperature. Your body follows it, but being wet, a fire or an inn change how you feel.",
+  "|cffff8fb1Energy|r  After a few hours of adventuring you get tired, sooner when you're cold or too hot. Rest at an inn or in a city, sit by a campfire, or doze off.",
+  "|cffff8fb1Thermometer|r  The button by the minimap shows the air temperature. Your body follows it, but moving, being wet, a fire or an inn change how you feel.",
+  "|cffff8fb1Screen edges|r  They light up for a moment when something gets worse: blue for the cold, orange for the heat, red for hunger and thirst, dark for tiredness. You can turn this off in the Body tab.",
 }, "\n")
 
 M.coldEnter = {

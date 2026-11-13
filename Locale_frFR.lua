@@ -818,6 +818,7 @@ L.EL_NEED_STATES  = { ok = "Ça va", thirstyLight = "Légère soif", thirsty = "
   peckish = "Petit creux", hungry = "Faim", starving = "Grande faim",
   tiredLight = "Légère fatigue", tired = "Fatigue", exhausted = "Épuisement" }
 L.UI_OPT_THERMO   = "Afficher le thermomètre près de la minicarte"
+L.UI_OPT_FLASH    = "Bords de l'écran lumineux (froid, chaleur, faim, soif, fatigue)"
 L.UI_OPT_GENDER   = "Votre personnage (pour les accords)"
 L.UI_GENDER_AUTO  = "Auto"
 L.UI_GENDER_M     = "Masculin"
@@ -836,16 +837,17 @@ L.EL_HERE         = "Ici : %s"
 L.EL_MOVE_HINT    = "Clic : détails. Maj + glisser : déplacer."
 L.EL_OFF          = "Le module de confort du corps est désactivé. Vous pouvez le réactiver dans l'onglet Options."
 L.EL_PAGE_INTRO   = "Ce que ressent votre personnage. Purement cosmétique : rien ici ne change vos caractéristiques."
-L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp, une auberge, un toit au-dessus de la tête.\nSe rafraîchir : rentrer à l'intérieur, attendre la nuit, se baigner.\nSe sécher : le temps, et bien plus vite près d'un feu.\nLa soif : buvez n'importe quoi. Elle monte plus vite quand il fait chaud.\nLa faim : asseyez-vous et mangez.\nL'énergie : reposez-vous à l'intérieur sans bouger (une auberge, une maison en ville), asseyez-vous au coin du feu, ou faites une sieste (/sleep). Flâner en ville ou s'asseoir ailleurs aide un peu (jusqu'à 60 %) ; rester immobile évite juste de se fatiguer.\nLa pluie vous trempe dehors, et rafraîchit l'air."
+L.EL_PAGE_TIPS    = "Se réchauffer : un feu de camp, une auberge, un toit au-dessus de la tête, ou continuer à bouger.\nSe rafraîchir : rentrer à l'intérieur, attendre la nuit, se baigner.\nSe sécher : le temps, et bien plus vite près d'un feu.\nLa soif : buvez n'importe quoi. Elle monte plus vite quand il fait chaud.\nLa faim : asseyez-vous et mangez.\nL'énergie : reposez-vous à l'intérieur sans bouger (une auberge, une maison en ville), asseyez-vous au coin du feu, ou faites une sieste (/sleep). Flâner en ville ou s'asseoir ailleurs aide un peu (jusqu'à 60 %) ; rester immobile évite juste de se fatiguer.\nLa pluie vous trempe dehors, et rafraîchit l'air."
 L.EL_GUIDE = table.concat({
   "|cffffd100Confort du corps (Elements)|r",
   "Votre personnage ressent le froid, la chaleur, l'eau, la soif, la faim et la fatigue, et vous le dit dans le chat. L'onglet Corps montre les détails. (Dans les Options, vous pouvez aussi afficher des icônes ou des barres près de votre portrait.)",
-  "|cffff8fb1Froid et chaleur|r  Chaque zone a son climat. Les nuits sont plus fraîches dehors. Feux de camp, auberges et toits vous réchauffent ; être mouillé vous refroidit.",
+  "|cffff8fb1Froid et chaleur|r  Chaque zone a son climat. Les nuits sont plus fraîches dehors. Feux de camp, auberges et toits vous réchauffent ; être mouillé vous refroidit. Bouger vous réchauffe aussi (marcher un peu, combattre davantage), et la chaleur retombe vite une fois à l'arrêt.",
   "|cffff8fb1Humidité|r  Nager vous trempe. Vous séchez avec le temps, plus vite à la chaleur ou près d'un feu.",
   "|cffff8fb1Soif|r  Monte doucement avec le temps, plus vite dans les zones chaudes et en combat. Boire n'importe quoi vous désaltère.",
   "|cffff8fb1Faim|r  Monte en deux heures environ, plus vite en combat ou quand vous avez froid. Manger vous rassasie.",
-  "|cffff8fb1Énergie|r  Après quelques heures d'aventure, la fatigue arrive. Reposez-vous dans une auberge ou en ville, au coin du feu, ou somnolez un moment.",
-  "|cffff8fb1Thermomètre|r  Le bouton près de la minicarte indique la température de l'air. Votre corps la suit, mais l'eau, un feu ou une auberge changent votre ressenti.",
+  "|cffff8fb1Énergie|r  Après quelques heures d'aventure, la fatigue arrive, plus tôt quand vous avez froid ou trop chaud. Reposez-vous dans une auberge ou en ville, au coin du feu, ou somnolez un moment.",
+  "|cffff8fb1Thermomètre|r  Le bouton près de la minicarte indique la température de l'air. Votre corps la suit, mais bouger, l'eau, un feu ou une auberge changent votre ressenti.",
+  "|cffff8fb1Bords de l'écran|r  Ils s'illuminent un instant quand quelque chose empire : bleu pour le froid, orange pour la chaleur, rouge pour la faim et la soif, sombre pour la fatigue. Désactivable dans l'onglet Corps.",
 }, "\n")
 
 M.coldEnter = {

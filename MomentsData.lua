@@ -599,6 +599,7 @@ D.BODY_GEAR_CHANCE = 0.6
 D.BODY_PERSON_POOLS = {
   coldEnter = true, freezingEnter = true, coldRemind = true, freezingRemind = true, warmBack = true,
   hotEnter = true, hotRemind = true, soaked = true, dry = true, fireWarm = true,
+  effortSweat = true, effortChill = true,
 }
 
 local CLOAK_COLD = { draft = true,
@@ -756,6 +757,27 @@ D.BODY_LINES = {
   napStart       = { NAP_START, NAP_START_FUR },
   napWakeFull    = { NAP_FULL_1 },
   napWakeShort   = { NAP_SHORT_1, NAP_SHORT_2 },
+  -- Walking in the cold (noted 2026-11-13): it warms you up (after 1 min 30 of walking where
+  -- standing still would leave you cold), a long walk (8 min, air below 8°C) makes you
+  -- sweat, and stopping after that chills you. Sweat and skin: not in an animal form.
+  effortWarm = {
+    { draft = true, always = true,
+      en = "Walking warms you up a little. Better not to stop for too long.",
+      fr = "Marcher vous réchauffe un peu. Mieux vaut ne pas trop s'arrêter." },
+    { draft = true, always = true,
+      en = "Your legs are working, and the cold backs off a little.",
+      fr = "Vos jambes travaillent, et le froid recule un peu." },
+  },
+  effortSweat = {
+    { draft = true, always = true, when = { shifted = false },
+      en = "Despite the cold, all this walking has warmed you up. A drop of sweat runs down your back.",
+      fr = "Malgré le froid, vous avez chaud à force de marcher. Une goutte de sueur vous coule dans le dos." },
+  },
+  effortChill = {
+    { draft = true, always = true, when = { shifted = false },
+      en = "You stop, and the sweat cools on your skin at once. A shiver runs through you.",
+      fr = "Vous vous arrêtez, et la sueur refroidit aussitôt sur votre peau. Un frisson vous parcourt." },
+  },
 }
 
 ---------------------------------------------------------------------------

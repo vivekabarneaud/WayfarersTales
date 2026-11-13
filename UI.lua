@@ -972,7 +972,7 @@ local function BuildBody(parent)
   page:Add(top, 8)
   page.here = Para(page, "GameFontHighlight", 10)
 
-  local set = Box(page.p, 92)
+  local set = Box(page.p, 118)
   BoxLabel(set, 10, -10, "UI_OPT_BODYSTYLE")
   page.bodyStyle = Segmented(set, 10, -30, {
     { "none", function() return L.UI_BODYSTYLE.none end },
@@ -984,6 +984,10 @@ local function BuildBody(parent)
   end)
   page.thermo = CheckBox(set, 6, -58, "showThermo", "UI_OPT_THERMO", function()
     if KT.Elements then KT.Elements.UpdateThermo() end
+  end)
+  -- the screen-edge flash: turning it on shows one, so you see what it looks like
+  page.flash = CheckBox(set, 6, -84, "bodyFlash", "UI_OPT_FLASH", function()
+    if KT.Elements and api.GetDB().settings.bodyFlash then KT.Elements.Flash("cold", 2) end
   end)
   page.settings = page:Add(set, 10)
   page.guide = GuideBox(page)
@@ -1015,6 +1019,7 @@ local function RefreshBody(page)
     page.guide.text:SetText(TipsText())
     page.bodyStyle:Select(db.settings.bodyStyle or "none")
     page.thermo:Refresh()
+    page.flash:Refresh()
   end
   page:Layout()
 end

@@ -3,7 +3,7 @@
 --
 -- Values from 0 to 100:
 --   temp    50 = comfortable, lower = cold, higher = hot. Follows the AIR
---           temperature (see World.lua), plus being wet, swimming, fires, inns.
+--           temperature (see World.lua), plus moving, being wet, swimming, fires, inns.
 --   wet     0 = dry, 100 = soaked
 --   thirst  100 = fine, 0 = parched        (drink to fill it)
 --   hunger  100 = fed, 0 = starving        (eat to fill it)
@@ -15,11 +15,19 @@ local E = {}
 KT.Elements = E
 
 local TICK = 5            -- seconds between updates
-local TEMP_HALFLIFE = 240 -- seconds for your body to get halfway to what the air makes it feel
+local TEMP_HALFLIFE = 45  -- seconds for your body to get halfway to what it feels (air, effort, water...):
+                          -- fast at first, then slower; the same for a new climate or after stopping
+-- Moving warms you: degrees of felt air on foot, more in a fight (not on a mount, in
+-- flight or swimming). Half as much in the heat: sweat cools you.
+local EFFORT_WALK, EFFORT_FIGHT = 8, 12
+local TEMP_LINE_GAP = 240 -- seconds between two "getting cold / warm again" lines (the
+                          -- body changes fast now: walking and stopping can flip it)
 
 local state               -- this character's saved values
 local swimStart
 local sitting, napping    -- sat down (X key, /sit) and napping (/sleep), until you move
+local footSince, stopSince -- moving on foot since (GetTime), stopped since
+local sweaty              -- warm from a long walk in the cold: stopping will chill you
 local lastEnv = {}
 local tip                 -- the hover panel with bars (created on first hover)
 
@@ -143,14 +151,87 @@ end
 -- How warm does the place make your body feel?
 ---------------------------------------------------------------------------
 
-function E.Target(env)
-  local target = 50 + ((env.air or 15) - 16) * 2.2   -- 16°C feels just right
+-- Extra warmth from moving, in degrees of felt air (see EFFORT_WALK)
+local function Effort(env)
+  local e = (env.combat and not env.mounted and EFFORT_FIGHT) or (env.onFoot and EFFORT_WALK) or 0
+  local air = env.air or 15
+  if air > 15 then e = e * math.max(0.5, 1 - (air - 15) / 20) end -- half from 25°C: you sweat
+  return e
+end
+
+function E.Target(env, still)
+  local felt = (env.air or 15) + (still and 0 or Effort(env))
+  local target = 50 + (felt - 20) * 2.2   -- 20°C feels just right, standing still
   if env.swimming then target = target - 10 end
   if state.wet > 30 then target = target - 15 * (state.wet / 100) end
   if env.indoors and env.resting then target = 50 + (target - 50) * 0.5 end -- inns are cosy
   if env.nearFire then target = math.max(target, 56) end -- a fire warms you to cosy, never scorches
   return Clamp(target)
 end
+
+---------------------------------------------------------------------------
+-- Screen-edge flash: a soft glow around the screen when you get colder, hotter,
+-- hungrier, thirstier or more tired, and with each reminder (Body tab: on by default).
+-- Behind the interface, never takes clicks.
+---------------------------------------------------------------------------
+
+local FLASH_COLOR = {
+  cold = { 0.35, 0.65, 1 }, hot = { 1, 0.5, 0.1 },
+  hunger = { 0.85, 0.1, 0.08 }, thirst = { 0.85, 0.1, 0.08 },
+  tired = { 0, 0, 0 },        -- the edges darken, like heavy eyelids
+}
+local FLASH_ALPHA = { 0.2, 0.35, 0.55 } -- by level: a little, yes, a lot
+local FLASH_IN, FLASH_HOLD, FLASH_OUT = 0.4, 0.3, 1.2
+local flash
+
+local function Gradient(tex, orient, c, a1, a2)
+  tex:SetColorTexture(1, 1, 1, 1)
+  if CreateColor and pcall(tex.SetGradient, tex, orient, CreateColor(c[1], c[2], c[3], a1), CreateColor(c[1], c[2], c[3], a2)) then return end
+  if tex.SetGradientAlpha then tex:SetGradientAlpha(orient, c[1], c[2], c[3], a1, c[1], c[2], c[3], a2) end
+end
+
+local function CreateFlash()
+  flash = CreateFrame("Frame", nil, UIParent)
+  flash:SetAllPoints(UIParent)
+  flash:SetFrameStrata("BACKGROUND")
+  flash:EnableMouse(false)
+  flash:Hide()
+  flash.edges = {}
+  for _, side in ipairs({ "TOP", "BOTTOM", "LEFT", "RIGHT" }) do
+    local t = flash:CreateTexture(nil, "BACKGROUND")
+    t:SetPoint(side)
+    flash.edges[side] = t
+  end
+  flash:SetScript("OnUpdate", function(self)
+    local t = GetTime() - self.start
+    local a
+    if t < FLASH_IN then a = t / FLASH_IN
+    elseif t < FLASH_IN + FLASH_HOLD then a = 1
+    elseif t < FLASH_IN + FLASH_HOLD + FLASH_OUT then a = 1 - (t - FLASH_IN - FLASH_HOLD) / FLASH_OUT
+    else self:Hide() return end
+    self:SetAlpha(a)
+  end)
+end
+
+-- kind: cold / hot / hunger / thirst / tired; level 1 (a little) to 3 (a lot)
+function E.Flash(kind, level)
+  local c = FLASH_COLOR[kind]
+  if not c or KT.GetDB().settings.bodyFlash == false then return end
+  if not flash then CreateFlash() end
+  local peak = FLASH_ALPHA[level or 1] or FLASH_ALPHA[1]
+  local w, h = UIParent:GetWidth(), UIParent:GetHeight()
+  local size = math.floor(math.min(w, h) * 0.2) -- how far the glow reaches into the screen
+  local e = flash.edges
+  e.TOP:SetSize(w, size);    Gradient(e.TOP, "VERTICAL", c, 0, peak)      -- (VERTICAL: bottom -> top)
+  e.BOTTOM:SetSize(w, size); Gradient(e.BOTTOM, "VERTICAL", c, peak, 0)
+  e.LEFT:SetSize(size, h);   Gradient(e.LEFT, "HORIZONTAL", c, peak, 0)   -- (HORIZONTAL: left -> right)
+  e.RIGHT:SetSize(size, h);  Gradient(e.RIGHT, "HORIZONTAL", c, 0, peak)
+  flash.start = GetTime()
+  flash:SetAlpha(0)
+  flash:Show()
+end
+
+local NEED_FLASH = { thirst = "thirst", hunger = "hunger", energy = "tired" }
 
 ---------------------------------------------------------------------------
 -- Messages when things change
@@ -163,18 +244,28 @@ local function CheckStates(env)
   -- Temperature
   local prev = state.tempState or "ok"
   local ts = TempState(state.temp, prev)
+  local tempKind = TEMP_RANK[ts] < 0 and "cold" or "hot"
   if ts ~= prev then
     local r, pr = TEMP_RANK[ts], TEMP_RANK[prev]
+    -- (freezing and overheating always speak up; the milder changes wait a little
+    -- between two lines, the state still changes)
+    local severe = math.abs(r) >= 2
     if r ~= 0 and math.abs(r) > math.abs(pr) and r * pr >= 0 then
-      Say(ts .. "Enter", nil, true)
+      if severe or Ready("tempLine", TEMP_LINE_GAP) then
+        Say(ts .. "Enter", nil, true)
+        Mark("tempLine")
+        E.Flash(tempKind, math.abs(r) + 1)
+      end
       Mark("tempRemind")
-    elseif ts == "ok" then
+    elseif ts == "ok" and Ready("tempLine", TEMP_LINE_GAP) then
       Say(pr < 0 and "warmBack" or "coolBack", nil, true)
+      Mark("tempLine")
     end
     state.tempState = ts
   elseif ts ~= "ok" and Ready("tempRemind", 600) and KT.Chance(0.8) then
     Mark("tempRemind")
     Say(ts .. "Remind")
+    E.Flash(tempKind, math.abs(TEMP_RANK[ts]) + 1)
   end
 
   -- Thirst, hunger, energy
@@ -186,6 +277,7 @@ local function CheckStates(env)
       if NeedRank(s, n.states) > NeedRank(p, n.states) then
         Say("body_" .. s, nil, true)
         Mark(n.key .. "Remind")
+        E.Flash(NEED_FLASH[n.key], NeedRank(s, n.states))
       elseif s == "ok" then
         Say(n.relief, nil, true)
       end
@@ -193,6 +285,7 @@ local function CheckStates(env)
     elseif s ~= "ok" and Ready(n.key .. "Remind", n.remind) and KT.Chance(0.8) then
       Mark(n.key .. "Remind")
       Say("body_" .. s)
+      E.Flash(NEED_FLASH[n.key], NeedRank(s, n.states))
     end
   end
 
@@ -216,6 +309,10 @@ function E.Tick()
   if UnitIsDeadOrGhost("player") then return end
   local env = KT.World.Snapshot()
   local dt = TICK
+  -- on foot and moving (for the warmth of effort): not on a mount, a flight or swimming
+  local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
+  env.mounted = (IsMounted and IsMounted()) or (UnitOnTaxi and UnitOnTaxi("player")) or false
+  env.onFoot = moving and not env.mounted and not env.swimming or false
 
   -- Back after a long time away: warmed up, dried off, fed, rested.
   if state.needsReset then
@@ -263,9 +360,36 @@ function E.Tick()
     end
   end
 
-  -- Temperature drifts toward what the air makes you feel
+  -- Temperature drifts toward what you feel (the air, moving, water...)
   local target = E.Target(env)
   state.temp = state.temp + (target - state.temp) * (1 - math.exp(-dt / TEMP_HALFLIFE))
+
+  -- How long you've been walking (a stop of a few seconds doesn't count)
+  local now = GetTime()
+  if env.onFoot then
+    footSince, stopSince = footSince or now, nil
+  else -- stopped, or riding
+    stopSince = stopSince or now
+    if now - stopSince > 15 then footSince = nil end
+  end
+  -- Walking in the cold: it warms you up, a long walk even makes you sweat, and
+  -- stopping after that chills you fast.
+  local cold = (env.air or 15) < 8
+  if not env.combat and KT.LineGapOK() then
+    local walked = footSince and env.onFoot and now - footSince or 0
+    if walked >= 90 and E.Target(env, true) < 35 and state.temp > before.temp and Ready("effortWarm", 1800) then
+      Mark("effortWarm")
+      Say("effortWarm")
+    elseif walked >= 480 and cold and state.temp >= 35 and not sweaty and Ready("effortSweat", 2700) then
+      Mark("effortSweat")
+      sweaty = true
+      Say("effortSweat")
+    elseif sweaty and stopSince and not moving and now - stopSince >= 8 then
+      sweaty = nil
+      if cold and not env.indoors then Say("effortChill") end
+    end
+  end
+  if sweaty and stopSince and now - stopSince > 60 then sweaty = nil end
 
   -- Thirst: ~2h15 from full to empty in mild air, faster in the heat and in combat
   if env.drinking then
@@ -291,7 +415,6 @@ function E.Tick()
   -- by a campfire, eating or drinking, dozing off (AFK), or napping (/sleep, fast).
   -- Up to 60 only: anywhere else in town, or sitting down elsewhere.
   -- Standing still only stops the drop.
-  local moving = KT.Senses and KT.Senses.Moving and KT.Senses.Moving()
   if (moving or env.combat) and (sitting or napping) then E.StandUp() end
   local recover = 0
   if env.seatedAtFire then recover = math.max(recover, 0.15) end
@@ -315,7 +438,10 @@ function E.Tick()
   else
     local rate = 100 / 7200 -- (about 2 hours)
     if env.combat or env.swimming then rate = rate * 1.5 end
-    if state.temp < 20 then rate = rate * 1.2 end
+    -- being cold or hot tires you faster
+    local ts = state.tempState or "ok"
+    if ts == "cold" or ts == "hot" then rate = rate * 1.15
+    elseif ts == "freezing" or ts == "overheat" then rate = rate * 1.3 end
     state.energy = Clamp(state.energy - rate * dt)
   end
 
