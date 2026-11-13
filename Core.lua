@@ -128,6 +128,10 @@ local function SpellName(id)
   return ok and n or nil
 end
 
+-- Your bags: the backpack (0), four bags, and the reagent bag (5), where ingredients
+-- such as raw fish go. (A bag you don't have just has no slots.)
+local LAST_BAG = math.max(NUM_TOTAL_EQUIPPED_BAG_SLOTS or 0, (NUM_BAG_SLOTS or 4) + 1)
+
 local function ItemClass(id)
   local fn = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
   if not fn or not id then return nil end
@@ -1084,7 +1088,7 @@ local function RandomBagItem()
   local numSlots = C_Container and C_Container.GetContainerNumSlots or GetContainerNumSlots
   local itemLink = C_Container and C_Container.GetContainerItemLink or GetContainerItemLink
   if not (numSlots and itemLink) then return nil end
-  for bag = 0, 4 do
+  for bag = 0, LAST_BAG do
     local okN, n = pcall(numSlots, bag)
     for slot = 1, (okN and n or 0) do
       local okL, link = pcall(itemLink, bag, slot)
@@ -1134,7 +1138,7 @@ local function ResolveFeed(itemID, link)
   pet.stats.feeds = pet.stats.feeds + 1
   if itemID then pet.foods[itemID] = (pet.foods[itemID] or 0) + 1 end
   FirstMemory("firstFeed")
-  local item = link or "food"
+  local item = link or L.FOOD_FALLBACK -- (item not found: "your meal")
 
   local meal = state.meal
   if meal and GetTime() <= meal.expires then
@@ -1144,7 +1148,7 @@ local function ResolveFeed(itemID, link)
     if itemID == meal.itemID then
       Say("mealShared", { item = item }, Gain("meal"), true)
     else
-      Say("mealOther", { item = meal.link or "food" }, Gain("mealAlt"), true)
+      Say("mealOther", { item = meal.link or L.FOOD_FALLBACK }, Gain("mealAlt"), true)
     end
     -- a shared meal can reveal the favorite too
     local k, t = FoodKind(itemID, link), pet.tastes
@@ -1423,8 +1427,9 @@ local bagCounts, bagLinks, bagReady, bagPending = {}, {}, false, false
 
 local function SnapshotBags()
   local counts, links = {}, {}
-  for bag = 0, (NUM_BAG_SLOTS or 4) do
-    for slot = 1, C_Container.GetContainerNumSlots(bag) or 0 do
+  for bag = 0, LAST_BAG do
+    local okN, n = pcall(C_Container.GetContainerNumSlots, bag)
+    for slot = 1, (okN and n or 0) do
       local info = C_Container.GetContainerItemInfo(bag, slot)
       if info and info.itemID then
         counts[info.itemID] = (counts[info.itemID] or 0) + (info.stackCount or 1)

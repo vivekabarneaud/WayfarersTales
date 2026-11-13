@@ -202,6 +202,7 @@ L.CMD_ROOF = {
 }
 L.CMD_STATUS_HINT = "Type |cffffd100/wt help|r for all commands."
 L.CMD_NO_PET     = "No hunter pet is out right now."
+L.FOOD_FALLBACK  = "meal" -- in pet lines when the food your pet ate couldn't be found ("your meal")
 L.CMD_CHATTY     = "Chattiness set to %d."
 L.CMD_DEBUG      = "Debug mode: %s"
 L.CMD_NO_MEMORY  = "No memories yet. Your story is just beginning!"

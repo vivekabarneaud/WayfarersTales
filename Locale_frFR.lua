@@ -200,6 +200,7 @@ L.CMD_ROOF = {
 }
 L.CMD_STATUS_HINT = "Tapez |cffffd100/wt help|r pour toutes les commandes."
 L.CMD_NO_PET    = "Aucun familier de chasseur n'est invoqué pour le moment."
+L.FOOD_FALLBACK = "repas" -- dans les lignes du familier quand l'aliment n'a pas pu être trouvé (« votre repas »)
 L.CMD_CHATTY    = "Fréquence des réactions réglée sur %d."
 L.CMD_DEBUG     = "Mode débogage : %s"
 L.CMD_NO_MEMORY = "Pas encore de souvenirs. Votre histoire ne fait que commencer !"
