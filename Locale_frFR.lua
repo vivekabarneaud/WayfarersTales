@@ -834,6 +834,36 @@ L.EL_NIGHT        = "nuit"
 L.EL_FIRE         = "près d'un feu"
 L.EL_SWIMMING     = "dans l'eau"
 L.EL_HERE         = "Ici : %s"
+-- Onglet Corps, au survol des barres de température et d'énergie
+L.EL_TIP = {
+  air     = "Air ici : %s",
+  walk    = "+ Marcher vous réchauffe (%s)",
+  fight   = "+ Le combat vous échauffe (%s)",
+  still   = "Vous ne bougez pas : votre corps revient vers la température de l'air",
+  fire    = "+ Le feu vous réchauffe",
+  inn     = "+ L'auberge vous garde au chaud",
+  water   = "- L'eau vous refroidit",
+  wet     = "- Vos vêtements mouillés vous refroidissent",
+  rising  = "En hausse, vers : %s",
+  falling = "En baisse, vers : %s",
+  steady  = "Stable : %s",
+  energy = {
+    nap     = "+ Une sieste : vous récupérez vite",
+    fire    = "+ Au coin du feu : vous récupérez complètement",
+    afk     = "+ Vous somnolez : vous récupérez complètement",
+    meal    = "+ Manger ou boire vous repose",
+    indoors = "+ Au repos à l'intérieur : vous récupérez complètement",
+    town    = "+ En ville : vous reprenez votre souffle, jusqu'à 60 %",
+    sit     = "+ Une pause assise : vous récupérez jusqu'à 60 %",
+    still   = "Vous ne bougez pas : la fatigue n'avance plus",
+    walk    = "- Marcher vous fatigue",
+    ride    = "- Même en selle, la route vous fatigue",
+    fight   = "- Le combat vous fatigue plus vite",
+    swim    = "- Nager vous fatigue plus vite",
+    cold    = "- Le froid vous fatigue plus vite",
+    heat    = "- La chaleur vous fatigue plus vite",
+  },
+}
 L.EL_MOVE_HINT    = "Clic : détails. Maj + glisser : déplacer."
 L.EL_OFF          = "Le module de confort du corps est désactivé. Vous pouvez le réactiver dans l'onglet Options."
 L.EL_PAGE_INTRO   = "Ce que ressent votre personnage. Purement cosmétique : rien ici ne change vos caractéristiques."

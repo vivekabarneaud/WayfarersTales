@@ -967,6 +967,21 @@ local function BuildBody(parent)
   for i = 1, 5 do
     local bar = StyledBar(top, PAGE_W - x - 16, 18)
     bar:SetPoint("TOPLEFT", x + 4, -50 - (i - 1) * 36)
+    -- hover: what's pushing this bar right now (temperature and energy only)
+    bar:EnableMouse(true)
+    bar:SetScript("OnEnter", function(self)
+      local lines = KT.Elements and self.tipKey and KT.Elements.BarTip(self.tipKey)
+      if not lines then return end
+      GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+      GameTooltip:AddLine(self.text:GetText() or "", 1, 0.82, 0)
+      for _, l in ipairs(lines) do GameTooltip:AddLine(l[1], l[2], l[3], l[4], true) end
+      GameTooltip:Show()
+      self.tipShown = true
+    end)
+    bar:SetScript("OnLeave", function(self)
+      self.tipShown = nil
+      GameTooltip:Hide()
+    end)
     page.bars[i] = bar
   end
   page:Add(top, 8)
@@ -1008,6 +1023,9 @@ local function RefreshBody(page)
     if r then
       bar.text:SetText(r[1])
       E.ApplyBar(bar, r)
+      bar.tipKey = r.key
+      -- the tooltip follows along while you hover (the panel refreshes every few seconds)
+      if bar.tipShown and GameTooltip:GetOwner() == bar then bar:GetScript("OnEnter")(bar) end
     end
   end
   page.intro:SetText(on and L.EL_PAGE_INTRO or L.EL_OFF)

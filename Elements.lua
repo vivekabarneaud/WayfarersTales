@@ -416,34 +416,43 @@ function E.Tick()
   -- Up to 60 only: anywhere else in town, or sitting down elsewhere.
   -- Standing still only stops the drop.
   if (moving or env.combat) and (sitting or napping) then E.StandUp() end
-  local recover = 0
-  if env.seatedAtFire then recover = math.max(recover, 0.15) end
-  if env.afk then recover = math.max(recover, 0.1) end
-  if env.eating or env.drinking then recover = math.max(recover, 0.08) end
-  if env.resting and env.indoors and not moving then recover = math.max(recover, 0.05) end
-  if napping then recover = math.max(recover, D.NAP_RATE) end
+  -- (why: what's happening to your energy right now, for the Body tab's tooltip)
+  local recover, why, tempWhy = 0, nil, nil
+  local function rest(rate, key) if rate > recover then recover, why = rate, key end end
+  if env.seatedAtFire then rest(0.15, "fire") end
+  if env.afk then rest(0.1, "afk") end
+  if env.eating or env.drinking then rest(0.08, "meal") end
+  if env.resting and env.indoors and not moving then rest(0.05, "indoors") end
+  if napping then rest(D.NAP_RATE, "nap") end
   if recover > 0 then
     state.energy = Clamp(state.energy + recover * dt)
   elseif env.resting then
     -- in town: you get your breath back, up to 60 (above that, it holds)
+    why = "town"
     if state.energy < D.SIT_ENERGY_CAP then
       state.energy = math.min(D.SIT_ENERGY_CAP, state.energy + 0.05 * dt)
     end
   elseif sitting then
+    why = "sit"
     if state.energy < D.SIT_ENERGY_CAP then
       state.energy = math.min(D.SIT_ENERGY_CAP, state.energy + D.SIT_RATE * dt)
     end
   elseif not moving and not env.combat and not env.swimming then
     -- standing still: you don't get more tired, but you don't rest either
+    why = "still"
   else
     local rate = 100 / 7200 -- (about 2 hours)
     if env.combat or env.swimming then rate = rate * 1.5 end
+    why = (env.combat and "fight") or (env.swimming and "swim") or (env.mounted and "ride") or "walk"
     -- being cold or hot tires you faster
     local ts = state.tempState or "ok"
     if ts == "cold" or ts == "hot" then rate = rate * 1.15
     elseif ts == "freezing" or ts == "overheat" then rate = rate * 1.3 end
+    if ts ~= "ok" then tempWhy = TEMP_RANK[ts] < 0 and "cold" or "heat" end
     state.energy = Clamp(state.energy - rate * dt)
   end
+  E.energyWhy, E.energyTempWhy = why, tempWhy
+  E.tempTarget = target
 
   -- Which gauges are moving right now, and the colour of their glow:
   --   needs (thirst, hunger, energy): green when filling, red when dropping faster
@@ -494,6 +503,12 @@ function E.FormatAir(c)
   return Round(c) .. "°C"
 end
 
+-- A difference of temperature: "+8°C" / "+14°F"
+function E.FormatDelta(c)
+  if E.Unit() == "F" then return "+" .. Round(c * 9 / 5) .. "°F" end
+  return "+" .. Round(c) .. "°C"
+end
+
 -- One row per gauge: { label, value 0-100, r, g, b }
 function E.Rows()
   if not state then return {} end
@@ -504,14 +519,55 @@ function E.Rows()
     { string.format(L.EL_WET, Round(state.wet)), state.wet, unpack(E.BAR_COLORS.wet) },
   }
   rows[1].glow, rows[2].glow = trend.temp, trend.wet
+  rows[1].key, rows[2].key = "temp", "wet"
   for _, n in ipairs(NEEDS) do
     local s = NeedState(state[n.key], state[n.key .. "State"], n.states)
     local row = { string.format(L["EL_" .. n.key:upper()], KT.G(L.EL_NEED_STATES[s] or s)), state[n.key],
       unpack(E.BAR_COLORS[n.key]) }
     row.glow = trend[n.key]
+    row.key = n.key
     rows[#rows + 1] = row
   end
   return rows
+end
+
+-- What's pushing a bar up or down right now (Body tab, on hover): for the bars that
+-- aren't obvious (temperature, energy). Returns { { text, r, g, b }, ... } or nil.
+local UP, DOWN, NEUTRAL = { 0.4, 1, 0.4 }, { 1, 0.45, 0.35 }, { 0.85, 0.85, 0.85 }
+function E.BarTip(key)
+  local env, T = E.env, L.EL_TIP
+  if not state or not env or not T then return nil end
+  local out = {}
+  local function add(text, c) out[#out + 1] = { text, c[1], c[2], c[3] } end
+  if key == "temp" then
+    add(string.format(T.air, E.FormatAir(env.air or 15)), NEUTRAL)
+    local effort = Effort(env)
+    if env.combat and not env.mounted then
+      add(string.format(T.fight, E.FormatDelta(effort)), UP)
+    elseif env.onFoot then
+      add(string.format(T.walk, E.FormatDelta(effort)), UP)
+    elseif not (KT.Senses and KT.Senses.Moving and KT.Senses.Moving()) then
+      add(T.still, NEUTRAL)
+    end
+    if env.nearFire then add(T.fire, UP) end
+    if env.indoors and env.resting then add(T.inn, UP) end
+    if env.swimming then add(T.water, DOWN)
+    elseif state.wet > 30 then add(T.wet, DOWN) end
+    local target = E.tempTarget or state.temp
+    local towards = L.EL_TEMP_STATES[TempState(target, state.tempState)] or ""
+    local d = target - state.temp
+    add(string.format(d > 1 and T.rising or d < -1 and T.falling or T.steady, towards), NEUTRAL)
+  elseif key == "energy" then
+    local why = E.energyWhy
+    if why and T.energy[why] then
+      local good = why ~= "walk" and why ~= "ride" and why ~= "fight" and why ~= "swim" and why ~= "still"
+      add(T.energy[why], good and UP or why == "still" and NEUTRAL or DOWN)
+    end
+    if E.energyTempWhy then add(T.energy[E.energyTempWhy], DOWN) end
+  else
+    return nil
+  end
+  return out
 end
 
 -- Bars that glide to their new value (instead of jumping every 5 seconds)

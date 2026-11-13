@@ -845,6 +845,36 @@ L.EL_NIGHT        = "night"
 L.EL_FIRE         = "near a fire"
 L.EL_SWIMMING     = "in the water"
 L.EL_HERE         = "Here: %s"
+-- Body tab, hovering the temperature and energy bars: what's pushing them right now
+L.EL_TIP = {
+  air     = "Air here: %s",
+  walk    = "+ Walking warms you up (%s)",
+  fight   = "+ Fighting heats you up (%s)",
+  still   = "Standing still: your body settles back to the air",
+  fire    = "+ The fire warms you",
+  inn     = "+ The inn keeps you snug",
+  water   = "- The water chills you",
+  wet     = "- Your wet clothes chill you",
+  rising  = "Rising, towards: %s",
+  falling = "Falling, towards: %s",
+  steady  = "Steady: %s",
+  energy = {
+    nap     = "+ Napping: you recover fast",
+    fire    = "+ By the fire: you recover fully",
+    afk     = "+ Dozing off: you recover fully",
+    meal    = "+ Eating or drinking rests you",
+    indoors = "+ Resting indoors: you recover fully",
+    town    = "+ In town: you get your breath back, up to 60%",
+    sit     = "+ Sitting down: you recover up to 60%",
+    still   = "Standing still: you're not getting more tired",
+    walk    = "- Walking tires you",
+    ride    = "- Even on a mount, the road tires you",
+    fight   = "- Fighting tires you faster",
+    swim    = "- Swimming tires you faster",
+    cold    = "- The cold tires you faster",
+    heat    = "- The heat tires you faster",
+  },
+}
 L.EL_MOVE_HINT    = "Click: details. Shift + drag: move."
 L.EL_OFF          = "The body comfort module is turned off. You can turn it back on in the Options tab."
 L.EL_PAGE_INTRO   = "How your character feels. Pure flavor: nothing here changes your stats."
