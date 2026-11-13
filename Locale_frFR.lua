@@ -837,8 +837,9 @@ L.EL_HERE         = "Ici : %s"
 -- Onglet Corps, au survol des barres de température et d'énergie
 L.EL_TIP = {
   air     = "Air ici : %s",
-  walk    = "+ Marcher vous réchauffe (%s)",
-  fight   = "+ Le combat vous échauffe (%s)",
+  walk    = "+ Marcher vous réchauffe (%s, jusqu'à %s)",
+  fight   = "+ Le combat vous échauffe (%s, jusqu'à %s)",
+  fading  = "+ La chaleur de l'effort retombe (%s)",
   still   = "Vous ne bougez pas : votre corps revient vers la température de l'air",
   fire    = "+ Le feu vous réchauffe",
   inn     = "+ L'auberge vous garde au chaud",

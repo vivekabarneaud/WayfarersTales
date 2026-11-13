@@ -362,7 +362,11 @@ function E.Tick()
 
   -- Temperature drifts toward what you feel (the air, moving, water...)
   local target = E.Target(env)
-  state.temp = state.temp + (target - state.temp) * (1 - math.exp(-dt / TEMP_HALFLIFE))
+  local follow = 1 - math.exp(-dt / TEMP_HALFLIFE)
+  state.temp = state.temp + (target - state.temp) * follow
+  -- the share of that warmth that comes from moving, as your body takes it in (it grows
+  -- while you walk and fades when you stop, at the same pace): for the Body tab's tooltip
+  E.effortNow = (E.effortNow or 0) + (Effort(env) - (E.effortNow or 0)) * follow
 
   -- How long you've been walking (a stop of a few seconds doesn't count)
   local now = GetTime()
@@ -541,11 +545,14 @@ function E.BarTip(key)
   local function add(text, c) out[#out + 1] = { text, c[1], c[2], c[3] } end
   if key == "temp" then
     add(string.format(T.air, E.FormatAir(env.air or 15)), NEUTRAL)
-    local effort = Effort(env)
+    -- (now: what your body has taken in so far; max: where it's heading if you keep going)
+    local max, now = Effort(env), E.effortNow or 0
     if env.combat and not env.mounted then
-      add(string.format(T.fight, E.FormatDelta(effort)), UP)
+      add(string.format(T.fight, E.FormatDelta(now), E.FormatDelta(max)), UP)
     elseif env.onFoot then
-      add(string.format(T.walk, E.FormatDelta(effort)), UP)
+      add(string.format(T.walk, E.FormatDelta(now), E.FormatDelta(max)), UP)
+    elseif now >= 0.5 then
+      add(string.format(T.fading, E.FormatDelta(now)), UP)
     elseif not (KT.Senses and KT.Senses.Moving and KT.Senses.Moving()) then
       add(T.still, NEUTRAL)
     end

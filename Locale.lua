@@ -848,8 +848,9 @@ L.EL_HERE         = "Here: %s"
 -- Body tab, hovering the temperature and energy bars: what's pushing them right now
 L.EL_TIP = {
   air     = "Air here: %s",
-  walk    = "+ Walking warms you up (%s)",
-  fight   = "+ Fighting heats you up (%s)",
+  walk    = "+ Walking warms you up (%s, up to %s)",
+  fight   = "+ Fighting heats you up (%s, up to %s)",
+  fading  = "+ The warmth from moving is fading (%s)",
   still   = "Standing still: your body settles back to the air",
   fire    = "+ The fire warms you",
   inn     = "+ The inn keeps you snug",
