@@ -23,7 +23,7 @@
 - **Feux de camp** : un feu quelque part dans les parages ne réchauffe l'air que d'un peu. Asseyez-vous tout près pour profiter de toute sa chaleur (même dans la neige), tant que vous ne vous éloignez pas.
 - **Trajets aériens** : là-haut, le vent vous refroidit, et vous sèche.
 - **Le froid et la chaleur vous fatiguent plus vite.**
-- **Mal de résurrection** : de nouvelles lignes à votre retour auprès du gardien des esprits, si vous combattez alors qu'il vous affaiblit encore, et quand il se dissipe ; il vous fatigue aussi plus vite.
+- **Mal de résurrection** : de nouvelles lignes à votre retour auprès du Gardien des âmes, si vous combattez alors qu'il vous affaiblit encore, et quand il se dissipe ; il vous fatigue aussi plus vite.
 - **Les bords de l'écran s'illuminent** quand vous avez froid (bleu), chaud (orange), faim ou soif (rouge), ou sommeil (sombre). Désactivable dans l'onglet Corps.
 - **Onglet Corps** : survolez la barre de température ou d'énergie pour voir ce qui la fait bouger en ce moment.
 - **« Ça va mieux »** arrive maintenant pendant que vous mangez ou buvez, et non plusieurs minutes après.
