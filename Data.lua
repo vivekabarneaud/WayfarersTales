@@ -285,6 +285,13 @@ D.FOOD_WORDS = {
 -- Drinks, so a looted water bottle doesn't make your pet drool.
 D.DRINKS = { [159] = true, [1179] = true, [1205] = true, [1708] = true, [1645] = true, [8766] = true, [252031] = true }
 
+-- Food and drinks that cool you down or warm you up: degrees of felt air while you have
+-- them, fading over 5 minutes once you stop (Elements.lua).
+D.FOOD_TEMP = {
+  [1179] = -6, -- Ice Cold Milk
+  [3663] = 6,  -- Murloc Fin Soup: a hot soup, with strong spices
+}
+
 ---------------------------------------------------------------------------
 -- Warlock demons (Kindred): respect instead of affection, their own lines
 ---------------------------------------------------------------------------

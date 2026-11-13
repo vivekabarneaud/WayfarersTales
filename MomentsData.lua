@@ -827,6 +827,17 @@ D.BODY_LINES = {
       en = "You stop, and the sweat cools on your skin at once. A shiver runs through you.",
       fr = "Vous vous arrêtez, et la sueur refroidit aussitôt sur votre peau. Un frisson vous parcourt." },
   },
+  -- a cold drink (D.FOOD_TEMP) while you're hot / while you're cold
+  foodCoolHeat_1179 = { -- (lines for one item: <pool>_<itemID>)
+    { draft = true, always = true,
+      en = "The ice-cold milk runs down your throat. For a moment, the heat loosens its grip.",
+      fr = "Le lait glacé coule dans votre gorge. L'espace d'un instant, la chaleur desserre son étreinte." },
+  },
+  foodCoolCold_1179 = {
+    { draft = true, always = true,
+      en = "Ice-cold milk, in this cold… A shiver runs all the way down your back.",
+      fr = "Du lait glacé, par ce froid… Un frisson vous parcourt jusqu'au bas du dos." },
+  },
 }
 
 ---------------------------------------------------------------------------

@@ -168,8 +168,22 @@ end
 
 local FLIGHT_WIND = 8 -- degrees colder on a flight path: the wind up there
 
+-- Hot and cold food and drinks (D.FOOD_TEMP): degrees of felt air while you have them,
+-- fading over FOOD_TEMP_FADE seconds once you stop.
+local FOOD_TEMP_FADE = 300
+local foodTemp           -- { deg, name, stopAt (nil while you're still eating or drinking) }
+local consumeSince       -- eating or drinking since (GetTime)
+local foodLine           -- a line waiting for a quiet moment ("foodCoolHeat"...)
+local function FoodTempNow()
+  if not foodTemp then return 0 end
+  if not foodTemp.stopAt then return foodTemp.deg end
+  local k = 1 - (GetTime() - foodTemp.stopAt) / FOOD_TEMP_FADE
+  if k <= 0 then foodTemp = nil return 0 end
+  return foodTemp.deg * k
+end
+
 function E.Target(env, still)
-  local felt = (env.air or 15) + (still and 0 or Effort(env))
+  local felt = (env.air or 15) + (still and 0 or Effort(env)) + FoodTempNow()
   if env.taxi then felt = felt - FLIGHT_WIND end
   local target = 50 + (felt - 20) * 2.2   -- 20°C feels just right, standing still
   if env.swimming then target = target - 10 end
@@ -432,6 +446,38 @@ function E.Tick()
     end
   end
 
+  -- What you eat or drink: cooling or warming (the item leaves your bags around the
+  -- moment you start, so we look for it during the first seconds)
+  if env.eating or env.drinking then
+    consumeSince = consumeSince or now
+    if (not foodTemp or foodTemp.stopAt) and now - consumeSince <= 12 then
+      local d = env.drinking and KT.LastDrink and KT.LastDrink(12)
+      local f = env.eating and KT.LastFood and KT.LastFood(12)
+      local deg = (d and D.FOOD_TEMP[d] or 0) + (f and D.FOOD_TEMP[f] or 0)
+      if deg ~= 0 then
+        local id = (d and D.FOOD_TEMP[d]) and d or f
+        foodTemp = { deg = deg, name = GetItemInfo and GetItemInfo(id) }
+        -- a line only when it matters: relief in the heat, a shiver in the cold, warmth in the cold
+        -- (each item has its own lines: foodCoolHeat_1179...; none yet = no line)
+        local r = TEMP_RANK[state.tempState or "ok"] or 0
+        local pool = (deg < 0 and r > 0 and "foodCoolHeat") or (deg < 0 and r < 0 and "foodCoolCold")
+          or (deg > 0 and r < 0 and "foodWarmCold")
+        foodLine = pool and D.BODY_LINES and D.BODY_LINES[pool .. "_" .. id] and (pool .. "_" .. id) or nil
+      end
+    end
+  else
+    consumeSince = nil
+    if foodTemp and not foodTemp.stopAt then foodTemp.stopAt = now end
+  end
+  if foodLine then
+    if not (env.eating or env.drinking) and not (foodTemp and foodTemp.stopAt and now - foodTemp.stopAt < 30) then
+      foodLine = nil -- too late
+    elseif KT.LineGapOK() then
+      Say(foodLine, nil, true)
+      foodLine = nil
+    end
+  end
+
   -- Temperature drifts toward what you feel (the air, moving, water...)
   local target = E.Target(env)
   local follow = 1 - math.exp(-dt / TEMP_HALFLIFE)
@@ -637,6 +683,10 @@ function E.BarTip(key)
     if env.taxi then add(T.wind, DOWN) end
     if env.atFire then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
     if env.hotSpot then add(T.forge, UP) end
+    local food = FoodTempNow() -- (cooling or warming food and drinks)
+    if foodTemp and math.abs(food) >= 0.5 then
+      add(string.format(food < 0 and T.foodCool or T.foodWarm, foodTemp.name or "?"), food < 0 and DOWN or UP)
+    end
     if env.indoors and env.resting then add(T.inn, UP) end
     if env.swimming then add(T.water, DOWN)
     elseif state.wet > 30 then add(T.wet, DOWN) end
