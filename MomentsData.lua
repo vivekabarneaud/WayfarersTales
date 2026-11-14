@@ -17,6 +17,7 @@ local D = KT.Data
 D.MOMENT_RULES = {
   eat             = { cd = 900,  chance = 1, gap = 20 },
   eatItem         = { cd = 900,  chance = 1, gap = 20, shares = "eat" },
+  eatBland        = { cd = 900,  chance = 0.6, gap = 20, shares = "eat" }, -- stale bread, spider meat... (D.BLAND_WORDS)
   drink           = { cd = 900,  chance = 1, gap = 20 },
   drinkItem       = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
   drinkWater      = { cd = 900,  chance = 1, gap = 20, shares = "drink" },
@@ -51,6 +52,7 @@ D.MOMENT_RULES = {
   fishJunk        = { cd = 600,  chance = 1,   gap = 0 },
   npc             = { cd = 120,  chance = 1,   gap = 20 },
   npcVisit        = { cd = 120,  chance = 1,   gap = 20, shares = "npc" }, -- generic "you're a regular" lines (by role)
+  npcPersona      = { cd = 120,  chance = 1,   gap = 20, shares = "npc" }, -- the same, for an NPC with a personality
   questAccept_2159 = { cd = 0,   chance = 1,   gap = 0 },
   questDone_22     = { cd = 0,   chance = 1,   gap = 0 },
   questWanted      = { cd = 30,  chance = 1,   gap = 0 },  -- you take a wanted poster
@@ -1598,4 +1600,145 @@ D.MOMENTS.npcVisit = {
   { draft = true, when = V(15, nil, { service = "auctioneer" }),
     en = "{npc} knows you well by now: always buying, selling, and coming back.",
     fr = "{npc} vous connaît bien, maintenant : vous êtes toujours là, à acheter, vendre et revenir." },
+}
+
+-- Food that isn't appetizing (2026-11-14), by words in its name: flavour only, for you
+-- (your pet has its own tastes: a bear may well enjoy spider meat). {item} = the food.
+D.BLAND_WORDS = { "rassis", "stale", "moisi", "moldy", "mouldy", "araignée", "spider", "biscuit de mer", "hardtack" }
+D.MOMENTS.eatBland = {
+  { draft = true,
+    en = "You chew on your {item} for a long time. It fills you up, and that's about all.",
+    fr = "Vous mâchez longuement votre {item}. Ça cale, et c'est à peu près tout." },
+  { draft = true,
+    en = "Not the best meal of your life, but your stomach won't complain.",
+    fr = "Pas le meilleur repas de votre vie, mais votre estomac ne s'en plaindra pas." },
+}
+
+-- NPC personalities (2026-11-14): an NPC with one (D.NPCS[id].persona) gets these "you're a
+-- regular" lines instead of the generic and role ones (D.MOMENTS.npcPersona, same visits).
+-- Noted by hand from what players see (gossip text, look, manner).
+D.NPCS[5512].persona  = "warm"      -- Kaita Deepforge: kind
+D.NPCS[957].persona   = "brisk"     -- Dane Lindgren: busy, straight to the point
+D.NPCS[2456].persona  = "proud"     -- Newton Burnside: proud of the bank's security
+D.NPCS[2457].persona  = "proud"     -- John Burnside: proud of the bank's security
+D.NPCS[5483].persona  = "shrewd"    -- Erika Tate: no haggling, go find a goblin
+D.NPCS[15659].persona = "jovial"    -- Jaxon: on his crate in the middle of the hall
+D.NPCS[332].persona   = "cold"      -- Master Mathias Shaw: no time for your problems
+D.NPCS[1325].persona  = "menacing"  -- Jasper Fel: choose your words carefully...
+D.NPCS[344].persona   = "weary"     -- Magistrate Solomon: old, Lakeshire under siege
+
+local function P(persona, lo, hi)
+  return { persona = persona, visitsAtLeast = lo, visitsBelow = hi }
+end
+D.MOMENTS.npcPersona = {
+  -- warm
+  { draft = true, when = P("warm", 2, 5),
+    en = "{npc} recognizes you and smiles warmly, as if your return were good news.",
+    fr = "{npc} vous reconnaît et vous sourit chaleureusement, comme si votre retour était une bonne nouvelle." },
+  { draft = true, when = P("warm", 5, 15),
+    en = "{npc} greets you with obvious pleasure and asks how your travels are going.",
+    fr = "{npc} vous accueille avec un plaisir évident et vous demande comment se passent vos voyages." },
+  { draft = true, when = P("warm", 15),
+    en = "{npc} greets you like family. Here, your return is always welcome.",
+    fr = "{npc} vous accueille comme quelqu'un de la famille. Ici, votre retour fait toujours plaisir." },
+  -- gruff
+  { draft = true, when = P("gruff", 2, 5),
+    en = "{npc} grunts when you come in. Still, you could swear that was a hello.",
+    fr = "{npc} grogne à votre arrivée. Pourtant, vous jureriez que c'était un bonjour." },
+  { draft = true, when = P("gruff", 5, 15),
+    en = "{npc} grumbles something about regulars. It sounds almost fond.",
+    fr = "{npc} marmonne quelque chose à propos des habitués. Ça sonne presque affectueux." },
+  { draft = true, when = P("gruff", 15),
+    en = "{npc} pretends not to see you, then deals with you first. No doubt about it, you're a regular.",
+    fr = "{npc} fait mine de ne pas vous voir, puis s'occupe de vous en premier. Pas de doute, vous êtes {un habitué|une habituée|un·e habitué·e}." },
+  -- brisk
+  { draft = true, when = P("brisk", 2, 5),
+    en = "{npc} recognizes you with a quick nod, mind already on the next thing.",
+    fr = "{npc} vous reconnaît d'un bref signe de tête, l'esprit déjà à la suite." },
+  { draft = true, when = P("brisk", 5, 15),
+    en = "No small talk with {npc}, but no need to explain anything either. That suits you both.",
+    fr = "Pas de bavardage avec {npc}, mais pas besoin d'expliquer quoi que ce soit non plus. Ça vous convient à tous les deux." },
+  { draft = true, when = P("brisk", 15),
+    en = "{npc} has your business done before you've finished asking. Efficiency, between regulars.",
+    fr = "{npc} règle votre affaire avant même que vous ayez fini de demander. L'efficacité, entre habitués." },
+  -- proud
+  { draft = true, when = P("proud", 2, 5),
+    en = "{npc} recognizes you and straightens up a little: someone who comes back is proof of good work.",
+    fr = "{npc} vous reconnaît et se redresse un peu : quelqu'un qui revient, c'est la preuve d'un travail bien fait." },
+  { draft = true, when = P("proud", 5, 15),
+    en = "{npc} greets you with a satisfied look. Regulars like you are something to be proud of.",
+    fr = "{npc} vous accueille d'un air satisfait. Des habitués comme vous, c'est une fierté." },
+  { draft = true, when = P("proud", 15),
+    en = "{npc} would probably hold you up as an example, if anyone asked. You're part of the house's reputation now.",
+    fr = "{npc} vous citerait sans doute en exemple, si on le lui demandait. Vous faites partie de la réputation de la maison, maintenant." },
+  -- shrewd
+  { draft = true, when = P("shrewd", 2, 5),
+    en = "{npc} recognizes you, and you can almost see the sum being done: someone who comes back is good for business.",
+    fr = "{npc} vous reconnaît, et vous voyez presque le calcul se faire : quelqu'un qui revient, c'est bon pour les affaires." },
+  { draft = true, when = P("shrewd", 5, 15),
+    en = "{npc} greets you with the smile kept for the best customers.",
+    fr = "{npc} vous accueille avec le sourire réservé aux meilleurs clients." },
+  { draft = true, when = P("shrewd", 15),
+    en = "By now you've probably paid for a good part of {npc}'s business. And {npc} knows it.",
+    fr = "À ce stade, vous avez sans doute financé une bonne partie des affaires de {npc}. Et {npc} le sait." },
+  -- jovial
+  { draft = true, when = P("jovial", 2, 5),
+    en = "{npc} lights up when you arrive and greets you like an old friend, though you've barely met.",
+    fr = "{npc} s'illumine à votre arrivée et vous salue comme une vieille connaissance, alors que vous vous connaissez à peine." },
+  { draft = true, when = P("jovial", 5, 15),
+    en = "{npc} has a word for everyone, but for you, there are a few more.",
+    fr = "{npc} a un mot pour chacun, mais pour vous, il y en a quelques-uns de plus." },
+  { draft = true, when = P("jovial", 15),
+    en = "With {npc}, a visit is never quick. You've learned to plan for it, and you don't mind.",
+    fr = "Avec {npc}, une visite n'est jamais rapide. Vous avez appris à prévoir le temps qu'il faut, et ça ne vous déplaît pas." },
+  -- reserved
+  { draft = true, when = P("reserved", 2, 5),
+    en = "{npc} holds your gaze a moment longer than usual. A sign of recognition, perhaps.",
+    fr = "{npc} soutient votre regard un instant de plus que d'habitude. Un signe de reconnaissance, peut-être." },
+  { draft = true, when = P("reserved", 5, 15),
+    en = "{npc} still says little, but the silences have become comfortable.",
+    fr = "{npc} parle toujours aussi peu, mais les silences sont devenus confortables." },
+  { draft = true, when = P("reserved", 15),
+    en = "{npc} gives you a small smile, rare and discreet. From {npc}, that means a lot.",
+    fr = "{npc} vous adresse un petit sourire, rare et discret. Venant de {npc}, ça veut dire beaucoup." },
+  -- mysterious
+  { draft = true, when = P("mysterious", 2, 5),
+    en = "{npc} seemed to know you were coming. You're not sure what to make of that.",
+    fr = "{npc} semblait savoir que vous alliez venir. Vous ne savez pas trop quoi en penser." },
+  { draft = true, when = P("mysterious", 5, 15),
+    en = "{npc} greets you with a knowing look. You get the feeling more is known about you here than you've ever said.",
+    fr = "{npc} vous accueille d'un regard entendu. Vous avez l'impression qu'on en sait plus sur vous ici que vous n'en avez jamais dit." },
+  { draft = true, when = P("mysterious", 15),
+    en = "{npc} acknowledges you with the faintest nod. Among people who keep secrets, that's practically a hug.",
+    fr = "{npc} vous salue d'un hochement de tête à peine perceptible. Chez les gens qui gardent des secrets, c'est presque une accolade." },
+  -- weary
+  { draft = true, when = P("weary", 2, 5),
+    en = "{npc} recognizes you, and for a moment the weight on those shoulders seems lighter.",
+    fr = "{npc} vous reconnaît, et l'espace d'un instant, le poids sur ses épaules semble moins lourd." },
+  { draft = true, when = P("weary", 5, 15),
+    en = "{npc} greets you with a tired smile. In hard times, a familiar face helps.",
+    fr = "{npc} vous accueille avec un sourire fatigué. En ces temps difficiles, un visage familier, ça aide." },
+  { draft = true, when = P("weary", 15),
+    en = "{npc} has watched you come and go so many times. You've become one of the few things here people can count on.",
+    fr = "{npc} vous a tant de fois {vu|vue|vu·e} aller et venir. Vous faites partie des rares choses sur lesquelles on peut compter, ici." },
+  -- cold
+  { draft = true, when = P("cold", 2, 5),
+    en = "{npc} recognizes you, and clearly still has no time for you.",
+    fr = "{npc} vous reconnaît, et n'a visiblement toujours pas de temps à vous consacrer." },
+  { draft = true, when = P("cold", 5, 15),
+    en = "{npc} spares you a glance this time. That's progress.",
+    fr = "{npc} vous accorde un regard, cette fois. C'est un progrès." },
+  { draft = true, when = P("cold", 15),
+    en = "{npc} hears you out for a whole sentence before turning away. You've clearly earned some respect.",
+    fr = "{npc} vous écoute une phrase entière avant de se détourner. Vous avez visiblement gagné un peu de respect." },
+  -- menacing
+  { draft = true, when = P("menacing", 2, 5),
+    en = "{npc} recognizes you. You're not sure that's good news.",
+    fr = "{npc} vous reconnaît. Vous ne savez pas si c'est une bonne nouvelle." },
+  { draft = true, when = P("menacing", 5, 15),
+    en = "{npc} watches you come in, face unreadable. Being remembered here feels a lot like being on a list.",
+    fr = "{npc} vous regarde entrer, le visage indéchiffrable. Ici, qu'on se souvienne de vous, c'est un peu comme figurer sur une liste." },
+  { draft = true, when = P("menacing", 15),
+    en = "{npc} gives you the faintest nod. From {npc}, that's practically warmth. You'll still choose your words carefully.",
+    fr = "{npc} vous adresse un signe de tête à peine perceptible. Venant de {npc}, c'est presque de la chaleur. Vous choisirez quand même vos mots avec soin." },
 }

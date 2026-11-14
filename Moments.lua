@@ -271,6 +271,17 @@ local function DiaryLine(drink, itemID, link, n)
   return false
 end
 
+-- Food that isn't appetizing, by words in its name (flavour only: your pet has its own tastes)
+local function IsBland(link)
+  local name = link:match("%[(.-)%]")
+  if not name then return false end
+  name = name:lower()
+  for _, w in ipairs(D.BLAND_WORDS) do
+    if name:find(w, 1, true) then return true end
+  end
+  return false
+end
+
 -- chained: you're still seated, starting the next item right after the last one
 local function MealLine(drink, tries, chained)
   -- (not "KT.LastFood and KT.LastFood(6)": "and" would keep only the first value, the id)
@@ -281,7 +292,12 @@ local function MealLine(drink, tries, chained)
     After(1.5, function() MealLine(drink, tries + 1, chained) end, "meal")
     return
   end
-  if link and DiaryLine(drink, itemID, link, CountMeal(itemID, drink and "drink" or "food")) then return end
+  -- not appetizing (stale bread, spider meat...): its own line, and no "first taste" delight
+  local bland = link and not drink and IsBland(link)
+  if bland then
+    CountMeal(itemID, "food") -- (still in your food diary)
+    if Play("eatBland", { item = link }) then return end
+  elseif link and DiaryLine(drink, itemID, link, CountMeal(itemID, drink and "drink" or "food")) then return end
   -- the usual "you sit down and take a first bite" only for the first item of a meal
   if chained then return end
   if not drink then
@@ -775,9 +791,10 @@ local function NPCLine(info)
   if healer then
     if not newVisit and lineAt >= (state.diedAt or 0) then return false end -- already had this death's line
   elseif now - lineAt < D.NPC_LINE_CD then return false end
-  if Play(v.generic and "npcVisit" or "npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race,
+  local visitKey = known.persona and "npcPersona" or "npcVisit" -- (a personality replaces the generic and role lines)
+  if Play(v.generic and visitKey or "npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race,
     npcRole = known.role, npcSex = info.sex, npcID = info.id, npcVisits = v.n, npcSince = v.since,
-    npcService = NpcService(info, known, state), ghostOK = healer }) then
+    npcService = NpcService(info, known, state), npcPersona = known.persona, ghostOK = healer }) then
     state.npcLine[info.id] = time()
     v.generic = nil
     return true

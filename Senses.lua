@@ -202,6 +202,7 @@ local function Check(when, ctx)
   if when.npcID and not InList(when.npcID, ctx.npcID) then return false, "npc" end
   -- what the NPC does for you (innkeeper, banker, flight_master, auctioneer, trainer, vendor)
   if when.service and not InList(when.service, ctx.npcService) then return false, "npc" end
+  if when.persona and when.persona ~= ctx.npcPersona then return false, "npc" end -- (D.NPCS[id].persona)
   if when.city and ctx.biome ~= "city" then return false, "city" end -- in a capital
   -- how many times you came back to this NPC (a visit = after more than 30 minutes away,
   -- or each death for the spirit healer), and how long since the visit before this one
