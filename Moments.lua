@@ -635,11 +635,12 @@ local function Tick()
   end
   lastIndoors = indoors
 
-  -- your hunter pet reacts to the rain now and then (the line checks the sky and the rain)
+  -- your hunter pet reacts to the rain or the snow now and then (the line checks the sky and the rain)
   if KT.ModuleOn("kindred") and UnitExists("pet") and not UnitIsDead("pet") and UnitCreatureFamily
     and UnitCreatureFamily("pet") and not onTaxi then
     local w = S.Weather()
     if w and w.confirmed and w.name == "rain" then Play("petRain", { pet = UnitName("pet") }) end
+    if w and w.confirmed and w.name == "snow" then Play("petSnow", { pet = UnitName("pet") }) end
   end
 
   -- standing still for a while (not AFK, not fighting, not swimming)

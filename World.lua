@@ -131,6 +131,8 @@ function W.AirTemp(env)
   local hour = (h or 12) + (m or 0) / 60
   c = c + 4 * math.cos((hour - 15) / 24 * 2 * math.pi)       -- warmest ~15h, coolest ~3h
   if env.rain and not env.indoors then c = c - (1 + 3 * env.rain) end -- rain cools the air (up to -4°C)
+  -- snow only falls in the cold: at most 2°C, down to -2°C when it snows hard (not under a roof)
+  if env.snow and not env.indoors then c = math.min(c, 2 - 4 * env.snow) end
   if env.indoors then c = c + (18 - c) * 0.6 end             -- roofs soften everything
   -- places hotter than their zone (the Great Forge's lava and furnaces), whatever the hour
   local hot = env.sub and HOT_SPOTS[env.sub]
@@ -176,9 +178,10 @@ function W.Snapshot()
     eating = W.HasAura(D.SPELL_FOOD_AURA, true),
     drinking = W.HasAura(D.SPELL_DRINK_AURA, true),
   }
-  -- rain (only once its weather type is confirmed): 0 to 1
+  -- rain and snow (only once their weather type is confirmed): 0 to 1
   local wok, w = pcall(function() return KT.Senses and KT.Senses.Weather and KT.Senses.Weather() end)
   if wok and w and w.confirmed and w.name == "rain" then env.rain = tonumber(w.intensity) or 0.5 end
+  if wok and w and w.confirmed and w.name == "snow" then env.snow = tonumber(w.intensity) or 0.5 end
   env.atFire = W.AtFire(env)
   env.air = W.AirTemp(env)
   -- your position on the zone map, in % like the coordinates under the minimap

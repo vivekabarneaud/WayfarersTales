@@ -433,12 +433,15 @@ function E.Tick()
   -- Wetness
   -- in the rain, outdoors and not under a roof (Aldrassil, Teldrassil's canopy...)
   local inRain = env.rain and not env.indoors and not (KT.Senses and KT.Senses.Roofed and KT.Senses.Roofed(env))
+  -- snow melting on your clothes: wets you three times slower than rain
+  local inSnow = env.snow and not env.indoors and not (KT.Senses and KT.Senses.Roofed and KT.Senses.Roofed(env))
   if env.swimming then
     swimStart = swimStart or GetTime()
     state.wet = 100
-  elseif inRain then
+  elseif inRain or inSnow then
     -- soaked in about 2 to 6 minutes, depending on how hard it rains
-    state.wet = Clamp(state.wet + (0.25 + 0.5 * env.rain) * dt)
+    local fall = inRain and (0.25 + 0.5 * env.rain) or (0.25 + 0.5 * env.snow) / 3
+    state.wet = Clamp(state.wet + fall * dt)
     if state.wet >= 80 and not state.soaked and KT.LineGapOK() then
       state.soaked = true
       Say("soaked")
@@ -726,6 +729,9 @@ function E.BarTip(key)
       add(T.still, NEUTRAL)
     end
     if env.taxi then add(T.wind, DOWN) end
+    if not env.indoors then -- (the weather: rain and snow cool the air outside)
+      if env.snow then add(T.snow, DOWN) elseif env.rain then add(T.rain, DOWN) end
+    end
     if env.atFire then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
     if env.hotSpot then add(T.forge, UP) end
     local food = FoodTempNow() -- (cooling or warming food and drinks)

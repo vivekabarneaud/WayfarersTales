@@ -43,6 +43,7 @@ D.MOMENT_RULES = {
   campSit         = { cd = 900,  chance = 1,   gap = 10 },
   campRested      = { cd = 900,  chance = 1,   gap = 10 },
   petRain         = { cd = 900,  chance = 0.1, gap = 30 }, -- checked every 5 s while it rains
+  petSnow         = { cd = 900,  chance = 0.1, gap = 30, shares = "petRain" }, -- checked every 5 s while it snows
   fishCast        = { cd = 600,  chance = 1,   gap = 10 },
   fishWait        = { cd = 900,  chance = 1,   gap = 30 },
   fishCatch       = { cd = 300,  chance = 1,   gap = 0 },
@@ -1050,6 +1051,21 @@ D.MOMENTS.petRain = {
     en = "{pet} looks up at the sky, blinking at the raindrops.",
     fr = "{pet} lève les yeux vers le ciel et cligne des paupières sous les gouttes.",
     when = { indoors = false, sky = true, weather = "rain" } },
+}
+-- Your hunter pet in the snow (2026-11-14)
+D.MOMENTS.petSnow = {
+  { draft = true,
+    en = "{pet} snaps at the falling snowflakes, then sneezes.",
+    fr = "{pet} essaie d'attraper des flocons au vol, puis éternue.",
+    when = { indoors = false, sky = true, weather = "snow" } },
+  { draft = true,
+    en = "Snowflakes settle on {pet}'s back. One good shake, and they fly everywhere, onto you included.",
+    fr = "Des flocons se posent sur le dos de {pet}. Une bonne secousse, et ils volent partout, sur vous y compris.",
+    when = { indoors = false, sky = true, weather = "snow" } },
+  { draft = true,
+    en = "{pet} sniffs at the falling snow, then follows a flake with its eyes, puzzled.",
+    fr = "{pet} renifle la neige qui tombe, puis suit un flocon des yeux, l'air perplexe.",
+    when = { indoors = false, sky = true, weather = "snow" } },
 }
 
 ---------------------------------------------------------------------------
