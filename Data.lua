@@ -38,6 +38,7 @@ D.GAIN = {
   play     = { amount = 0.5, cooldown = 900,  cap = 2 }, -- playful emotes, once the pet trusts you
   sad      = { amount = 0.5, cooldown = 1800, cap = 1 }, -- the pet comforts you
   attention = { amount = 2 },                -- answered a petting request in time
+  playAnswered = { amount = 2 },             -- answered a play request in time
   sorry    = { amount = 0.5 },               -- apologized soon after being rude
   level    = { amount = 1 },                 -- you gained a level together
 }
@@ -63,8 +64,8 @@ D.FOOD_KINDS = { "meat", "fish", "cheese", "bread", "fungus", "fruit" }
 -- Mood of the day and how it changes chances (1 = normal).
 D.MOODS = { "playful", "sleepy", "cuddly", "curious", "hungry" }
 D.MOOD_MULT = {
-  playful = { idle = 1.5, playful = 1.5 },
-  sleepy  = { idle = 1.2, attention = 0.5, playful = 0.5 },
+  playful = { idle = 1.5, playful = 1.5, playRequest = 4 },
+  sleepy  = { idle = 1.2, attention = 0.5, playful = 0.5, playRequest = 0 },
   cuddly  = { attention = 2 },
   curious = { loot = 1.6, idle = 1.3 },
   hungry  = { meal = 1.6, loot = 1.3 },
@@ -114,6 +115,16 @@ D.MEAL_WINDOW        = 30    -- seconds to answer a meal request (you're still e
 D.MEAL_CHAIN         = 8     -- eating the next item within this many seconds: still the same meal
 D.ATTENTION_WINDOW   = 120   -- seconds to answer a petting request
 D.ATTENTION_COOLDOWN = 2400
+-- Play requests: mostly on playful days (D.MOOD_MULT playRequest), never on sleepy ones.
+-- Any of these emotes in time answers; some get a line of their own (by "game").
+D.PLAY_WINDOW   = 120
+D.PLAY_COOLDOWN = 2400
+D.PLAY_CHANCE   = 0.015 -- per minute, before the mood (x4 on playful days: like a cuddle request)
+D.PLAY_EMOTES = {
+  POINT = "stick", BECKON = "stick", CHEER = "any",
+  CHICKEN = "chicken", FLAP = "chicken", STRUT = "chicken", ROAR = "any", GROWL = "any", CHARGE = "any",
+  DANCE = "dance", BOUNCE = "any", SILLY = "any", TRAIN = "any", TICKLE = "tickle",
+}
 D.IDLE_COOLDOWN      = 600
 D.MEAL_COOLDOWN      = 1200
 D.MEAL_SNIFF_COOLDOWN = 1200 -- pet makes a face at food it won't eat
@@ -226,6 +237,8 @@ D.POOL_SOUND = {
   sorryForgive = "happy", campfireRest = "happy", reunion = "excited", stableReunion = "excited",
   playful = "excited", roar = "excited", chicken = "excited", followAfterStay = "excited",
   campfireEnergized = "excited", playerLevel = "excited",
+  playRequest = "excited", playAnswered = "excited", playAnswered_chicken = "excited",
+  playAnswered_dance = "excited", playAnswered_tickle = "happy", playAnswered_stick = "excited",
   rude = "hurt",
   tierUp = "ui:big", loyaltyUp = "ui:big", anniversary = "ui:big", daysTogether = "ui:big",
   feedFavoriteFirst = "ui:discover", favoriteRevealed = "ui:discover",

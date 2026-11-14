@@ -540,6 +540,52 @@ M.attentionAnswered = {
 M.attentionExpired = {
   "{pet} s'éloigne en reniflant le sol.",
 }
+-- Demandes de jeu (2026-11-14) : surtout les jours joueurs ; répondre par une emote de jeu à temps.
+M.playRequest = {
+  {
+    "{pet} pousse un caillou vers vous du {snout}, puis recule d'un pas, sans trop savoir. Une invitation à jouer ?",
+    "{pet} fait un petit bond devant vous, puis s'immobilise. Un peu d'audace, beaucoup d'hésitation : ça ressemble à une invitation à jouer.",
+  },
+  {
+    "{pet} lâche un bâton à vos pieds et lève vers vous des yeux brillants. On joue ?",
+    "{pet} bondit autour de vous, puis s'arrête et vous fixe, comme pour dire : à vous de jouer.",
+  },
+  {
+    "{pet} se ramasse sur ses pattes, l'arrière-train en l'air. Au moindre geste de votre part, la course-poursuite commence.",
+    "{pet} vous bouscule d'un coup de tête, puis détale en se retournant : attrape-moi si tu peux !",
+  },
+}
+M.playAnswered = {
+  {
+    "{pet} entre dans le jeu, un peu maladroitement, en vous jetant des regards comme pour vérifier que c'est permis.",
+    "Quelques bonds hésitants, puis d'autres plus assurés. {pet} commence à y prendre goût.",
+  },
+  {
+    "{pet} s'élance à votre poursuite, et pendant un moment, vous ne faites plus que jouer, sans le moindre souci.",
+    "{pet} se roule par terre, aux anges. C'était exactement le jeu qu'il fallait.",
+  },
+  {
+    "Vous jouez jusqu'à en perdre haleine. {pet} se laisse tomber contre vous, le bonheur à l'état pur.",
+    "{pet} connaît tous vos jeux par cœur, et pourtant chaque partie semble être la meilleure de toutes.",
+  },
+}
+M.playAnswered_chicken = { "Vous battez des bras, et c'est parti : {pet} vous court après dans tous les sens." }
+M.playAnswered_dance = { "{pet} sautille maladroitement au rythme de votre danse." }
+M.playAnswered_tickle = { "{pet} se tortille sous vos doigts et les mordille, tout doucement." }
+M.playAnswered_stick = { "Vous faites semblant de lancer le bâton. {pet} file, revient, vous lance un regard outré… puis en redemande." }
+M.playExpired = {
+  "{pet} renonce à jouer et se couche avec un petit soupir.",
+  "{pet} attend encore un peu, puis s'éloigne pour jouer de son côté.",
+}
+M.playRequest_bird = {
+  "{pet} sautille autour de vous, les ailes entrouvertes, et pousse un petit cri : on joue ?",
+  "{pet} laisse tomber une plume à vos pieds et penche la tête, dans l'attente.",
+}
+M.playAnswered_bird = { "{pet} voltige autour de vous en décrivant des cercles, aux anges." }
+M.playRequest_scaly = { "{pet} fouette l'air de sa queue et claque des mâchoires dans le vide, pour jouer." }
+M.playAnswered_scaly = { "{pet} file à gauche et à droite autour de vous, avec la vivacité d'un lézard au soleil." }
+M.playRequest_chitin = { "{pet} décrit un cercle autour de vous en trottinant, avec des cliquetis excités." }
+M.playAnswered_chitin = { "{pet} vous court après dans un cliquetis de pattes. Aucun doute : c'est un jeu." }
 M.comfort = {
   "{pet} se serre contre vous. Votre réconfort compte beaucoup après ce combat.",
   "{pet} pousse un petit soupir de soulagement à votre contact.",

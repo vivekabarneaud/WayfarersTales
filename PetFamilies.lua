@@ -1,6 +1,7 @@
 -- Wayfarer's Tales - hunter pets: a few lines per family (bear, boar, cat...), on top of
 -- the lines for their body type (furry, bird, scaly, chitin). Keyed like D.FAMILY_SOUND.
--- Events: idle (any idle moment), campfire (resting by the fire, once you sat down at it), affection (/pet...).
+-- Events: idle (any idle moment), campfire (resting by the fire, once you sat down at it), affection (/pet...),
+-- playRequest / playAnswered (a play request, and when you play along).
 -- when: the usual Senses conditions (still = you're standing still, moving = walking,
 -- weather = "rain"...). minBand / maxBand: bond 1 low, 2 middle, 3 high.
 -- French: nothing agrees with the pet.
@@ -299,3 +300,43 @@ D.PET_FAMILY_LINES = {
     },
   },
 }
+
+-- Play requests and games (2026-11-14), on top of the general play lines
+local PLAY = {
+  bear = {
+    playRequest = { { draft = true,
+      en = "{pet} rears up on its hind legs and waves a big paw at you. A little play-fight?",
+      fr = "{pet} se dresse sur ses pattes arrière et agite une grosse patte vers vous. Une petite bagarre pour rire ?" } },
+    playAnswered = { { draft = true,
+      en = "{pet} tumbles around with you in a clumsy play-fight, all paws and happy huffs.",
+      fr = "{pet} roule avec vous dans une bagarre pour rire, maladroite, toute en pattes et en souffles joyeux." } },
+  },
+  boar = {
+    playRequest = { { draft = true,
+      en = "{pet} paws the ground and snorts, head low, ready for a pretend charge.",
+      fr = "{pet} gratte le sol du sabot et s'ébroue, tête basse : une charge pour rire se prépare." } },
+    playAnswered = { { draft = true,
+      en = "{pet} charges, swerves at the last moment, and comes back for more, grunting happily.",
+      fr = "{pet} charge, fait un écart au dernier moment, et revient en redemander avec de joyeux grognements." } },
+  },
+  cat = {
+    playRequest = { { draft = true,
+      en = "{pet}'s pupils go huge and round. A twitch of the tail, a wiggle of the hips: the zoomies are coming.",
+      fr = "Les pupilles de {pet} deviennent immenses et toutes rondes. Un frémissement de la queue, un petit déhanché : les cinq minutes de folie approchent." } },
+    playAnswered = { { draft = true,
+      en = "{pet} tears around you at full speed, stops dead, then acts as if nothing happened.",
+      fr = "{pet} fait des tours à toute allure autour de vous, s'arrête net, puis fait comme si de rien n'était." } },
+  },
+  wolf = {
+    playRequest = { { draft = true,
+      en = "{pet} drops into a play bow, front paws low, tail wagging hard.",
+      fr = "{pet} se met en position de jeu, les pattes avant au sol et la queue qui remue à toute vitesse." } },
+    playAnswered = { { draft = true,
+      en = "{pet} bounds around you, tail wagging, with short happy yips.",
+      fr = "{pet} bondit autour de vous en remuant la queue, avec de petits jappements joyeux." } },
+  },
+}
+for fam, events in pairs(PLAY) do
+  local f = D.PET_FAMILY_LINES[fam]
+  if f then for ev, lines in pairs(events) do f[ev] = lines end end
+end

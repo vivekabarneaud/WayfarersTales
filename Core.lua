@@ -405,6 +405,7 @@ end
 -- A line for this pet's family (bear, boar, cat...: PetFamilies.lua) that fits this
 -- moment, or nil. Pools map to the family's events.
 local FAMILY_EVENT = { idle = "idle", idleWalking = "idle", idleNight = "idle", idleResting = "idle",
+  playRequest = "playRequest", playAnswered = "playAnswered",
   campfireRest = "campfire", affection = "affection" } -- (not campfireNear: the "nearby" buff reaches far, and these lines lie by the fire)
 local function FamilyLine(poolKey)
   if not pet or pet.demon or not D.PET_FAMILY_LINES then return nil end
@@ -1002,6 +1003,19 @@ local function TryAttention()
   return false
 end
 
+-- A play emote while your pet asked to play (D.PLAY_EMOTES): a bonus, and a line for the
+-- game you picked (the stick, the chicken dance...) for a furry pet, else by bond and body.
+local function TryPlay(token)
+  local p = state.play
+  local style = token and D.PLAY_EMOTES[token]
+  if not (p and style and GetTime() <= p.expires and PetAlive()) then return false end
+  state.play = nil
+  local key = "playAnswered"
+  if style ~= "any" and not pet.archetype and M["playAnswered_" .. style] then key = "playAnswered_" .. style end
+  Say(key, nil, Gain("playAnswered"), true)
+  return true
+end
+
 -- Reaction to one of your emotes. kind comes from D.EMOTES (nil = unknown emote).
 local function OnEmote(kind, targeted, token)
   -- cheering right after a pet level-up
@@ -1065,7 +1079,7 @@ end
 
 -- Pet asks for cuddles now and then; answer with /pet in time for a bonus.
 local function MaybeAskAttention()
-  if state.attention or state.meal or InCombat() or db.settings.chatty == 0 then return false end
+  if state.attention or state.play or state.meal or InCombat() or db.settings.chatty == 0 then return false end
   if pet and pet.demon then return false end -- (a demon never asks for a cuddle)
   if not KT.LineGapOK() then return false end
   if not Ready("attention", D.ATTENTION_COOLDOWN) or not Chance(0.05 * MoodMult("attention")) then return false end
@@ -1077,6 +1091,26 @@ local function MaybeAskAttention()
     if state.attention == a then
       state.attention = nil
       if pet and Chance(0.5) then Say("attentionExpired") end
+    end
+  end)
+  return true
+end
+
+-- Pet asks to play now and then, mostly on playful days (never sleepy ones, never a demon);
+-- a play emote in time is a bonus (TryPlay).
+local function MaybeAskPlay()
+  if state.play or state.attention or state.meal or InCombat() or db.settings.chatty == 0 then return false end
+  if pet and pet.demon then return false end
+  if not KT.LineGapOK() then return false end
+  if not Ready("playRequest", D.PLAY_COOLDOWN) or not Chance(D.PLAY_CHANCE * MoodMult("playRequest")) then return false end
+  Mark("playRequest")
+  local p = { expires = GetTime() + D.PLAY_WINDOW }
+  state.play = p
+  Say("playRequest")
+  After(D.PLAY_WINDOW + 1, function()
+    if state.play == p then
+      state.play = nil
+      if pet and Chance(0.6) then Say("playExpired") end
     end
   end)
   return true
@@ -1681,7 +1715,7 @@ function H.PLAYER_LOGIN()
     if pet.stats.minutes % 10 == 0 then Gain("time") end
     RefreshEntry()
     if EnsureMood() and db.settings.chatty > 0 then Say("mood_" .. pet.mood.key) end -- new day while playing
-    if not MaybeAskAttention() then IdleMoment() end
+    if not MaybeAskAttention() and not MaybeAskPlay() then IdleMoment() end
   end)
 
   -- See which emote command you used (/pet, /dance...), so the pet can react to
@@ -1800,6 +1834,8 @@ function H.CHAT_MSG_TEXT_EMOTE(text, sender, ...)
     return
   end
   if not targeted and not D.EMOTE_UNTARGETED[kind or ""] then return end
+  -- answering a play request with a play emote (no need to target the pet)
+  if TryPlay(token) then return end
   Debug("emote", token or "?", kind or "other", targeted and "(at pet)" or "(not at pet)")
   OnEmote(kind, targeted, token)
 end

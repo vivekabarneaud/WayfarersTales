@@ -545,6 +545,53 @@ M.attentionAnswered = {
 M.attentionExpired = {
   "{pet} wanders off, sniffing the ground.",
 }
+-- Play requests (2026-11-14): mostly on playful days; answer with a play emote in time.
+-- By bond (shy, close, inseparable), by body type, and a few by emote.
+M.playRequest = {
+  {
+    "{pet} pushes a pebble toward you with its {snout}, then backs off a step, unsure. An invitation to play?",
+    "{pet} hops once in front of you, then freezes. A little daring, a lot of hesitation: it looks like an invitation to play.",
+  },
+  {
+    "{pet} drops a stick at your feet and looks up at you, eyes shining. Time to play?",
+    "{pet} bounces around you, then stops and stares, as if to say: your turn.",
+  },
+  {
+    "{pet} crouches low, rump in the air. At your slightest move, the chase begins.",
+    "{pet} bumps you with its head, then runs off looking back: catch me if you can!",
+  },
+}
+M.playAnswered = {
+  {
+    "{pet} plays along, a little clumsily, glancing at you as if to check it's allowed.",
+    "A few hesitant bounds, then more confident ones. {pet} is starting to enjoy this.",
+  },
+  {
+    "{pet} leaps after you, and for a moment the two of you are just playing, without a care.",
+    "{pet} rolls over, delighted. That was exactly the game it wanted.",
+  },
+  {
+    "You play until you're both out of breath. {pet} flops down against you, pure happiness.",
+    "{pet} knows all your games by heart, and still each round seems to be the best ever.",
+  },
+}
+M.playAnswered_chicken = { "You flap your arms, and off it goes: {pet} chases you all over the place." }
+M.playAnswered_dance = { "{pet} hops clumsily alongside your dance." }
+M.playAnswered_tickle = { "{pet} squirms under your fingers and nibbles at them, gently." }
+M.playAnswered_stick = { "You pretend to throw the stick. {pet} dashes off, comes back, gives you an outraged look... and wants to go again." }
+M.playExpired = {
+  "{pet} gives up on the game and lies down with a little sigh.",
+  "{pet} waits a little longer, then wanders off to play on its own.",
+}
+M.playRequest_bird = {
+  "{pet} hops around you, wings half open, with a little cry: shall we play?",
+  "{pet} drops a feather at your feet and tilts its head, waiting.",
+}
+M.playAnswered_bird = { "{pet} flutters around you in circles, delighted with the game." }
+M.playRequest_scaly = { "{pet} lashes its tail and snaps playfully at the air in front of you." }
+M.playAnswered_scaly = { "{pet} darts left and right around you, quick as a lizard in the sun." }
+M.playRequest_chitin = { "{pet} skitters in a circle around you, clicking excitedly." }
+M.playAnswered_chitin = { "{pet} scuttles after you, legs clattering. No doubt about it: this is a game." }
 M.comfort = {
   "{pet} presses close to you. Your comfort means a lot after that fight.",
   "{pet} lets out a small sigh of relief at your touch.",
