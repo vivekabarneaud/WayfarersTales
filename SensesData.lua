@@ -66,7 +66,7 @@ D.DANGER_FLAVOR = {
 }
 
 D.WEATHER_TYPES = { [0] = "clear", [1] = "rain", [2] = "snow", [3] = "sand" }
-D.WEATHER_CONFIRMED = { clear = true, rain = true } -- rain = type 1, seen in Stormwind on 2026-11-11 (intensity 0.88)
+D.WEATHER_CONFIRMED = { clear = true, rain = true, snow = true } -- rain = type 1, seen in Stormwind on 2026-11-11 (intensity 0.88); snow = type 2, seen in Loch Modan (Thelsamar) on 2026-11-14, intensity 1
 
 -- Places the game counts as "outdoors" but with a roof over your head: lines that
 -- need the open sky (sky = true) skip them. map = map ID (raw, as for spots), x/y in %.
