@@ -608,8 +608,82 @@ end
 -- Pet identity (permanent petNumber from the stable API)
 ---------------------------------------------------------------------------
 
+-- Before 0.70.1, a login where the game gave no realm name filed everything under "Name-":
+-- a stranger whose body, discoveries, pet and mascot bonds started over (seen 2026-11-20).
+-- Once per session, when the realm is known, those records go back where they belong.
+local function KeepOlder(t, junkKey, realKey)
+  local junk, real = t[junkKey], t[realKey]
+  if real and (real.created or 0) <= (junk.created or math.huge) then
+    t[junkKey] = nil -- the real story is older: today's restart is dropped
+    return
+  end
+  t[junkKey], t[realKey], junk.key = nil, junk, realKey
+end
+
+local function MergeEmptyRealm(name, realm)
+  local bad, good = name .. "-", name .. "-" .. realm
+  for _, t in ipairs({ db.elements or {}, db.senses or {} }) do
+    local junk, real = t[bad], t[good]
+    if junk and not real then
+      t[good], t[bad] = junk, nil
+    elseif junk then
+      -- keep the real record, add what only the stray one knew (places found that day...)
+      for k, v in pairs(junk) do
+        if real[k] == nil then
+          real[k] = v
+        elseif type(real[k]) == "table" and type(v) == "table" and v[1] == nil then
+          for kk, vv in pairs(v) do if real[k][kk] == nil then real[k][kk] = vv end end
+        end
+      end
+      t[bad] = nil
+    end
+  end
+  for _, t in ipairs({ db.pets or {}, db.mascots or {} }) do
+    local moves = {}
+    for k in pairs(t) do
+      if type(k) == "string" and k:sub(1, #bad + 1) == bad .. ":" then moves[#moves + 1] = k end
+    end
+    for _, k in ipairs(moves) do KeepOlder(t, k, good .. k:sub(#bad + 1)) end
+  end
+end
+
+-- "Name-Realm". The realm name can come back empty for a moment at login: then we use
+-- the realm we remember for this character (db.realms), or the only realm it has data on.
+-- Never known: "Name-", as before, so nobody's records move.
+local mergeTried
 local function CharKey()
-  return (UnitName("player") or "?") .. "-" .. (GetRealmName() or "?")
+  local name = UnitName("player") or "?"
+  local realm = GetRealmName and GetRealmName() or ""
+  if db then
+    db.realms = db.realms or {}
+    if realm ~= "" then
+      db.realms[name] = realm
+    elseif db.realms[name] then
+      realm = db.realms[name]
+    else
+      -- not remembered: the realm this name already has body or discovery data on (if only one)
+      local found, clash
+      for _, t in ipairs({ db.elements or {}, db.senses or {} }) do
+        for k in pairs(t) do
+          local r = type(k) == "string" and k:sub(1, #name + 1) == name .. "-" and k:sub(#name + 2)
+          if r and r ~= "" then
+            if found and found ~= r then clash = true end
+            found = r
+          end
+        end
+      end
+      realm = (not clash and found) or ""
+    end
+    -- only on the first call (at login, before any module picks its records)
+    if not mergeTried then
+      mergeTried = true
+      if realm ~= "" then
+        local ok, err = pcall(MergeEmptyRealm, name, realm)
+        if not ok then Debug("realm merge failed", err) end
+      end
+    end
+  end
+  return name .. "-" .. realm
 end
 
 local function GetActiveEntry()
@@ -812,6 +886,19 @@ local function OnPetAppear()
     or (entry and entry.petNumber and (CharKey() .. ":" .. entry.petNumber))
     or (CharKey() .. ":name:" .. tostring(name) .. ":" .. tostring(family))
   local rec = db.pets[key]
+  -- The same pet under another key (the realm name changed, or came back empty once):
+  -- it's not a new pet, it keeps its whole story.
+  if not rec and not demon and entry and entry.petNumber then
+    local prefix = (UnitName("player") or "?") .. "-"
+    for k, r in pairs(db.pets) do
+      if type(k) == "string" and k:sub(1, #prefix) == prefix and r.petNumber == entry.petNumber then
+        Debug("pet found under an old key", k, "->", key)
+        db.pets[k], db.pets[key], r.key = nil, r, key
+        rec = r
+        break
+      end
+    end
+  end
   local wasSame = pet == rec and rec ~= nil
   local isNew = rec == nil
 
@@ -1671,6 +1758,23 @@ function H.PLAYER_LOGIN()
   CreateHeart()
   if KT.CreateMinimapButton then KT.CreateMinimapButton() end
   if KT.IsDev() then KT.StartWeatherRecorder() end
+  -- dev: which realm functions answer, at login and a bit later (GetRealmName came back empty
+  -- for a whole session on 2026-11-20)
+  if KT.IsDev() then
+    local function Probe(when)
+      local function Try(fn) local ok, v = pcall(fn) return ok and tostring(v) or "error" end
+      db.realmProbe = db.realmProbe or {}
+      db.realmProbe[when] = {
+        t = time(),
+        realm = Try(function() return GetRealmName() end),
+        normalized = Try(function() return GetNormalizedRealmName() end),
+        full = Try(function() return select(2, UnitFullName("player")) end),
+        guid = Try(function() return UnitGUID("player") end),
+      }
+    end
+    Probe("login")
+    C_Timer.After(30, function() Probe("later") end)
+  end
   -- the welcome: right after the loading screen; this is only the fallback
   C_Timer.After(KT.welcomeFrame and not KT.welcomeFrame.fallback and 20 or 5, function() Welcome() end)
   C_Timer.NewTicker(60, function()
