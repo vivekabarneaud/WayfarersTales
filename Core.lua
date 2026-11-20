@@ -609,8 +609,32 @@ end
 -- Pet identity (permanent petNumber from the stable API)
 ---------------------------------------------------------------------------
 
+-- "Name-Realm". The realm name can come back empty for a moment at login (seen on
+-- 2026-11-20: the character became "Kitty-", a stranger with a brand new pet). So we
+-- remember each character's realm (db.realms) and use it when the game gives us nothing.
 local function CharKey()
-  return (UnitName("player") or "?") .. "-" .. (GetRealmName() or "?")
+  local name = UnitName("player") or "?"
+  local realm = GetRealmName and GetRealmName() or ""
+  if db then
+    db.realms = db.realms or {}
+    if realm ~= "" then
+      db.realms[name] = realm
+    elseif db.realms[name] then
+      realm = db.realms[name]
+    else
+      -- not remembered yet: the realm this name already has data on, if there's only one
+      local found
+      for k in pairs(db.elements or {}) do
+        local r = type(k) == "string" and k:sub(1, #name + 1) == name .. "-" and k:sub(#name + 2)
+        if r and r ~= "" and r ~= "?" then
+          if found and found ~= r then found = nil break end
+          found = r
+        end
+      end
+      realm = found or ""
+    end
+  end
+  return name .. "-" .. (realm ~= "" and realm or "?")
 end
 
 local function GetActiveEntry()
@@ -813,6 +837,19 @@ local function OnPetAppear()
     or (entry and entry.petNumber and (CharKey() .. ":" .. entry.petNumber))
     or (CharKey() .. ":name:" .. tostring(name) .. ":" .. tostring(family))
   local rec = db.pets[key]
+  -- The same pet under another key (the realm name changed, or came back empty once):
+  -- it's not a new pet, it keeps its whole story.
+  if not rec and not demon and entry and entry.petNumber then
+    local prefix = (UnitName("player") or "?") .. "-"
+    for k, r in pairs(db.pets) do
+      if type(k) == "string" and k:sub(1, #prefix) == prefix and r.petNumber == entry.petNumber then
+        Debug("pet found under an old key", k, "->", key)
+        db.pets[k], db.pets[key], r.key = nil, r, key
+        rec = r
+        break
+      end
+    end
+  end
   local wasSame = pet == rec and rec ~= nil
   local isNew = rec == nil
 

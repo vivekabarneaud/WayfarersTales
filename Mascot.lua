@@ -1017,7 +1017,7 @@ local FAMILY = {
 ---------------------------------------------------------------------------
 
 local cur, curGUID -- the mascot that's out (its record) and its ID
-local function CharKey() return (UnitName("player") or "?") .. "-" .. (GetRealmName() or "?") end
+local function CharKey() return KT.CharKey() end -- one answer for every module (Core.lua)
 local function Today() return date("%Y-%m-%d") end
 local function DB()
   local db = KT.GetDB()
