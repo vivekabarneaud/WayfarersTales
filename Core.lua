@@ -662,15 +662,18 @@ local function CharKey()
     elseif db.realms[name] then
       realm = db.realms[name]
     else
-      local found
-      for k in pairs(db.elements or {}) do
-        local r = type(k) == "string" and k:sub(1, #name + 1) == name .. "-" and k:sub(#name + 2)
-        if r and r ~= "" then
-          if found and found ~= r then found = nil break end
-          found = r
+      -- not remembered: the realm this name already has body or discovery data on (if only one)
+      local found, clash
+      for _, t in ipairs({ db.elements or {}, db.senses or {} }) do
+        for k in pairs(t) do
+          local r = type(k) == "string" and k:sub(1, #name + 1) == name .. "-" and k:sub(#name + 2)
+          if r and r ~= "" then
+            if found and found ~= r then clash = true end
+            found = r
+          end
         end
       end
-      realm = found or ""
+      realm = (not clash and found) or ""
     end
     -- only on the first call (at login, before any module picks its records)
     if not mergeTried then
@@ -1789,6 +1792,23 @@ function H.PLAYER_LOGIN()
   CreateHeart()
   if KT.CreateMinimapButton then KT.CreateMinimapButton() end
   if KT.IsDev() then KT.StartWeatherRecorder() end
+  -- dev: which realm functions answer, at login and a bit later (GetRealmName came back empty
+  -- for a whole session on 2026-11-20)
+  if KT.IsDev() then
+    local function Probe(when)
+      local function Try(fn) local ok, v = pcall(fn) return ok and tostring(v) or "error" end
+      db.realmProbe = db.realmProbe or {}
+      db.realmProbe[when] = {
+        t = time(),
+        realm = Try(function() return GetRealmName() end),
+        normalized = Try(function() return GetNormalizedRealmName() end),
+        full = Try(function() return select(2, UnitFullName("player")) end),
+        guid = Try(function() return UnitGUID("player") end),
+      }
+    end
+    Probe("login")
+    C_Timer.After(30, function() Probe("later") end)
+  end
   -- the welcome: right after the loading screen; this is only the fallback
   C_Timer.After(KT.welcomeFrame and not KT.welcomeFrame.fallback and 20 or 5, function() Welcome() end)
   C_Timer.NewTicker(60, function()
