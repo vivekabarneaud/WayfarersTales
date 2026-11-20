@@ -609,9 +609,49 @@ end
 -- Pet identity (permanent petNumber from the stable API)
 ---------------------------------------------------------------------------
 
--- "Name-Realm". The realm name can come back empty for a moment at login (seen on
--- 2026-11-20: the character became "Kitty-", a stranger with a brand new pet). So we
--- remember each character's realm (db.realms) and use it when the game gives us nothing.
+-- Before 0.70.1, a login where the game gave no realm name filed everything under "Name-":
+-- a stranger whose body, discoveries, pet and mascot bonds started over (seen 2026-11-20).
+-- Once per session, when the realm is known, those records go back where they belong.
+local function KeepOlder(t, junkKey, realKey)
+  local junk, real = t[junkKey], t[realKey]
+  if real and (real.created or 0) <= (junk.created or math.huge) then
+    t[junkKey] = nil -- the real story is older: today's restart is dropped
+    return
+  end
+  t[junkKey], t[realKey], junk.key = nil, junk, realKey
+end
+
+local function MergeEmptyRealm(name, realm)
+  local bad, good = name .. "-", name .. "-" .. realm
+  for _, t in ipairs({ db.elements or {}, db.senses or {} }) do
+    local junk, real = t[bad], t[good]
+    if junk and not real then
+      t[good], t[bad] = junk, nil
+    elseif junk then
+      -- keep the real record, add what only the stray one knew (places found that day...)
+      for k, v in pairs(junk) do
+        if real[k] == nil then
+          real[k] = v
+        elseif type(real[k]) == "table" and type(v) == "table" and v[1] == nil then
+          for kk, vv in pairs(v) do if real[k][kk] == nil then real[k][kk] = vv end end
+        end
+      end
+      t[bad] = nil
+    end
+  end
+  for _, t in ipairs({ db.pets or {}, db.mascots or {} }) do
+    local moves = {}
+    for k in pairs(t) do
+      if type(k) == "string" and k:sub(1, #bad + 1) == bad .. ":" then moves[#moves + 1] = k end
+    end
+    for _, k in ipairs(moves) do KeepOlder(t, k, good .. k:sub(#bad + 1)) end
+  end
+end
+
+-- "Name-Realm". The realm name can come back empty for a moment at login: then we use
+-- the realm we remember for this character (db.realms), or the only realm it has data on.
+-- Never known: "Name-", as before, so nobody's records move.
+local mergeTried
 local function CharKey()
   local name = UnitName("player") or "?"
   local realm = GetRealmName and GetRealmName() or ""
@@ -622,19 +662,26 @@ local function CharKey()
     elseif db.realms[name] then
       realm = db.realms[name]
     else
-      -- not remembered yet: the realm this name already has data on, if there's only one
       local found
       for k in pairs(db.elements or {}) do
         local r = type(k) == "string" and k:sub(1, #name + 1) == name .. "-" and k:sub(#name + 2)
-        if r and r ~= "" and r ~= "?" then
+        if r and r ~= "" then
           if found and found ~= r then found = nil break end
           found = r
         end
       end
       realm = found or ""
     end
+    -- only on the first call (at login, before any module picks its records)
+    if not mergeTried then
+      mergeTried = true
+      if realm ~= "" then
+        local ok, err = pcall(MergeEmptyRealm, name, realm)
+        if not ok then Debug("realm merge failed", err) end
+      end
+    end
   end
-  return name .. "-" .. (realm ~= "" and realm or "?")
+  return name .. "-" .. realm
 end
 
 local function GetActiveEntry()
