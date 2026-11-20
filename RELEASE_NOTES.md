@@ -1,23 +1,7 @@
-## 0.69.0 — Familiar faces
+## 0.69.1 — Hotfix
 
 **English**
-- **The spirit healer**: talk to it as a ghost and it has a word for you, with more lines as your visits pile up, and a few if you're back a little too soon.
-- **Death feels cold**: as a ghost your body cools down (thirst, hunger and energy stay on hold), and the warmth comes back once you're alive again.
-- **Named NPCs remember you**: innkeepers, bankers, flight masters, trainers, vendors and auctioneers greet you more warmly visit after visit, until you're a regular.
-- **Food and drinks**: each one fills you at its own pace (a stew fills you faster, a soup quenches a little, milk feeds a little), and some warm you up or cool you down: Ice Cold Milk refreshes you, Murloc Fin Soup warms you.
-- **Food and drink tooltips** tell you what they do: light, filling, hearty; hydrating, thirst-quenching; refreshing, icy; warming. You can turn them off in the Body tab.
-- **Ironforge**: the Great Forge is much hotter than the rest of the city.
-- **Crowds**: a place now feels lively from 10 players around and packed from 25.
-- **Mascots** show their affection gains (+1) and react to every cuddle.
-- **Fixes**: feeding your pet raw fish (from the reagent bag) is recognised again; your pet no longer sprawls "by the fire" when a campfire is merely nearby.
+- **Your progress no longer starts over**: on some logins the game doesn't tell addons which realm you're on, and Wayfarer's Tales took your character for a new one: your pet's story, your body gauges or your discoveries could start from zero. That's fixed, and if it already happened to you, everything comes back at your next login: your pet's and mascots' real story, plus the places you discovered in the meantime.
 
 **Français**
-- **Le Gardien des âmes** : parlez-lui sous forme de fantôme et il a un mot pour vous, avec d'autres lignes au fil de vos visites, et quelques-unes si vous revenez un peu trop vite.
-- **La mort est froide** : sous forme de fantôme, votre corps se refroidit (soif, faim et énergie restent en suspens), et la chaleur revient une fois de retour parmi les vivants.
-- **Les PNJ nommés se souviennent de vous** : aubergistes, banquiers, maîtres de vol, entraîneurs, marchands et commissaires-priseurs vous accueillent un peu plus chaleureusement à chaque visite, jusqu'à ce que vous fassiez partie des habitués.
-- **Nourriture et boissons** : chacune vous rassasie à son rythme (un ragoût cale plus vite, une soupe désaltère un peu, le lait nourrit un peu), et certaines vous réchauffent ou vous rafraîchissent : le Lait glacé vous rafraîchit, la Soupe aux ailerons de murloc vous réchauffe.
-- **Les infobulles des nourritures et boissons** disent ce qu'elles font : léger, nourrissant, copieux ; hydratant, désaltérant ; rafraîchissant, glacé ; réchauffant. Désactivable dans l'onglet Corps.
-- **Forgefer** : la Grande Forge est bien plus chaude que le reste de la ville.
-- **Foule** : un lieu paraît animé à partir de 10 joueurs alentour, et bondé à partir de 25.
-- **Mascottes** : elles montrent leurs gains d'affection (+1) et réagissent à chaque câlin.
-- **Corrections** : nourrir votre familier de poisson cru (depuis le sac de composants) est de nouveau reconnu ; votre familier ne s'étale plus « près du feu » quand un feu de camp est seulement dans les parages.
+- **Votre progression ne repart plus de zéro** : à certaines connexions, le jeu n'indique pas aux addons sur quel royaume vous êtes, et Wayfarer's Tales prenait votre personnage pour un nouveau : l'histoire de votre familier, vos jauges ou vos découvertes pouvaient repartir de zéro. C'est corrigé, et si c'est déjà arrivé, tout revient à votre prochaine connexion : la vraie histoire de votre familier et de vos mascottes, plus les lieux découverts entre-temps.
