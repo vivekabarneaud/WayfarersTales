@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wayfarer's Maps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #eef0ec; --surface: #fbfcf9; --ink: #1d2420; --muted: #5d6a63; --line: #d3d9d3;
+  --accent: #8a6a12; --accent-soft: #f3ead2;
+  --note: #5d6a63; --note-soft: #e6e9e5;
+  --proposed: #9a5a00; --proposed-soft: #f6e6c9;
+  --approved: #2f7a4b; --approved-soft: #dcefe2;
+  --danger: #a33a32;
+  --stage: #2a2f2b;
+  --font-line: "Literata", Georgia, serif;
+  --font-ui: "Manrope", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141917; --surface: #1c2320; --ink: #e6ebe7; --muted: #9aa8a0; --line: #2e3833;
+    --accent: #e0bb55; --accent-soft: #3a3220;
+    --note: #9aa8a0; --note-soft: #27302c; --proposed: #f0b45a; --proposed-soft: #3d2f18;
+    --approved: #6fcf91; --approved-soft: #1f3a2a; --danger: #f08a80; --stage: #0d100f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141917; --surface: #1c2320; --ink: #e6ebe7; --muted: #9aa8a0; --line: #2e3833;
+  --accent: #e0bb55; --accent-soft: #3a3220;
+  --note: #9aa8a0; --note-soft: #27302c; --proposed: #f0b45a; --proposed-soft: #3d2f18;
+  --approved: #6fcf91; --approved-soft: #1f3a2a; --danger: #f08a80; --stage: #0d100f;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--font-ui); display: flex; flex-direction: column; }
+button, select, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 12px; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: var(--surface); border-color: var(--accent); font-weight: 600; }
+button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+button.danger { color: var(--danger); }
+select, input[type=text], input[type=number], textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+textarea { width: 100%; resize: vertical; font-family: var(--font-line); font-size: 15px; line-height: 1.5; }
+
+header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--surface); flex-wrap: wrap; }
+header h1 { font: 600 18px/1 var(--font-line); margin: 0 8px 0 0; color: var(--accent); }
+header .spacer { flex: 1; }
+.saved { color: var(--muted); font-size: 13px; }
+.saved.dirty { color: var(--proposed); font-weight: 600; }
+
+.banner { display: none; padding: 8px 16px; background: var(--proposed-soft); color: var(--proposed); border-bottom: 1px solid var(--line); gap: 10px; align-items: center; }
+.banner.show { display: flex; }
+
+main { flex: 1; display: flex; min-height: 0; }
+.stage-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.tools { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tools label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.tools .sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+.stage { flex: 1; overflow: auto; background: var(--stage); position: relative; }
+.mapwrap { position: relative; margin: 16px; display: inline-block; user-select: none; }
+.mapwrap img { display: block; width: 100%; height: 100%; image-rendering: auto; }
+.mapwrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+#paint { cursor: none; }
+.empty { color: #b9c2bc; padding: 48px; max-width: 560px; font-size: 15px; }
+.empty b { color: #e0bb55; }
+.point { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; transform: rotate(45deg); background: #fff; border: 2px solid #c0392b; pointer-events: auto; z-index: 3; }
+.point.mine { border-color: #2980b9; }
+.point span { position: absolute; left: 14px; top: -8px; transform: rotate(-45deg); transform-origin: left top; white-space: nowrap; background: rgba(0,0,0,.75); color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 4px; display: none; }
+.point:hover span { display: block; }
+.status { display: flex; gap: 16px; padding: 6px 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; background: var(--surface); }
+.status b { color: var(--ink); font-weight: 600; }
+
+aside { width: 380px; border-left: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; min-height: 0; }
+aside h2 { font: 600 12px/1 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.list-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 8px; }
+.list { overflow: auto; max-height: 38%; padding: 0 8px 8px; border-bottom: 1px solid var(--line); }
+.row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+.row:hover { background: var(--bg); }
+.row.sel { background: var(--accent-soft); }
+.swatch { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+.row .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .eye { border: none; background: none; padding: 2px 4px; color: var(--muted); }
+.chip { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+.chip.note { background: var(--note-soft); color: var(--note); }
+.chip.changed { background: var(--proposed-soft); color: var(--proposed); }
+.chip.proposed { background: var(--proposed-soft); color: var(--proposed); }
+.chip.approved { background: var(--approved-soft); color: var(--approved); }
+.card { flex: 1; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.card .field { display: flex; flex-direction: column; gap: 6px; }
+.card .field > span { font-size: 12px; font-weight: 600; color: var(--muted); }
+.card .line2 { display: flex; gap: 8px; align-items: center; }
+.card input[type=text] { flex: 1; }
+.card input[type=color] { width: 36px; height: 32px; padding: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.box { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--bg); }
+.box h3 { margin: 0 0 6px; font-size: 12px; color: var(--muted); }
+.box .lines p { font-family: var(--font-line); margin: 6px 0; }
+.hint { color: var(--muted); font-size: 13px; }
+.muted-empty { color: var(--muted); padding: 16px 8px; font-size: 13px; }
+dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 18px; max-width: 360px; }
+dialog form { display: flex; flex-direction: column; gap: 10px; }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+kbd { font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Wayfarer's Maps</h1>
+  <select id="zone" title="Zone"></select>
+  <button id="btnFolder">Maps folder…</button>
+  <span class="spacer"></span>
+  <span id="saved" class="saved">Not saved yet</span>
+  <button id="btnOpen" title="Load a regions.js file">Open…</button>
+  <button id="btnSave" class="primary" title="Ctrl+S">Save</button>
+</header>
+<div id="banner" class="banner"></div>
+<main>
+  <div class="stage-col">
+    <div class="tools">
+      <button id="toolBrush" class="on" title="B">Brush</button>
+      <button id="toolErase" title="E">Eraser</button>
+      <label>Size <input id="size" type="range" min="0.4" max="12" step="0.2" value="2.5"></label>
+      <span class="sep"></span>
+      <button id="btnUndo" title="Ctrl+Z">Undo</button>
+      <span class="sep"></span>
+      <label><input id="showAll" type="checkbox" checked> All regions</label>
+      <label><input id="showPoints" type="checkbox" checked> Check points</label>
+      <button id="btnPoint" title="Add a point you read in game">+ Point</button>
+      <span class="sep"></span>
+      <button id="zoomOut" title="Zoom out">−</button>
+      <button id="zoomFit">Fit</button>
+      <button id="zoomIn" title="Zoom in">+</button>
+    </div>
+    <div class="stage" id="stage">
+      <div class="empty" id="empty"></div>
+      <div class="mapwrap" id="mapwrap" hidden>
+        <img id="mapimg" alt="">
+        <canvas id="regions"></canvas>
+        <canvas id="paint"></canvas>
+        <div id="points"></div>
+      </div>
+    </div>
+    <div class="status"><span>Position <b id="pos">–</b></span><span>Here <b id="here">–</b></span></div>
+  </div>
+  <aside>
+    <div class="list-head"><h2>Regions in this zone</h2><button id="btnNew">+ New region</button></div>
+    <div class="list" id="list"></div>
+    <div class="card" id="card"></div>
+  </aside>
+</main>
+
+<dialog id="pointDlg">
+  <form method="dialog">
+    <b>Add a check point</b>
+    <span class="hint">Stand somewhere in game, read the coordinates under the minimap, and type them here. If the map is lined up, the point lands on the right spot.</span>
+    <div class="line2" style="display:flex;gap:8px"><input id="ptX" type="number" step="0.1" min="0" max="100" placeholder="x" style="width:90px"><input id="ptY" type="number" step="0.1" min="0" max="100" placeholder="y" style="width:90px"></div>
+    <input id="ptLabel" type="text" placeholder="What's there (e.g. Goldshire inn door)">
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button value="cancel">Cancel</button><button value="ok" class="primary">Add</button></div>
+  </form>
+</dialog>
+
+<script src="checkpoints.js"></script>
+<script src="regions.js"></script>
+<script>
+"use strict";
+// ---------------------------------------------------------------------------
+// Wayfarer's Maps: paint regions over a zone map, write a note on each, save.
+// Data lives in regions.js (window.WT_REGIONS). Each region's area is a GRID x GRID
+// bitmap over the zone map (x and y from 0 to 100 %, like the game's coordinates),
+// saved run-length encoded. Claude reads the notes, writes proposals into the same
+// file; only approved regions go into the addon (see README.md).
+// ---------------------------------------------------------------------------
+const GRID = 200; // 0.5 % per cell
+const ZONES = [
+  [1429,"Elwynn Forest"],[1453,"Stormwind"],[1436,"Westfall"],[1433,"Redridge Mountains"],[1431,"Duskwood"],
+  [1426,"Dun Morogh"],[1455,"Ironforge"],[1432,"Loch Modan"],[1437,"Wetlands"],[1424,"Hillsbrad Foothills"],
+  [1416,"Alterac Mountains"],[1417,"Arathi Highlands"],[1425,"The Hinterlands"],[1418,"Badlands"],[1427,"Searing Gorge"],
+  [1428,"Burning Steppes"],[1435,"Swamp of Sorrows"],[1430,"Deadwind Pass"],[1419,"Blasted Lands"],[1434,"Stranglethorn Vale"],
+  [1420,"Tirisfal Glades"],[1458,"Undercity"],[1421,"Silverpine Forest"],[1422,"Western Plaguelands"],[1423,"Eastern Plaguelands"],
+  [1438,"Teldrassil"],[1457,"Darnassus"],[1439,"Darkshore"],[1440,"Ashenvale"],[1442,"Stonetalon Mountains"],
+  [1443,"Desolace"],[1444,"Feralas"],[1441,"Thousand Needles"],[1445,"Dustwallow Marsh"],[1446,"Tanaris"],
+  [1449,"Un'Goro Crater"],[1451,"Silithus"],[1448,"Felwood"],[1452,"Winterspring"],[1447,"Azshara"],[1450,"Moonglade"],
+  [1411,"Durotar"],[1454,"Orgrimmar"],[1412,"Mulgore"],[1456,"Thunder Bluff"],[1413,"The Barrens"],
+];
+const PALETTE = ["#e6194b","#3cb44b","#4363d8","#f58231","#911eb4","#42d4f4","#f032e6","#bfef45","#fabed4","#469990","#dcbeff","#9a6324","#fffac8","#800000","#aaffc3","#000075"];
+const STATUS = { note: "your note", changed: "changed since proposal", proposed: "proposed", approved: "approved" };
+const LS_KEY = "wt-maps-unsaved", LS_PREF = "wt-maps-prefs";
+
+// ---------- small helpers ----------
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]/g, "");
+function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch {} }
+// IndexedDB: remembers the maps folder and the save file between visits (file handles can't go in localStorage)
+function idb(mode, fn) {
+  return new Promise((ok, ko) => {
+    let req; try { req = indexedDB.open("wt-maps", 1); } catch (e) { return ko(e); }
+    req.onupgradeneeded = () => req.result.createObjectStore("kv");
+    req.onerror = () => ko(req.error);
+    req.onsuccess = () => { const tx = req.result.transaction("kv", mode); const r = fn(tx.objectStore("kv")); tx.oncomplete = () => ok(r && r.result); tx.onerror = () => ko(tx.error); };
+  });
+}
+const idbGet = k => idb("readonly", s => s.get(k)).catch(() => null);
+const idbSet = (k, v) => idb("readwrite", s => s.put(v, k)).catch(() => null);
+
+// ---------- bitmaps ----------
+function encode(bits) {
+  const runs = []; let cur = 0, n = 0;
+  for (let i = 0; i < bits.length; i++) { const b = bits[i] ? 1 : 0; if (b === cur) n++; else { runs.push(n); cur = b; n = 1; } }
+  runs.push(n);
+  return runs.map(r => r.toString(36)).join(".");
+}
+function decode(s) {
+  const bits = new Uint8Array(GRID * GRID);
+  if (!s) return bits;
+  let i = 0, cur = 0;
+  for (const t of s.split(".")) { const n = parseInt(t, 36) || 0; if (cur) bits.fill(1, i, i + n); i += n; cur ^= 1; }
+  return bits;
+}
+
+// ---------- state ----------
+let data = normalize(window.WT_REGIONS);
+const bitmaps = new Map();   // region id -> Uint8Array
+const layers = new Map();    // region id -> { canvas, ctx, img }
+let zone = null, selId = null, tool = "brush", dirty = false;
+let images = new Map();      // zone id -> object URL
+let saveHandle = null, folderHandle = null;
+const undo = [];
+const prefs = lsGet(LS_PREF) || {};
+
+function normalize(d) {
+  d = d && typeof d === "object" ? d : {};
+  return { version: 1, grid: GRID, savedAt: d.savedAt || null, regions: Array.isArray(d.regions) ? d.regions : [], checkpoints: Array.isArray(d.checkpoints) ? d.checkpoints : [] };
+}
+function bitsOf(r) { if (!bitmaps.has(r.id)) bitmaps.set(r.id, decode(r.cells)); return bitmaps.get(r.id); }
+function zoneRegions() { return data.regions.filter(r => r.zone === zone); }
+function selRegion() { return data.regions.find(r => r.id === selId) || null; }
+function zoneName(id) { const z = ZONES.find(z => z[0] === id); return z ? z[1] : "Zone " + id; }
+
+function markDirty() {
+  dirty = true;
+  for (const r of data.regions) if (bitmaps.has(r.id)) r.cells = encode(bitmaps.get(r.id));
+  lsSet(LS_KEY, { at: Date.now(), data });
+  const s = $("saved"); s.textContent = "Unsaved changes"; s.classList.add("dirty");
+}
+function markSaved() {
+  dirty = false; lsDel(LS_KEY);
+  const s = $("saved"); s.classList.remove("dirty");
+  s.textContent = "Saved " + new Date(data.savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// ---------- layers (one tiny canvas per region, one pixel per cell) ----------
+function hexRGB(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function layerOf(r) {
+  let L = layers.get(r.id);
+  if (!L || L.color !== r.color) {
+    const canvas = L ? L.canvas : document.createElement("canvas");
+    canvas.width = canvas.height = GRID;
+    const ctx = canvas.getContext("2d");
+    const img = ctx.createImageData(GRID, GRID);
+    L = { canvas, ctx, img, color: r.color, rgb: hexRGB(r.color) };
+    layers.set(r.id, L);
+    const bits = bitsOf(r);
+    for (let i = 0; i < bits.length; i++) if (bits[i]) setPx(L, i, 1);
+    ctx.putImageData(img, 0, 0);
+  }
+  return L;
+}
+function setPx(L, i, on) { const p = i * 4; L.img.data[p] = L.rgb[0]; L.img.data[p + 1] = L.rgb[1]; L.img.data[p + 2] = L.rgb[2]; L.img.data[p + 3] = on ? 255 : 0; }
+
+// ---------- drawing ----------
+const imgEl = $("mapimg"), regCv = $("regions"), paintCv = $("paint"), wrap = $("mapwrap");
+let view = { w: 0, h: 0, zoom: 1 };
+
+function layout() {
+  if (!imgEl.naturalWidth) return;
+  const stage = $("stage");
+  const fitW = Math.max(200, stage.clientWidth - 32), fitH = Math.max(150, stage.clientHeight - 32);
+  const fit = Math.min(fitW / imgEl.naturalWidth, fitH / imgEl.naturalHeight);
+  view.w = Math.round(imgEl.naturalWidth * fit * view.zoom);
+  view.h = Math.round(imgEl.naturalHeight * fit * view.zoom);
+  wrap.style.width = view.w + "px"; wrap.style.height = view.h + "px";
+  const dpr = window.devicePixelRatio || 1;
+  for (const c of [regCv, paintCv]) { c.width = Math.round(view.w * dpr); c.height = Math.round(view.h * dpr); }
+  drawRegions(); drawPoints();
+}
+let rafPending = false;
+function drawRegions() {
+  if (rafPending) return; rafPending = true;
+  requestAnimationFrame(() => {
+    rafPending = false;
+    const ctx = regCv.getContext("2d");
+    ctx.clearRect(0, 0, regCv.width, regCv.height);
+    ctx.imageSmoothingEnabled = false;
+    const all = $("showAll").checked;
+    const list = zoneRegions().filter(r => !r.hidden && (all || r.id === selId));
+    list.sort((a, b) => (a.id === selId) - (b.id === selId)); // the selected one on top
+    for (const r of list) {
+      const L = layerOf(r);
+      ctx.globalAlpha = r.id === selId ? 0.6 : 0.32;
+      ctx.drawImage(L.canvas, 0, 0, regCv.width, regCv.height);
+    }
+    ctx.globalAlpha = 1;
+  });
+}
+function drawBrush(px, py) {
+  const ctx = paintCv.getContext("2d"), dpr = window.devicePixelRatio || 1;
+  ctx.clearRect(0, 0, paintCv.width, paintCv.height);
+  if (px == null) return;
+  const rad = brushR() / 100 * view.w * dpr;
+  ctx.beginPath(); ctx.arc(px / 100 * view.w * dpr, py / 100 * view.h * dpr, rad, 0, Math.PI * 2);
+  ctx.lineWidth = 2 * dpr; ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.stroke();
+  ctx.lineWidth = 1 * dpr; ctx.strokeStyle = tool === "erase" ? "#ff8a80" : "#fff"; ctx.stroke();
+}
+function drawPoints() {
+  const box = $("points"); box.innerHTML = "";
+  if (!$("showPoints").checked || zone == null) return;
+  const pts = [...(window.WT_CHECKPOINTS || []).filter(p => p.zone === zone), ...data.checkpoints.filter(p => p.zone === zone).map(p => ({ ...p, mine: p }))];
+  for (const p of pts) {
+    const d = document.createElement("div");
+    d.className = "point" + (p.mine ? " mine" : "");
+    d.style.left = p.x + "%"; d.style.top = p.y + "%";
+    d.innerHTML = `<span>${esc(p.label)} · ${p.x}, ${p.y}${p.mine ? " (yours: right-click to remove)" : ""}</span>`;
+    if (p.mine) d.oncontextmenu = e => { e.preventDefault(); data.checkpoints = data.checkpoints.filter(q => q !== p.mine); markDirty(); drawPoints(); };
+    box.appendChild(d);
+  }
+}
+
+// ---------- painting ----------
+const brushR = () => parseFloat($("size").value); // radius in % of the map width
+function toPct(e) { const r = paintCv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100]; }
+function stamp(r, px, py, on) {
+  const bits = bitsOf(r), L = layerOf(r), rad = brushR();
+  const radPxSq = (rad / 100 * view.w) ** 2;
+  const radY = rad * view.w / view.h; // the same radius in % of the height
+  const i0 = Math.max(0, Math.floor((px - rad) / 100 * GRID)), i1 = Math.min(GRID - 1, Math.ceil((px + rad) / 100 * GRID));
+  const j0 = Math.max(0, Math.floor((py - radY) / 100 * GRID)), j1 = Math.min(GRID - 1, Math.ceil((py + radY) / 100 * GRID));
+  let changed = false;
+  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+    const dx = ((i + 0.5) / GRID * 100 - px) / 100 * view.w, dy = ((j + 0.5) / GRID * 100 - py) / 100 * view.h;
+    if (dx * dx + dy * dy > radPxSq) continue;
+    const k = j * GRID + i;
+    if (bits[k] !== (on ? 1 : 0)) { bits[k] = on ? 1 : 0; setPx(L, k, on); changed = true; }
+  }
+  if (changed) L.ctx.putImageData(L.img, 0, 0);
+  return changed;
+}
+let stroke = null;
+paintCv.addEventListener("pointerdown", e => {
+  if (e.button !== 0) return;
+  const r = selRegion();
+  if (!r || r.zone !== zone) { flash("Pick or create a region first (+ New region)."); return; }
+  if (r.hidden) { r.hidden = false; renderList(); }
+  paintCv.setPointerCapture(e.pointerId);
+  const [px, py] = toPct(e);
+  stroke = { r, last: [px, py], before: bitsOf(r).slice(), changed: false };
+  stroke.changed = stamp(r, px, py, tool === "brush") || stroke.changed;
+  drawRegions();
+});
+paintCv.addEventListener("pointermove", e => {
+  const [px, py] = toPct(e);
+  drawBrush(px, py); showHere(px, py);
+  if (!stroke) return;
+  const [lx, ly] = stroke.last, dist = Math.hypot(px - lx, (py - ly) * view.h / view.w);
+  const steps = Math.max(1, Math.ceil(dist / Math.max(0.2, brushR() / 3)));
+  for (let s = 1; s <= steps; s++) stroke.changed = stamp(stroke.r, lx + (px - lx) * s / steps, ly + (py - ly) * s / steps, tool === "brush") || stroke.changed;
+  stroke.last = [px, py];
+  drawRegions();
+});
+function endStroke() {
+  if (!stroke) return;
+  if (stroke.changed) { undo.push({ id: stroke.r.id, bits: stroke.before }); if (undo.length > 40) undo.shift(); markDirty(); renderCard(); }
+  stroke = null;
+}
+paintCv.addEventListener("pointerup", endStroke);
+paintCv.addEventListener("pointercancel", endStroke);
+paintCv.addEventListener("pointerleave", () => { drawBrush(null); $("pos").textContent = "–"; $("here").textContent = "–"; });
+function doUndo() {
+  const u = undo.pop(); if (!u) return;
+  bitmaps.set(u.id, u.bits); layers.delete(u.id);
+  markDirty(); drawRegions(); renderCard();
+}
+function showHere(px, py) {
+  $("pos").textContent = `${px.toFixed(1)}, ${py.toFixed(1)}`;
+  const i = Math.floor(px / 100 * GRID), j = Math.floor(py / 100 * GRID);
+  if (i < 0 || j < 0 || i >= GRID || j >= GRID) { $("here").textContent = "–"; return; }
+  const names = zoneRegions().filter(r => bitsOf(r)[j * GRID + i]).map(r => r.name || "(unnamed)");
+  $("here").textContent = names.length ? names.join(" + ") : "no region";
+}
+
+// ---------- regions list and card ----------
+function renderList() {
+  const box = $("list");
+  const rs = zoneRegions();
+  if (zone == null) { box.innerHTML = `<div class="muted-empty">Choose a zone first.</div>`; return; }
+  if (!rs.length) { box.innerHTML = `<div class="muted-empty">No region yet. Click <b>+ New region</b>, give it a name, and paint.</div>`; return; }
+  box.innerHTML = rs.map(r => `<div class="row${r.id === selId ? " sel" : ""}" data-id="${r.id}">
+    <span class="swatch" style="background:${r.color}"></span>
+    <span class="name">${esc(r.name || "(unnamed)")}</span>
+    <span class="chip ${r.status || "note"}">${STATUS[r.status || "note"]}</span>
+    <button class="eye" data-eye="${r.id}" title="Show / hide">${r.hidden ? "◌" : "●"}</button></div>`).join("");
+  box.querySelectorAll(".row").forEach(el => el.onclick = e => {
+    const id = el.dataset.id;
+    if (e.target.dataset.eye) { const r = data.regions.find(x => x.id === id); r.hidden = !r.hidden; renderList(); drawRegions(); return; }
+    select(id);
+  });
+}
+function area(r) { const b = bitsOf(r); let n = 0; for (let i = 0; i < b.length; i++) n += b[i]; return n; }
+function renderCard() {
+  const box = $("card"), r = selRegion();
+  if (!r || r.zone !== zone) { box.innerHTML = `<p class="hint">Select a region to write its note.</p>
+    <div class="box"><h3>How it works</h3><p class="hint">1. <b>+ New region</b>, give it a name.<br>2. Paint its area with the brush (<kbd>B</kbd>), fix the edges with the eraser (<kbd>E</kbd>).<br>3. Write what this place is, in your own words: what you see, smell, hear, how it feels, how warm or cold.<br>4. <b>Save</b>. Claude reads the notes and proposes values and lines; you'll see them here.</p>
+    <p class="hint">Regions can overlap: a small "fire" region inside a "gnoll camp" adds its details to the camp.</p></div>`; return; }
+  const n = area(r);
+  const f = r.final;
+  box.innerHTML = `
+    <div class="field"><span>Name</span><div class="line2"><input id="fName" type="text" value="${esc(r.name)}" placeholder="e.g. Crystal Lake"><input id="fColor" type="color" value="${r.color}" title="Colour on the map"></div></div>
+    <div class="field"><span>Your note</span><textarea id="fNote" rows="8" placeholder="What is this place? What do you see, smell, hear? How does it feel? Warmer or colder? Anything that changes at night or in the rain?">${esc(r.note)}</textarea></div>
+    <div class="line2"><span class="chip ${r.status || "note"}">${STATUS[r.status || "note"]}</span><span class="hint">${n ? (n * 100 / (GRID * GRID)).toFixed(1) + " % of the map" : "nothing painted yet"}</span></div>
+    ${r.proposal ? `<div class="box"><h3>Claude's proposal</h3><div style="white-space:pre-wrap">${esc(r.proposal)}</div></div>` : ""}
+    ${f ? `<div class="box"><h3>Approved</h3>
+      <div class="hint">${[f.kind && "Kind: " + esc(f.kind), f.air != null && "Air: " + (f.air > 0 ? "+" : "") + f.air + "°C", f.water != null && "Water: " + f.water + "°C", f.outdoorsOnly && "outdoors only", f.sub && "sub-zone: " + esc(f.sub)].filter(Boolean).join(" · ")}</div>
+      <div class="lines">${(f.lines || []).map(l => `<p>${esc(l.fr)}<br><span class="hint">${esc(l.en)}</span></p>`).join("")}</div></div>` : ""}
+    <div style="margin-top:auto;display:flex;gap:8px;justify-content:space-between"><button id="fClear" class="danger">Clear painting</button><button id="fDelete" class="danger">Delete region</button></div>`;
+  $("fName").oninput = e => { r.name = e.target.value; markDirty(); renderListSoon(); };
+  $("fNote").oninput = e => { r.note = e.target.value; if (r.status === "proposed" || r.status === "approved") { r.status = "changed"; renderListSoon(); } markDirty(); };
+  $("fColor").oninput = e => { r.color = e.target.value; markDirty(); drawRegions(); renderListSoon(); };
+  $("fClear").onclick = () => { if (!confirm(`Erase everything painted for "${r.name || "this region"}"?`)) return; undo.push({ id: r.id, bits: bitsOf(r).slice() }); bitmaps.set(r.id, new Uint8Array(GRID * GRID)); layers.delete(r.id); markDirty(); drawRegions(); renderCard(); };
+  $("fDelete").onclick = () => { if (!confirm(`Delete "${r.name || "this region"}" and its note?`)) return; data.regions = data.regions.filter(x => x !== r); bitmaps.delete(r.id); layers.delete(r.id); selId = null; markDirty(); renderList(); renderCard(); drawRegions(); };
+}
+let listTimer = null;
+function renderListSoon() { clearTimeout(listTimer); listTimer = setTimeout(renderList, 250); }
+function select(id) { selId = id; renderList(); renderCard(); drawRegions(); }
+function newRegion() {
+  if (zone == null) { flash("Choose a zone first."); return; }
+  const used = new Set(zoneRegions().map(r => r.color));
+  const color = PALETTE.find(c => !used.has(c)) || PALETTE[zoneRegions().length % PALETTE.length];
+  const r = { id: "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), zone, name: "", note: "", status: "note", color, cells: "" };
+  data.regions.push(r);
+  markDirty(); select(r.id);
+  setTool("brush");
+  setTimeout(() => $("fName") && $("fName").focus(), 0);
+}
+
+// ---------- zones and map images ----------
+function renderZones() {
+  const sel = $("zone");
+  const opts = ZONES.slice().sort((a, b) => (images.has(b[0]) - images.has(a[0])) || a[1].localeCompare(b[1]));
+  sel.innerHTML = `<option value="">Choose a zone…</option>` + opts.map(([id, name]) => {
+    const n = data.regions.filter(r => r.zone === id).length;
+    return `<option value="${id}"${id === zone ? " selected" : ""}>${images.has(id) ? "🗺 " : "   "}${esc(name)}${n ? ` (${n})` : ""}</option>`;
+  }).join("");
+}
+function matchZone(fileName) {
+  const f = norm(fileName.replace(/\.[^.]+$/, ""));
+  let best = null;
+  for (const [id, name] of ZONES) { const n = norm(name).replace(/^the/, ""); if (f === n || f.startsWith(n) || f.includes(n)) if (!best || n.length > best[1]) best = [id, n.length]; }
+  return best ? best[0] : null;
+}
+function setZone(id) {
+  zone = id; prefs.zone = id; lsSet(LS_PREF, prefs);
+  if (selRegion() && selRegion().zone !== id) selId = null;
+  const url = images.get(id);
+  $("empty").hidden = !!url; wrap.hidden = !url;
+  if (!url) {
+    $("empty").innerHTML = id == null
+      ? `Choose a zone at the top. Zones with a 🗺 have a map image.`
+      : (images.size
+        ? `No map image for <b>${esc(zoneName(id))}</b> in your maps folder yet. Save one there (from Wowhead's Classic maps), named after the zone, e.g. <b>${esc(zoneName(id).replace(/\s+/g, "-"))}.png</b>, then click <b>Maps folder…</b> again.`
+        : `Click <b>Maps folder…</b> and choose the folder with your zone maps (Desktop\\Wayfarers-maps).`);
+  } else if (imgEl.src !== url) { imgEl.onload = layout; imgEl.src = url; }
+  else layout();
+  undo.length = 0;
+  renderZones(); renderList(); renderCard(); drawRegions(); drawPoints();
+}
+async function loadFolder(dir) {
+  images.forEach(u => URL.revokeObjectURL(u)); images = new Map();
+  for await (const entry of dir.values()) {
+    if (entry.kind !== "file" || !/\.(png|jpe?g|webp)$/i.test(entry.name)) continue;
+    const id = matchZone(entry.name);
+    if (id && !images.has(id)) images.set(id, URL.createObjectURL(await entry.getFile()));
+  }
+  folderHandle = dir; idbSet("folder", dir);
+  renderZones(); setZone(zone ?? (images.size ? [...images.keys()][0] : null));
+}
+async function pickFolder() {
+  if (window.showDirectoryPicker) {
+    try { await loadFolder(await window.showDirectoryPicker({ id: "wt-maps", mode: "read" })); } catch (e) { if (e.name !== "AbortError") flash("Couldn't open that folder: " + e.message); }
+    return;
+  }
+  // older browsers: pick the image files themselves
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*"; inp.multiple = true;
+  inp.onchange = () => { for (const f of inp.files) { const id = matchZone(f.name); if (id) images.set(id, URL.createObjectURL(f)); } renderZones(); setZone(zone ?? [...images.keys()][0] ?? null); };
+  inp.click();
+}
+
+// ---------- save / open ----------
+function fileText() {
+  for (const r of data.regions) if (bitmaps.has(r.id)) r.cells = encode(bitmaps.get(r.id));
+  const clean = { ...data, regions: data.regions.map(({ hidden, ...r }) => r) };
+  return "// Wayfarer's Tales - map regions, painted in tools/map/index.html (see README.md).\n// Notes are yours; proposal / final / status are filled in with Claude.\nwindow.WT_REGIONS = " + JSON.stringify(clean, null, 1) + ";\n";
+}
+async function save() {
+  data.savedAt = new Date().toISOString();
+  const text = fileText();
+  if (window.showSaveFilePicker) {
+    try {
+      if (!saveHandle) saveHandle = await window.showSaveFilePicker({ id: "wt-regions", suggestedName: "regions.js", types: [{ description: "Regions", accept: { "text/javascript": [".js"] } }] });
+      if ((await saveHandle.queryPermission({ mode: "readwrite" })) !== "granted" && (await saveHandle.requestPermission({ mode: "readwrite" })) !== "granted") throw new Error("permission refused");
+      const w = await saveHandle.createWritable(); await w.write(text); await w.close();
+      idbSet("save", saveHandle); markSaved(); return;
+    } catch (e) { if (e.name === "AbortError") return; flash("Couldn't save there (" + e.message + "): downloading instead."); }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "text/javascript" })); a.download = "regions.js"; a.click();
+  markSaved();
+}
+async function openFile() {
+  if (dirty && !confirm("Replace your unsaved changes with the file's content?")) return;
+  let text, handle = null;
+  try {
+    if (window.showOpenFilePicker) { [handle] = await window.showOpenFilePicker({ id: "wt-regions", types: [{ description: "Regions", accept: { "text/javascript": [".js"] } }] }); text = await (await handle.getFile()).text(); }
+    else { text = await new Promise(ok => { const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".js"; inp.onchange = () => inp.files[0].text().then(ok); inp.click(); }); }
+  } catch (e) { if (e.name !== "AbortError") flash("Couldn't open it: " + e.message); return; }
+  const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
+  try { loadData(JSON.parse(json)); } catch { flash("That file doesn't look like a regions.js."); return; }
+  if (handle) { saveHandle = handle; idbSet("save", handle); }
+  markSaved();
+}
+function loadData(d) { data = normalize(d); bitmaps.clear(); layers.clear(); undo.length = 0; selId = null; renderZones(); setZone(zone); }
+
+// ---------- misc UI ----------
+function flash(msg) { const b = $("banner"); b.innerHTML = esc(msg); b.classList.add("show"); clearTimeout(flash.t); flash.t = setTimeout(() => b.classList.remove("show"), 5000); }
+function setTool(t) { tool = t; $("toolBrush").classList.toggle("on", t === "brush"); $("toolErase").classList.toggle("on", t === "erase"); }
+$("toolBrush").onclick = () => setTool("brush");
+$("toolErase").onclick = () => setTool("erase");
+$("btnUndo").onclick = doUndo;
+$("btnNew").onclick = newRegion;
+$("btnSave").onclick = save;
+$("btnOpen").onclick = openFile;
+$("btnFolder").onclick = pickFolder;
+$("zone").onchange = e => setZone(e.target.value ? +e.target.value : null);
+$("showAll").onchange = drawRegions;
+$("showPoints").onchange = drawPoints;
+$("size").oninput = () => { prefs.size = $("size").value; lsSet(LS_PREF, prefs); };
+$("zoomIn").onclick = () => { view.zoom = Math.min(6, view.zoom * 1.4); layout(); };
+$("zoomOut").onclick = () => { view.zoom = Math.max(0.5, view.zoom / 1.4); layout(); };
+$("zoomFit").onclick = () => { view.zoom = 1; layout(); };
+$("stage").addEventListener("wheel", e => {
+  if (!e.ctrlKey || wrap.hidden) return;
+  e.preventDefault();
+  const st = $("stage"), r = wrap.getBoundingClientRect();
+  const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+  view.zoom = Math.min(6, Math.max(0.5, view.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+  layout();
+  const r2 = wrap.getBoundingClientRect();
+  st.scrollLeft += (r2.left + fx * r2.width) - e.clientX; st.scrollTop += (r2.top + fy * r2.height) - e.clientY;
+}, { passive: false });
+$("btnPoint").onclick = () => { if (zone == null) return flash("Choose a zone first."); $("ptX").value = $("ptY").value = $("ptLabel").value = ""; $("pointDlg").showModal(); };
+$("pointDlg").addEventListener("close", () => {
+  if ($("pointDlg").returnValue !== "ok") return;
+  const x = parseFloat($("ptX").value), y = parseFloat($("ptY").value);
+  if (!(x >= 0 && x <= 100 && y >= 0 && y <= 100)) return flash("Coordinates go from 0 to 100.");
+  data.checkpoints.push({ zone, x, y, label: $("ptLabel").value.trim() || "my point" });
+  markDirty(); $("showPoints").checked = true; drawPoints();
+});
+document.addEventListener("keydown", e => {
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); save(); return; }
+  if (typing) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); doUndo(); }
+  else if (e.key === "b") setTool("brush");
+  else if (e.key === "e") setTool("erase");
+  else if (e.key === "[") { $("size").value = Math.max(0.4, brushR() - 0.4); }
+  else if (e.key === "]") { $("size").value = Math.min(12, brushR() + 0.4); }
+});
+window.addEventListener("resize", layout);
+window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+// ---------- start ----------
+(async function start() {
+  if (prefs.size) $("size").value = prefs.size;
+  zone = prefs.zone ?? null;
+  if (data.savedAt) markSaved();
+  // changes left unsaved last time (browser closed before saving)?
+  const un = lsGet(LS_KEY);
+  if (un && un.data && (!data.savedAt || un.at > Date.parse(data.savedAt))) {
+    const b = $("banner");
+    b.innerHTML = `You have unsaved changes from ${new Date(un.at).toLocaleString()}. <button id="bRestore" class="primary">Restore them</button> <button id="bDrop">Discard</button>`;
+    b.classList.add("show");
+    $("bRestore").onclick = () => { loadData(un.data); markDirty(); b.classList.remove("show"); };
+    $("bDrop").onclick = () => { lsDel(LS_KEY); b.classList.remove("show"); };
+  }
+  saveHandle = await idbGet("save");
+  const dir = await idbGet("folder");
+  renderZones(); setZone(zone);
+  if (dir) {
+    try {
+      if ((await dir.queryPermission({ mode: "read" })) === "granted") await loadFolder(dir);
+      else {
+        $("btnFolder").textContent = "Reopen maps folder";
+        $("btnFolder").onclick = async () => { try { if ((await dir.requestPermission({ mode: "read" })) === "granted") await loadFolder(dir); else await pickFolder(); } catch { await pickFolder(); } $("btnFolder").textContent = "Maps folder…"; $("btnFolder").onclick = pickFolder; };
+      }
+    } catch {}
+  }
+})();
+</script>
+</body>
+</html>
