@@ -15,6 +15,11 @@ local D = KT.Data
 --   gap    = it never plays less than this many seconds after another Senses line
 --   shares = uses the timer of another moment (e.g. stepping in and stepping out)
 D.MOMENT_RULES = {
+  dungeon_36      = { cd = 43200, chance = 1, gap = 0 }, -- entering the Deadmines (instance 36): at most twice a day
+  dive            = { cd = 600,  chance = 1, gap = 10 },  -- under water: the breath bar shows up
+  diveCold        = { cd = 600,  chance = 1, gap = 10, shares = "dive" }, -- ...in water at 8°C or less
+  breathLow       = { cd = 300,  chance = 1, gap = 0 },   -- 30% of your breath left
+  surface         = { cd = 600,  chance = 1, gap = 0 },   -- back up after 20 s or more under water
   eat             = { cd = 900,  chance = 1, gap = 20 },
   eatItem         = { cd = 900,  chance = 1, gap = 20, shares = "eat" },
   eatBland        = { cd = 900,  chance = 0.6, gap = 20, shares = "eat" }, -- stale bread, spider meat... (D.BLAND_WORDS)
@@ -1121,6 +1126,29 @@ D.MOMENTS.fishFirst = {
     fr = "Vous brandissez votre {item} comme un trophée. Personne ne regarde, mais tant pis : c'est une première !",
     when = { alone = true } },
 }
+-- Under water (the breath bar)
+D.MOMENTS.dive = {
+  { draft = true,
+    en = "You take a deep breath and dive. The world goes quiet, replaced by the dull rumble of the water.",
+    fr = "Vous prenez une grande inspiration et plongez. Le bruit du monde s'éteint, remplacé par le grondement sourd de l'eau." },
+}
+D.MOMENTS.diveCold = {
+  { draft = true, en = "The icy water knocks the breath out of you.", fr = "L'eau glacée vous coupe le souffle." },
+}
+D.MOMENTS.breathLow = {
+  { draft = true, en = "Your lungs are burning. You need air, now!", fr = "Vos poumons brûlent. Il faut remonter, vite !" },
+}
+D.MOMENTS.surface = {
+  { draft = true, en = "You break the surface and gulp down a lungful of air.", fr = "Vous crevez la surface et avalez une grande goulée d'air." },
+}
+
+-- Entering a dungeon: D.MOMENTS["dungeon_<instance ID>"] (GetInstanceInfo; Discovery.lua)
+D.MOMENTS.dungeon_36 = { -- the Deadmines
+  { draft = true,
+    en = "Here, under Westfall's ruined fields, the Defias Brotherhood dug its lair. The air is dry and smells of black powder, lamp oil and coal dust.",
+    fr = "Ici, sous les champs ruinés de la Marche de l'Ouest, la Confrérie défias a creusé son repaire. L'air est sec et sent la poudre noire, l'huile de lampe et la poussière de charbon." },
+}
+
 D.MOMENTS.fishJunk = {
   { draft = true,
     en = "You reel in your line... and there's {item}. Not quite a fish, but it's something.",

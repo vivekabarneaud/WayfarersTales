@@ -803,10 +803,39 @@ local function NPCLine(info)
   return false
 end
 
+---------------------------------------------------------------------------
+-- Under water: the breath bar shows up (MIRROR_TIMER_START "BREATH") while you hold your breath
+---------------------------------------------------------------------------
+
+local dive -- { at, air = seconds of breath at the start, max, low = said, ticker }
+local function EndDive()
+  if dive and dive.ticker then dive.ticker:Cancel() end
+  local held = dive and GetTime() - dive.at or 0
+  dive = nil
+  if held >= 20 then Play("surface") end -- a long dive: that first breath of air
+end
+local function OnBreathStart(value, maxValue, scale, paused)
+  -- the bar fills up again (scale >= 0): you're back at the surface
+  if (tonumber(scale) or -1) >= 0 then EndDive() return end
+  local max = (tonumber(maxValue) or 0) / 1000
+  if max <= 0 or dive then return end
+  dive = { at = GetTime(), air = (tonumber(value) or 0) / 1000, max = max }
+  if paused and paused ~= 0 then return end -- (water breathing: no rush)
+  dive.ticker = C_Timer.NewTicker(1, function()
+    if not dive or dive.low then return end
+    if dive.air - (GetTime() - dive.at) <= dive.max * 0.3 then
+      dive.low = true
+      Play("breathLow")
+    end
+  end)
+  local water = KT.Elements and KT.Elements.env and KT.Elements.env.water
+  if not (water and water <= 8 and Play("diveCold")) then Play("dive") end
+end
+
 local f = CreateFrame("Frame")
 for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED",
-  "QUEST_ACCEPTED", "QUEST_TURNED_IN", "UI_INFO_MESSAGE", "PLAYER_DEAD" }) do
+  "QUEST_ACCEPTED", "QUEST_TURNED_IN", "UI_INFO_MESSAGE", "PLAYER_DEAD", "MIRROR_TIMER_START", "MIRROR_TIMER_STOP" }) do
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
@@ -844,6 +873,11 @@ f:SetScript("OnEvent", function(_, event, ...)
       end
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
+    elseif event == "MIRROR_TIMER_START" then
+      local timer, value, maxValue, scale, paused = ...
+      if timer == "BREATH" then pcall(OnBreathStart, value, maxValue, scale, paused) end
+    elseif event == "MIRROR_TIMER_STOP" then
+      if ... == "BREATH" then pcall(EndDive) end
     elseif event == "PLAYER_DEAD" then
       local st = S.State()
       if st then st.diedAt = time() end -- (the spirit healer: one visit per death)

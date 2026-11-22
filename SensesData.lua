@@ -998,6 +998,13 @@ S.spots = {
 -- Sub-zones (matched by name, English and French)
 ---------------------------------------------------------------------------
 S.subzones = {
+  -- the Deadmines (inside a dungeon the game gives no zone map: by name only)
+  { id = "dm_foundry", names = { "fonderie des gobelins", "goblin foundry", "the goblin foundry" },
+    arrive = {
+      { draft = true, long = true,
+        en = "The heat hits you in the face: the goblins' furnaces glow red, and the air smells of molten metal.",
+        fr = "La chaleur vous saute au visage : les fourneaux des gobelins rougeoient, et l'air sent le métal fondu." },
+    } },
   { id = "sw_trade", zone = 1453, names = { "trade district", "quartier commerçant", "the gilded rose", "la rose dorée" },
     ambient = {
       { en = "Merchants' signs creak in the breeze.", fr = "Les enseignes des marchands grincent dans la brise.", when = OUT },

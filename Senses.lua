@@ -184,8 +184,6 @@ local function InList(v, value)
 end
 
 local function Check(when, ctx)
-  -- in the water: only lines written for it (frogs in the reeds, the ground underfoot... are wrong there)
-  if ctx.swimming and not (when and when.swimming) then return false, "swimming" end
   if not when then return true end
   if when.night ~= nil and when.night ~= ctx.night then return false, when.night and "night" or "day" end
   if when.indoors ~= nil and when.indoors ~= ctx.indoors then return false, when.indoors and "indoors" or "outdoors" end
@@ -403,11 +401,17 @@ end
 -- a place's own lines have played, the next level takes over until they come back.
 local TIER = { spot = 0, subzone = 1, zone = 2, weather = 3, biome = 4, generic = 5 }
 
+-- in the water: only place lines written for it (frogs in the reeds, the ground underfoot... are wrong there)
+local function WaterOK(c, ctx)
+  return not ctx.swimming or (c.line.when and c.line.when.swimming) or false
+end
+
 function S.PickFrom(list, ctx)
   local pool, total, best = {}, 0, 99
   for _, c in ipairs(list) do
     local w = c.weight * StyleFactor(c)
-    if w > 0 and (not c.line.draft or S.Testing()) and Check(c.line.when, ctx) and not IsRecent(c.id) and not Cooldown(c) then
+    if w > 0 and (not c.line.draft or S.Testing()) and WaterOK(c, ctx) and Check(c.line.when, ctx)
+      and not IsRecent(c.id) and not Cooldown(c) then
       local tier = TIER[c.src] or 5
       if tier < best then
         -- a more precise level has something: start over with only that level
