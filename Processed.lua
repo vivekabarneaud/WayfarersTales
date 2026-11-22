@@ -10,9 +10,17 @@ D.PROCESSED = {
     [1794337789] = true, [1794337806] = true, [1794337831] = true, [1794337934] = true, -- NPCs, Aldrassil
     [1794337952] = true, [1794338033] = true, [1794338234] = true, [1794338493] = true, -- NPC, fall, quest, campfire
     [1794338705] = true, [1794338843] = true, [1794338945] = true, [1794338962] = true, -- Dolanaar, corruption, inn
+    [1794567668] = true, [1794568325] = true, [1794569357] = true, [1794569805] = true, -- quest 14, campfire, Heather, Fée
+    [1794570611] = true, [1794570642] = true, [1794593456] = true, [1794594149] = true, -- rain rings, rain on stone, tram, Gryth
+    [1794677884] = true, [1794679457] = true, [1794748743] = true, [1795107179] = true, -- gem, stale bread, Goldshire, Dun Morogh
+    [1795107321] = true, [1795107700] = true, [1795112258] = true, -- danger in Menethil, cold water, Goblin Foundry
   },
   flags = {
     [1794338113] = true, -- "Vous mangeriez bien quelque chose" below 25% hunger
+    [1794594715] = true, [1794647799] = true, [1794648175] = true, [1794677712] = true, -- tunnel, chest, soaked x2, wrong line
+    [1794680384] = true, [1795028576] = true, [1795029592] = true, [1795031983] = true, -- Dun Algaz, glougloute, shoulders, nap
+    [1795107230] = true, [1795107539] = true, [1795108001] = true, [1795108772] = true, -- danger, blackmouth, underwater, murloc fin
+    [1795109172] = true, -- fresh air in the Wetlands
   },
   -- by the minute shown in the report (when the exact time isn't known)
   notesAt = {
