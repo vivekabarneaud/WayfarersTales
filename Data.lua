@@ -296,6 +296,19 @@ D.FOOD_WORDS = {
     "haunch", "boulette", "kabob", "brochette", "pâté", "chair", "aile", "wing", "flank", "flanc" } },
 }
 
+-- Tunnels and passes between two zones (sub-zone names, French and English): the game says
+-- you're in the new zone while you can't see it yet, so its arrival lines wait until you're out.
+D.TUNNELS = { ["Passage de la porte Nord"] = true, ["North Gate Pass"] = true,
+  ["Passage de la porte Sud"] = true, ["South Gate Pass"] = true, ["Dun Algaz"] = true }
+
+-- Never pet food, even if a word above matches ("Aileron de murloc" has "aile" in it).
+D.NOT_FOOD_ITEMS = { [1468] = true } -- Murloc Fin
+D.NOT_FOOD_WORDS = { "aileron" }
+
+-- Fish you pull out of the water that aren't food (crafting fish): still a fish when you catch one.
+-- Oily Blackmouth, Firefin Snapper, Stonescale Eel, Lightning Eel
+D.FISH_CATCH = { [6358] = true, [6359] = true, [13422] = true, [13757] = true }
+
 -- Drinks, so a looted water bottle doesn't make your pet drool.
 D.DRINKS = { [159] = true, [1179] = true, [1205] = true, [1708] = true, [1645] = true, [8766] = true, [252031] = true }
 

@@ -83,7 +83,7 @@ D.ROOFED = {
 local OUT = { indoors = false }
 local OUT_WALK = { indoors = false, moving = true } -- lines about your steps: only while you walk
 -- landscapes where "fresh air" would be wrong (foul, dusty or dry air)
-local NOT_FOUL_AIR = { volcanic = true, plague = true, swamp = true, undercity = true, corrupted = true,
+local NOT_FOUL_AIR = { volcanic = true, plague = true, swamp = true, marsh = true, undercity = true, corrupted = true,
   farmland = true, desert = true, savanna = true, badlands = true, canyon = true, wasteland = true, forge = true }
 
 D.SENSES = {}
@@ -99,7 +99,8 @@ S.generic = {
                 fr = "Une brise légère vous effleure le visage et emporte un instant la fatigue de la route." } },
   { en = "You take a deep breath of fresh air.", fr = "Vous prenez une grande inspiration d'air frais.",
     when = { indoors = false, notBiomes = NOT_FOUL_AIR } },
-  { en = "You roll your shoulders, loosening up.", fr = "Vous faites rouler vos épaules pour vous détendre." },
+  { en = "You roll your shoulders, loosening up.", fr = "Vous faites rouler vos épaules pour vous détendre.",
+    when = { still = true } }, -- (a breather: not while running)
   { en = "Stars glitter overhead.", fr = "Les étoiles scintillent au-dessus de vous.",
     when = { indoors = false, sky = true, night = true, weather = "clear", notBiomes = { undercity = true, gloom = true } } },
   { en = "Light warms your face for a moment.", fr = "La lumière vous réchauffe un instant le visage.",

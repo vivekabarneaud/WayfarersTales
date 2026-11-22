@@ -184,6 +184,8 @@ local function InList(v, value)
 end
 
 local function Check(when, ctx)
+  -- in the water: only lines written for it (frogs in the reeds, the ground underfoot... are wrong there)
+  if ctx.swimming and not (when and when.swimming) then return false, "swimming" end
   if not when then return true end
   if when.night ~= nil and when.night ~= ctx.night then return false, when.night and "night" or "day" end
   if when.indoors ~= nil and when.indoors ~= ctx.indoors then return false, when.indoors and "indoors" or "outdoors" end
@@ -636,6 +638,10 @@ end
 -- Returns true if a line was shown.
 local function FirstVisit(ctx)
   local subKey = ctx.subLower ~= "" and ("subname:" .. ctx.subLower) or nil
+
+  -- still in the tunnel that leads there (you can't see the place yet), or swimming (its lines
+  -- are about the land): checked again a few seconds later
+  if ctx.swimming or D.TUNNELS[GetSubZoneText() or ""] then return false end
 
   -- a new zone: its arrival line (long ones favoured), and its sub-zone counts as visited
   if ctx.mapID and not state.visited[ctx.mapID] then

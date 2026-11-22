@@ -749,7 +749,7 @@ local TIRED_LIGHT_2 = { draft = true, always = true,
   fr = "Vous étouffez un petit bâillement." }
 
 -- Napping (/sleep): lying down, then waking up when you move (full or not quite)
-D.NAP_RATE = 10        -- energy points per second while napping
+D.NAP_RATE = 0.5       -- energy points per second while napping (about 3 min from empty to full)
 D.NAP_FULL = 95        -- waking up at this much energy or more: "fully rested"
 D.SIT_RATE = 0.05      -- sitting down elsewhere than an inn or a campfire...
 D.SIT_ENERGY_CAP = 60  -- ...helps a little, up to this

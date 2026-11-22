@@ -296,7 +296,8 @@ local function MealLine(drink, tries, chained)
   local bland = link and not drink and IsBland(link)
   if bland then
     CountMeal(itemID, "food") -- (still in your food diary)
-    if Play("eatBland", { item = link }) then return end
+    Play("eatBland", { item = link })
+    return -- (its line resting: nothing, rather than "the first bite is always the best")
   elseif link and DiaryLine(drink, itemID, link, CountMeal(itemID, drink and "drink" or "food")) then return end
   -- the usual "you sit down and take a first bite" only for the first item of a meal
   if chained then return end
@@ -531,7 +532,7 @@ local function OnLootMessage(msg)
   if fishEndAt and GetTime() - fishEndAt < 6 then
     fishEndAt = nil
     local id = tonumber(looted:match("item:(%d+)"))
-    local isFish = id and KT.FoodKind and KT.FoodKind(id, looted) == "fish"
+    local isFish = id and (D.FISH_CATCH[id] or (KT.FoodKind and KT.FoodKind(id, looted) == "fish"))
     local state = S.State()
     if isFish and state then
       state.fishCaught = state.fishCaught or {}

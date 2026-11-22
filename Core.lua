@@ -725,6 +725,7 @@ local foodKindCache = {}
 local function FoodKind(itemID, link)
   if not itemID then return nil end
   if D.FOOD[itemID] then return D.FOOD[itemID] end
+  if D.NOT_FOOD_ITEMS[itemID] then return nil end
   if foodKindCache[itemID] ~= nil then return foodKindCache[itemID] or nil end
   local name = link and link:match("%[(.-)%]")
   if not name and C_Item and C_Item.GetItemNameByID then
@@ -733,6 +734,9 @@ local function FoodKind(itemID, link)
   end
   if not name then return nil end -- not loaded yet: try again next time
   name = name:lower()
+  for _, word in ipairs(D.NOT_FOOD_WORDS) do
+    if name:find(word, 1, true) then foodKindCache[itemID] = false return nil end
+  end
   local found = false
   for _, group in ipairs(D.FOOD_WORDS) do
     for _, word in ipairs(group[2]) do
@@ -812,6 +816,9 @@ local function CheckZone()
   if (UnitOnTaxi and UnitOnTaxi("player")) or (IsFlying and IsFlying()) then return end
   local zone = CurrentZone()
   if not zone then return end
+  -- still in the tunnel that leads there (Dun Algaz...): wait until you're out
+  state.tunnelZone = nil
+  if D.TUNNELS[GetSubZoneText() or ""] then state.tunnelZone = true return end
   pet.zones = pet.zones or {}
   local silent = next(pet.zones) == nil -- pets from before this feature: start counting quietly
   if pet.zones[zone] then return end
@@ -2061,6 +2068,11 @@ end
 
 function H.PLAYER_CONTROL_GAINED() -- e.g. landing after a flight path
   After(2, CheckZone)
+end
+
+-- a new sub-zone: out of the tunnel at last? then the new zone counts
+function H.ZONE_CHANGED()
+  if state.tunnelZone then After(1, CheckZone) end
 end
 
 function H.ZONE_CHANGED_NEW_AREA()

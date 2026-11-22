@@ -304,7 +304,8 @@ local function CheckRelief(env)
     local p = state[sk] or "ok"
     if p ~= "ok" and NeedState(state[n.key], p, n.states) == "ok" then
       state[sk] = "ok"
-      local now = n.key == "energy" or (n.key == "thirst" and env.drinking) or (n.key == "hunger" and env.eating)
+      -- (napping: the wake-up line says it)
+      local now = (n.key == "energy" and not napping) or (n.key == "thirst" and env.drinking) or (n.key == "hunger" and env.eating)
       if now and not said then
         Say(n.relief, nil, true)
         said = true
@@ -368,7 +369,7 @@ local function CheckStates(env)
         Say("body_" .. s, nil, true)
         Mark(n.key .. "Remind")
         E.Flash(NEED_FLASH[n.key], NeedRank(s, n.states))
-      elseif s == "ok" then
+      elseif s == "ok" and not (n.key == "energy" and napping) then -- napping: the wake-up line says it
         Say(n.relief, nil, true)
       end
       state[sk] = s
@@ -448,7 +449,8 @@ function E.Tick()
     end
   else
     if swimStart then
-      if GetTime() - swimStart >= 5 then
+      -- (still soaked from the last swim: nothing new to say)
+      if GetTime() - swimStart >= 5 and not state.soaked then
         state.soaked = true
         Say("soaked")
       end

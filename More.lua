@@ -497,8 +497,8 @@ D.SENSES_SOUNDS = {
   },
   marsh = {
     { draft = true, when = OUT,
-      en = "Frogs croak among the reeds, and somewhere, water gurgles under the mud.",
-      fr = "Des grenouilles coassent entre les roseaux, et quelque part, l'eau glougloute sous la vase." },
+      en = "Frogs croak among the reeds, and somewhere, bubbles pop on the surface of the mud.",
+      fr = "Des grenouilles coassent entre les roseaux, et quelque part, des bulles crèvent à la surface de la vase." },
   },
   jungle = {
     { draft = true, when = OUT,
