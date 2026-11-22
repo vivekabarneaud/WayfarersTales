@@ -121,12 +121,40 @@ end
 local BASE_C = { [-2] = -8, [-1] = 3, [0] = 14, [1] = 25, [2] = 35 }
 -- sub-zones hotter than the rest of their zone: degrees added, and at least as hot as a
 -- scorching zone (35°C). By the sub-zone's name, French and English.
-local HOT_SPOTS = { ["La Grande Forge"] = 8, ["The Great Forge"] = 8 }
+local HOT_SPOTS = { ["La Grande Forge"] = 8, ["The Great Forge"] = 8,
+  ["Fonderie des gobelins"] = 15, ["Goblin Foundry"] = 15, ["The Goblin Foundry"] = 15 } -- the Deadmines' furnaces
 
-function W.AirTemp(env)
+-- Places colder than their zone that have no sub-zone name: an area of the map (in % like the
+-- coordinates under the minimap) and the degrees added, air and water.
+local COLD_AREAS = {
+  { map = 1426, x1 = 58, x2 = 72, y1 = 2, y2 = 17, deg = -8 }, -- Dun Morogh: the peaks north of Ironforge
+}
+local function ColdArea(env)
+  if not (env.x and env.rawMapID) then return nil end
+  for _, a in ipairs(COLD_AREAS) do
+    if a.map == env.rawMapID and env.x >= a.x1 and env.x <= a.x2 and env.y >= a.y1 and env.y <= a.y2 then
+      return a.deg
+    end
+  end
+end
+
+-- The zone's temperature for the day: its climate, -3..+3 that changes each day (but stays
+-- the same all day for a given zone), and the cold areas.
+local function DayBase(env)
   local c = BASE_C[env.temp or 0] or 14
   local day = tonumber(date("%j")) or 1
-  c = c + ((day * 31 + (env.mapID or 0) * 7) % 7) - 3       -- -3..+3, stable for the day
+  c = c + ((day * 31 + (env.mapID or 0) * 7) % 7) - 3
+  return c + (env.coldArea or 0)
+end
+
+-- Water follows the season, not the hour: no day/night swing, rain doesn't cool it. Seas and
+-- lakes stay a little cooler than the air; never below 1°C (that would be ice), at most 30°C.
+function W.WaterTemp(env)
+  return math.max(1, math.min(30, DayBase(env) - 4))
+end
+
+function W.AirTemp(env)
+  local c = DayBase(env)
   local h, m = GetGameTime()
   local hour = (h or 12) + (m or 0) / 60
   c = c + 4 * math.cos((hour - 15) / 24 * 2 * math.pi)       -- warmest ~15h, coolest ~3h
@@ -183,7 +211,6 @@ function W.Snapshot()
   if wok and w and w.confirmed and w.name == "rain" then env.rain = tonumber(w.intensity) or 0.5 end
   if wok and w and w.confirmed and w.name == "snow" then env.snow = tonumber(w.intensity) or 0.5 end
   env.atFire = W.AtFire(env)
-  env.air = W.AirTemp(env)
   -- your position on the zone map, in % like the coordinates under the minimap
   local raw = W.MapID()
   env.rawMapID = raw
@@ -194,5 +221,8 @@ function W.Snapshot()
       if x and x > 0 then env.x, env.y = x * 100, y * 100 end
     end
   end
+  env.coldArea = ColdArea(env)
+  env.air = W.AirTemp(env)
+  env.water = W.WaterTemp(env)
   return env
 end

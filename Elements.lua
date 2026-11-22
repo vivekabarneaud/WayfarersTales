@@ -213,12 +213,21 @@ local function FoodTempNow()
   return foodTemp.deg * k
 end
 
+-- In the water: it takes your heat much faster than air, so it feels this much colder than it
+-- is, and swimming doesn't warm you (moving stirs the cold water against your skin).
+local WATER_CHILL = 6
+
 function E.Target(env, still)
-  local felt = (env.air or 15) + (still and 0 or Effort(env)) + FoodTempNow()
-  if env.taxi then felt = felt - FLIGHT_WIND end
+  local felt
+  if env.swimming then
+    felt = (env.water or 10) - WATER_CHILL + FoodTempNow()
+  else
+    felt = (env.air or 15) + (still and 0 or Effort(env)) + FoodTempNow()
+    if env.taxi then felt = felt - FLIGHT_WIND end
+  end
   local target = 50 + (felt - 20) * 2.2   -- 20°C feels just right, standing still
-  if env.swimming then target = target - 10 end
-  if state.wet > 30 then target = target - 15 * (state.wet / 100) end
+  -- wet clothes (in the water, the water itself already counts)
+  if state.wet > 30 and not env.swimming then target = target - 15 * (state.wet / 100) end
   if env.indoors and env.resting then target = 50 + (target - 50) * 0.5 end -- inns are cosy
   if env.atFire then target = math.max(target, 56) end -- at a fire: cosy whatever the climate, never scorching
   return Clamp(target)
@@ -834,7 +843,7 @@ function E.HereText()
   if env.night then parts[#parts + 1] = L.EL_NIGHT end
   if env.atFire then parts[#parts + 1] = L.EL_FIRE elseif env.nearFire then parts[#parts + 1] = L.EL_FIRE_NEAR end
   if env.hotSpot then parts[#parts + 1] = L.EL_FORGE end
-  if env.swimming then parts[#parts + 1] = L.EL_SWIMMING end
+  if env.swimming then parts[#parts + 1] = L.EL_SWIMMING .. " (" .. E.FormatAir(env.water or 10) .. ")" end
   return string.format(L.EL_HERE, table.concat(parts, ", "))
 end
 
