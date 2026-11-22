@@ -663,7 +663,7 @@ local function Tick()
   -- fishing: no "you stop to look around" (you're busy), a fishing line instead after a while
   if fishingSince and now - fishingSince > 12 then Play("fishWait") end
   if not fishingSince and S.Moving() then movedSinceFish = true end
-  local busy = onTaxi or UnitAffectingCombat("player") or UnitIsAFK("player") or IsSwimming() or fishingSince
+  local busy = onTaxi or UnitAffectingCombat("player") or KT.IsAFK() or IsSwimming() or fishingSince
   if busy or S.Moving() then
     stillSince, quietDone = nil, nil
   else

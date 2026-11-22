@@ -589,7 +589,7 @@ local function CanSpeak(ghostOK)
   if not state or not KT.ModuleOn("senses") or Rhythm() == 0 then return false end
   if UnitIsDeadOrGhost("player") and not ghostOK then return false end
   if UnitAffectingCombat("player") then return false end
-  if UnitIsAFK and UnitIsAFK("player") then return false end -- away from the keyboard: nobody to tell
+  if KT.IsAFK() then return false end -- away from the keyboard: nobody to tell
   if UnitOnTaxi and UnitOnTaxi("player") then return false end
   return true
 end

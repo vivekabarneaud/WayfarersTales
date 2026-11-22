@@ -1297,7 +1297,7 @@ local function Tick()
   local El = KT.Elements
 
   -- away (AFK) while sitting: your mascot may have curled up on your lap
-  local afk = UnitIsAFK and UnitIsAFK("player") and true or false
+  local afk = KT.IsAFK()
   if afk then
     if El and El.Sitting and El.Sitting() then afkOnLap = true end
   elseif wasAFK then

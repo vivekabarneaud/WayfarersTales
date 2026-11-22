@@ -259,6 +259,14 @@ function KT.Moving()
   return ok and moving or false
 end
 
+-- Away from the keyboard? In dungeons the game hides the answer (a "secret value", seen in
+-- the Deadmines on 2026-11-19: every module stopped): then we say no.
+function KT.IsAFK()
+  if not UnitIsAFK then return false end
+  local ok, afk = pcall(function() return UnitIsAFK("player") and true or false end)
+  return ok and afk or false
+end
+
 local function AddJournal(module, key, text, delta)
   lastShownAt = time()
   local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
@@ -1814,7 +1822,7 @@ function H.PLAYER_LOGIN()
   C_Timer.NewTicker(60, function()
     if not KT.ModuleOn("kindred") or not PetAlive() then return end
     pet.lastSeen = time()
-    if UnitIsAFK("player") then return end
+    if KT.IsAFK() then return end
     pet.stats.minutes = pet.stats.minutes + 1
     if pet.stats.minutes % 10 == 0 then Gain("time") end
     RefreshEntry()
@@ -1961,7 +1969,7 @@ local function CheckSoloWin()
   if state.actedAt and state.actedAt >= start - 2 then return end
   if not Ready("petSolo", D.PET_SOLO_COOLDOWN) then return end
   Mark("petSolo")
-  local afk = UnitIsAFK("player") and true or false
+  local afk = KT.IsAFK()
   local got = Gain("petSolo")
   FirstMemory("petSolo")
   After(1, function() if pet then Say(afk and "petSoloAfk" or "petSolo", nil, got) end end)
@@ -2094,7 +2102,7 @@ end
 -- Auto-AFK (idle character sits down) vs typing /afk yourself.
 function H.PLAYER_FLAGS_CHANGED(unit)
   if unit ~= "player" then return end
-  local afk = UnitIsAFK("player") and true or false
+  local afk = KT.IsAFK()
   if afk and not state.afk then
     state.afk, state.afkSince = true, GetTime()
     state.afkAuto = GetTime() - manualAfkAt > 3

@@ -172,7 +172,7 @@ function W.Snapshot()
     combat = UnitAffectingCombat("player") and true or false,
     zone = GetRealZoneText(),
     sub = GetSubZoneText(),
-    afk = UnitIsAFK("player") and true or false,
+    afk = KT.IsAFK(),
     seatedAtFire = W.HasAura(D.AURA_CAMP_WELCOME), -- the 60s "stay seated" campfire buff
     resSick = W.HasDebuff(D.AURA_RES_SICKNESS), -- resurrection sickness (after the spirit healer)
     eating = W.HasAura(D.SPELL_FOOD_AURA, true),
