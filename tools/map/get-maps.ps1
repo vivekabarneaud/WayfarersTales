@@ -16,6 +16,9 @@ $zones = [ordered]@{
   "Durotar" = 14; "Orgrimmar" = 1637; "Mulgore" = 215; "Thunder-Bluff" = 1638; "The-Barrens" = 17
 }
 
+# Where WoW Forever differs from the original Classic maps, take Wowhead's later version (checked in game).
+$version = @{ "Stormwind" = "wrath" }  # the harbour is there
+
 New-Item -ItemType Directory -Force $Folder | Out-Null
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $web = New-Object Net.WebClient
@@ -25,7 +28,8 @@ foreach ($name in $zones.Keys) {
   $file = Join-Path $Folder "$name.jpg"
   if ((Test-Path $file) -and -not $Force) { $kept++; continue }
   try {
-    $web.DownloadFile("https://wow.zamimg.com/images/wow/classic/maps/enus/original/$($zones[$name]).jpg", $file)
+    $v = if ($version[$name]) { $version[$name] } else { "classic" }
+    $web.DownloadFile("https://wow.zamimg.com/images/wow/$v/maps/enus/original/$($zones[$name]).jpg", $file)
     $got++
   } catch { $failed += $name; Remove-Item $file -ErrorAction SilentlyContinue }
 }

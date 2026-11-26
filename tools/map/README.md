@@ -9,7 +9,8 @@ Paint areas over a zone map, write what each place is, and discuss them with Cla
    The page recognises each image by its name (`Elwynn-Forest.jpg`, `Dun-Morogh.jpg`...), so keep only one image per zone at the top of the folder; the page ignores subfolders. The maps stay on your PC, never in git.
 3. Choose a zone, **+ New region**, give it a name, paint (brush `B`, eraser `E`, size `[` `]`, undo `Ctrl+Z`, zoom `Ctrl+wheel`).
 4. Write the note: what you see, smell, hear, how it feels, warmer or colder... in your own words.
-5. **Save** (`Ctrl+S`). The first time, save as `tools/map/regions.js` (replace the file); after that it saves there directly.
+5. Photos (optional): when you're at the place in game, take a screenshot and paste it on the region's card (`Ctrl+V`), or drop image files on the card. They're saved in the `photos` folder inside your maps folder (on your PC only); the region keeps their file names, so Claude can look at them.
+6. **Save** (`Ctrl+S`). The first time, save as `tools/map/regions.js` (replace the file); after that it saves there directly.
 
 Regions can overlap: a small "fire" region inside a "gnoll camp" adds its details to the camp.
 

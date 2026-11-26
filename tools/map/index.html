@@ -101,6 +101,16 @@ aside h2 { font: 600 12px/1 var(--font-ui); letter-spacing: .08em; text-transfor
 dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 18px; max-width: 360px; }
 dialog form { display: flex; flex-direction: column; gap: 10px; }
 dialog::backdrop { background: rgba(0,0,0,.35); }
+.dropzone { border: 1px dashed var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.dropzone.over { border-color: var(--accent); background: var(--accent-soft); }
+.photos { display: flex; flex-wrap: wrap; gap: 8px; }
+.photos:empty { display: none; }
+.thumb { position: relative; width: 108px; height: 66px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); cursor: zoom-in; display: flex; align-items: center; justify-content: center; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb button { position: absolute; top: 3px; right: 3px; padding: 0 6px; font-size: 13px; line-height: 18px; border-radius: 6px; background: rgba(0,0,0,.65); color: #fff; border: none; }
+.dropzone .hint button { padding: 2px 8px; }
+#photoDlg { max-width: 94vw; padding: 8px; }
+#photoDlg img { max-width: 92vw; max-height: 84vh; display: block; }
 kbd { font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
 </style>
 </head>
@@ -159,6 +169,8 @@ kbd { font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; 
     <div style="display:flex;gap:8px;justify-content:flex-end"><button value="cancel">Cancel</button><button value="ok" class="primary">Add</button></div>
   </form>
 </dialog>
+
+<dialog id="photoDlg"><form method="dialog"><img id="photoImg" alt=""><div style="display:flex;justify-content:flex-end"><button value="close">Close</button></div></form></dialog>
 
 <script src="checkpoints.js"></script>
 <script src="regions.js"></script>
@@ -419,6 +431,8 @@ function renderCard() {
   box.innerHTML = `
     <div class="field"><span>Name</span><div class="line2"><input id="fName" type="text" value="${esc(r.name)}" placeholder="e.g. Crystal Lake"><input id="fColor" type="color" value="${r.color}" title="Colour on the map"></div></div>
     <div class="field"><span>Your note</span><textarea id="fNote" rows="8" placeholder="What is this place? What do you see, smell, hear? How does it feel? Warmer or colder? Anything that changes at night or in the rain?">${esc(r.note)}</textarea></div>
+    <div class="field"><span>Photos</span><div class="dropzone" id="fDrop"><div class="photos" id="fPhotos"></div>
+      <div class="hint">Paste a screenshot (<kbd>Ctrl</kbd>+<kbd>V</kbd>), drop image files here, or <button id="fAddPhoto">Add…</button><br>They stay on your PC, in the <b>photos</b> folder inside your maps folder.</div></div></div>
     <div class="line2"><span class="chip ${r.status || "note"}">${STATUS[r.status || "note"]}</span><span class="hint">${n ? (n * 100 / (GRID * GRID)).toFixed(1) + " % of the map" : "nothing painted yet"}</span></div>
     ${r.proposal ? `<div class="box"><h3>Claude's proposal</h3><div style="white-space:pre-wrap">${esc(r.proposal)}</div></div>` : ""}
     ${f ? `<div class="box"><h3>Approved</h3>
@@ -430,7 +444,91 @@ function renderCard() {
   $("fColor").oninput = e => { r.color = e.target.value; markDirty(); drawRegions(); renderListSoon(); };
   $("fClear").onclick = () => { if (!confirm(`Erase everything painted for "${r.name || "this region"}"?`)) return; undo.push({ id: r.id, bits: bitsOf(r).slice() }); bitmaps.set(r.id, new Uint8Array(GRID * GRID)); layers.delete(r.id); markDirty(); drawRegions(); renderCard(); };
   $("fDelete").onclick = () => { if (!confirm(`Delete "${r.name || "this region"}" and its note?`)) return; data.regions = data.regions.filter(x => x !== r); bitmaps.delete(r.id); layers.delete(r.id); selId = null; markDirty(); renderList(); renderCard(); drawRegions(); };
+  const drop = $("fDrop");
+  drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+  drop.ondragleave = () => drop.classList.remove("over");
+  drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); addPhotos(r, e.dataTransfer.files); };
+  $("fAddPhoto").onclick = () => { const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*"; inp.multiple = true; inp.onchange = () => addPhotos(r, inp.files); inp.click(); };
+  renderPhotos(r);
 }
+
+// ---------- photos: screenshots of a place, kept in <maps folder>\photos (never in git); the region keeps their file names ----------
+const photoURLs = new Map(); // file name -> object URL
+async function photosDir(write) {
+  if (!folderHandle) throw new Error("open your maps folder first (Maps folder…)");
+  const mode = write ? "readwrite" : "read";
+  if ((await folderHandle.queryPermission({ mode })) !== "granted" && (await folderHandle.requestPermission({ mode })) !== "granted")
+    throw new Error("the page may not write in your maps folder: click Maps folder…, choose it again and allow editing");
+  return folderHandle.getDirectoryHandle("photos", { create: !!write });
+}
+async function photoURL(name) {
+  if (photoURLs.has(name)) return photoURLs.get(name);
+  const dir = await photosDir(false);
+  const url = URL.createObjectURL(await (await dir.getFileHandle(name)).getFile());
+  photoURLs.set(name, url);
+  return url;
+}
+function toJpeg(blob) { // screenshots arrive as big PNGs: store them as JPEG, at most 1920 px wide
+  return new Promise((ok, ko) => {
+    const img = new Image(), src = URL.createObjectURL(blob);
+    img.onload = () => {
+      const k = Math.min(1, 1920 / img.naturalWidth), c = document.createElement("canvas");
+      c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(src);
+      c.toBlob(b => b ? ok(b) : ko(new Error("couldn't convert the image")), "image/jpeg", 0.9);
+    };
+    img.onerror = () => { URL.revokeObjectURL(src); ko(new Error("the browser can't read that image")); };
+    img.src = src;
+  });
+}
+async function addPhotos(r, files) {
+  files = Array.from(files || []).filter(f => f && f.type.startsWith("image/"));
+  if (!files.length) return flash("No image there.");
+  try {
+    const dir = await photosDir(true); // ask for permission first, while the click / paste still counts
+    for (const f of files) {
+      const blob = await toJpeg(f);
+      const name = `${r.id}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 4)}.jpg`;
+      const w = await (await dir.getFileHandle(name, { create: true })).createWritable(); await w.write(blob); await w.close();
+      photoURLs.set(name, URL.createObjectURL(blob));
+      (r.photos = r.photos || []).push(name);
+    }
+    if (r.status === "proposed" || r.status === "approved") r.status = "changed";
+    markDirty(); renderList(); if (selId === r.id) renderCard();
+  } catch (e) { flash("Couldn't add the photo: " + e.message); }
+}
+async function removePhoto(r, name) {
+  if (!confirm("Remove this photo?")) return;
+  r.photos = (r.photos || []).filter(n => n !== name);
+  if (!r.photos.length) delete r.photos;
+  try { await (await photosDir(true)).removeEntry(name); } catch {}
+  const u = photoURLs.get(name); if (u) URL.revokeObjectURL(u); photoURLs.delete(name);
+  markDirty(); renderCard();
+}
+function renderPhotos(r) {
+  const box = $("fPhotos"); if (!box) return;
+  box.innerHTML = "";
+  for (const name of r.photos || []) {
+    const t = document.createElement("div"); t.className = "thumb"; t.title = name;
+    t.innerHTML = `<button title="Remove this photo">×</button>`;
+    t.onclick = e => {
+      if (e.target.tagName === "BUTTON") return removePhoto(r, name);
+      const u = photoURLs.get(name); if (u) { $("photoImg").src = u; $("photoDlg").showModal(); }
+    };
+    box.appendChild(t);
+    photoURL(name).then(u => { const i = new Image(); i.src = u; i.alt = ""; t.prepend(i); })
+      .catch(() => t.insertAdjacentHTML("afterbegin", `<span class="hint">${folderHandle ? "not found" : "open maps folder"}</span>`));
+  }
+}
+document.addEventListener("paste", e => {
+  const r = selRegion(); if (!r || r.zone !== zone) return;
+  const files = Array.from(e.clipboardData ? e.clipboardData.items : []).filter(i => i.kind === "file" && i.type.startsWith("image/")).map(i => i.getAsFile());
+  if (!files.length) return; // plain text: normal paste
+  e.preventDefault(); addPhotos(r, files);
+});
+// a file dropped next to the drop zone must not open in the tab (and lose unsaved work)
+document.addEventListener("dragover", e => e.preventDefault());
+document.addEventListener("drop", e => e.preventDefault());
 let listTimer = null;
 function renderListSoon() { clearTimeout(listTimer); listTimer = setTimeout(renderList, 250); }
 function select(id) { selId = id; renderList(); renderCard(); drawRegions(); }
@@ -469,7 +567,7 @@ function setZone(id) {
     $("empty").innerHTML = id == null
       ? `Choose a zone at the top. Zones with a 🗺 have a map image.`
       : (images.size
-        ? `No map image for <b>${esc(zoneName(id))}</b> in your maps folder yet. Save one there (from Wowhead's Classic maps), named after the zone, e.g. <b>${esc(zoneName(id).replace(/\s+/g, "-"))}.png</b>, then click <b>Maps folder…</b> again.`
+        ? `No map image for <b>${esc(zoneName(id))}</b> in your maps folder yet. Run <b>tools\\map\\get-maps.ps1</b> (see README.md), or save one there named after the zone, e.g. <b>${esc(zoneName(id).replace(/\s+/g, "-"))}.jpg</b>, then click <b>Maps folder…</b> again.`
         : `Click <b>Maps folder…</b> and choose the folder with your zone maps (Desktop\\Wayfarers-maps).`);
   } else if (imgEl.src !== url) { imgEl.onload = layout; imgEl.src = url; }
   else layout();
@@ -488,7 +586,7 @@ async function loadFolder(dir) {
 }
 async function pickFolder() {
   if (window.showDirectoryPicker) {
-    try { await loadFolder(await window.showDirectoryPicker({ id: "wt-maps", mode: "read" })); } catch (e) { if (e.name !== "AbortError") flash("Couldn't open that folder: " + e.message); }
+    try { await loadFolder(await window.showDirectoryPicker({ id: "wt-maps", mode: "readwrite" })); } catch (e) { if (e.name !== "AbortError") flash("Couldn't open that folder: " + e.message); }
     return;
   }
   // older browsers: pick the image files themselves
@@ -624,7 +722,7 @@ window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); 
       if ((await dir.queryPermission({ mode: "read" })) === "granted") await loadFolder(dir);
       else {
         $("btnFolder").textContent = "Reopen maps folder";
-        $("btnFolder").onclick = async () => { try { if ((await dir.requestPermission({ mode: "read" })) === "granted") await loadFolder(dir); else await pickFolder(); } catch { await pickFolder(); } $("btnFolder").textContent = "Maps folder…"; $("btnFolder").onclick = pickFolder; };
+        $("btnFolder").onclick = async () => { try { if ((await dir.requestPermission({ mode: "readwrite" })) === "granted") await loadFolder(dir); else await pickFolder(); } catch { await pickFolder(); } $("btnFolder").textContent = "Maps folder…"; $("btnFolder").onclick = pickFolder; };
       }
     } catch {}
   }
