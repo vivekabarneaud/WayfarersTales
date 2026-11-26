@@ -1082,7 +1082,7 @@ L.SN_TAGS = {
   day = "daytime", night = "night", indoors = "indoors", outdoors = "outdoors", resting = "city or inn",
   swimming = "swimming", weather = "weather: %s", crowd = "crowd: %s",
   airBelow = "air below %s", airAbove = "air above %s", notBiomes = "not in: %s", place = "place: %s",
-  long = "long", spot = "this spot", moving = "walking", hearth = "hearthstone", calm = "no crowd", alone = "nobody in sight", fishFresh = "just starting to fish", sky = "open sky", draft = "draft", rewrite = "rewrite (testing)", still = "standing still", form = "form: %s", shifted = "animal form", unshifted = "normal shape",
+  long = "long", spot = "this spot", region = "this painted area", near = "in view: %s", inhabited = "lived-in place", onFoot = "on foot", yeller = "when %s shouts", moving = "walking", hearth = "hearthstone", calm = "no crowd", alone = "nobody in sight", fishFresh = "just starting to fish", sky = "open sky", draft = "draft", rewrite = "rewrite (testing)", still = "standing still", form = "form: %s", shifted = "animal form", unshifted = "normal shape",
   cloak = "wearing a cloak", no_cloak = "no cloak", boots = "wearing boots", no_boots = "no boots", gloves = "wearing gloves", no_gloves = "no gloves", helm = "wearing a helmet", no_helm = "no helmet", intensityAbove = "heavier than %s", intensityBelow = "lighter than %s", armor = "chest armor: %s", race = "race: %s", notRace = "not for: %s",
 }
 L.SN_POS = "Position: %s   Spot: %s"
@@ -1158,6 +1158,7 @@ L.SN_REASONS = {
   weatherWait = "waiting for weather data", weather = "not in this weather",
   crowdUnknown = "needs to know who's around", crowd = "not with this crowd",
   cooldown = "already played, back in %s", moving = "only while walking", calm = "not with a crowd around", alone = "only when nobody (player or creature) is in sight", sky = "only under the open sky", draft = "draft, waiting for approval", still = "only when standing still",
+  near = "only when a certain creature is in view", abandoned = "not in an abandoned place", onFoot = "only on foot", yeller = "only when someone shouts",
   form = "not in this shape", cloak = "depends on your cloak", boots = "depends on your boots", gloves = "depends on your gloves", armor = "depends on your armor", helm = "depends on your helmet", intensity = "depends on how hard it falls", race = "told differently for your race", npc = "depends on the NPC", fish = "only when you start fishing", need = "depends on how hungry, thirsty or tired you are",
 }
 L.SN_BIOMES = {

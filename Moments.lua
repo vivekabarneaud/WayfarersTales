@@ -593,7 +593,7 @@ end
 -- Every few seconds: flights, dawn and dusk, stepping in and out, standing still
 ---------------------------------------------------------------------------
 
-local stillSince, quietDone, taxiSince, lastNight, lastIndoors, wasDead
+local stillSince, quietDone, taxiSince, lastNight, lastIndoors, wasDead, lastHour
 local wasSick, sickEndAt -- resurrection sickness: on you last time / just wore off (GetTime)
 local sickFought         -- the "you're not up to fighting" line already played this sickness
 
@@ -647,10 +647,16 @@ local function Tick()
   lastNight = night
 
   -- stepping in or out
+  -- (a painted region may have its own line for walking into its houses: Raven Hill's ruins)
   if lastIndoors ~= nil and indoors ~= lastIndoors and not onTaxi then
-    Play(indoors and "goIn" or "goOut")
+    if not (indoors and S.RegionEvent("goIn", nil, true)) then Play(indoors and "goIn" or "goOut") end
   end
   lastIndoors = indoors
+
+  -- a new hour on the game clock: Darkshire's great clock strikes it (painted regions' "hour" lines)
+  local hour = GetGameTime()
+  if lastHour ~= nil and hour ~= lastHour then S.RegionEvent("hour") end
+  lastHour = hour
 
   -- your hunter pet reacts to the rain or the snow now and then (the line checks the sky and the rain)
   if KT.ModuleOn("kindred") and UnitExists("pet") and not UnitIsDead("pet") and UnitCreatureFamily

@@ -138,6 +138,48 @@ local function ColdArea(env)
   end
 end
 
+-- Painted regions (tools/map, generated into RegionsData.lua): areas of a zone map with their
+-- own lines, temperature and flags. Each region's area is a 200 x 200 grid over the zone map,
+-- stored as runs of cells (base 36, separated by "."), off and on in turn, starting with off.
+local GRID = 200
+local runStarts = {} -- region -> where each run starts (cell index), and the total at the end
+local function Runs(r)
+  local b = runStarts[r]
+  if b then return b end
+  b = {}
+  local pos = 0
+  for t in (r.cells or ""):gmatch("[^%.]+") do
+    b[#b + 1] = pos
+    pos = pos + (tonumber(t, 36) or 0)
+  end
+  b[#b + 1] = pos
+  runStarts[r] = b
+  return b
+end
+local function Contains(r, idx)
+  local b = Runs(r)
+  if #b < 2 or idx >= b[#b] then return false end
+  local lo, hi = 1, #b - 1 -- the run k with b[k] <= idx < b[k + 1]
+  while lo < hi do
+    local mid = math.floor((lo + hi + 1) / 2)
+    if b[mid] <= idx then lo = mid else hi = mid - 1 end
+  end
+  return lo % 2 == 0 -- runs 2, 4, 6... are the painted ones
+end
+
+-- The regions you're standing in (none in dungeons, caves with their own map, or without a position)
+function W.RegionsAt(env)
+  local out = {}
+  local list = env.x and env.rawMapID and D.REGIONS and D.REGIONS[env.rawMapID]
+  if not list then return out end
+  local i, j = math.floor(env.x / 100 * GRID), math.floor(env.y / 100 * GRID)
+  if i < 0 or j < 0 or i >= GRID or j >= GRID then return out end
+  for _, r in ipairs(list) do
+    if Contains(r, j * GRID + i) then out[#out + 1] = r end
+  end
+  return out
+end
+
 -- The zone's temperature for the day: its climate, -3..+3 that changes each day (but stays
 -- the same all day for a given zone), and the cold areas.
 local function DayBase(env)
@@ -150,7 +192,7 @@ end
 -- Water follows the season, not the hour: no day/night swing, rain doesn't cool it. Seas and
 -- lakes stay a little cooler than the air; never below 1°C (that would be ice), at most 30°C.
 function W.WaterTemp(env)
-  return math.max(1, math.min(30, DayBase(env) - 4))
+  return math.max(1, math.min(30, DayBase(env) - 4 + (env.regionWater or 0))) -- (a cold river...)
 end
 
 function W.AirTemp(env)
@@ -166,6 +208,8 @@ function W.AirTemp(env)
   local hot = env.sub and HOT_SPOTS[env.sub]
   if hot then c = math.max(c + hot, BASE_C[2]) end
   env.hotSpot = hot and true or nil
+  -- painted regions warmer or colder than their zone (a camp full of torches...), outdoors
+  if env.regionAir and not env.indoors then c = c + env.regionAir end
   -- right at a fire: much warmer, mild even in the snow; a fire somewhere around
   -- (the wide "Campfire nearby" aura): only a little smoke and warmth in the air
   if env.atFire then c = math.max(c + 6, 18)
@@ -222,6 +266,13 @@ function W.Snapshot()
     end
   end
   env.coldArea = ColdArea(env)
+  env.mounted = IsMounted and IsMounted() and true or false
+  env.regions = W.RegionsAt(env)
+  for _, r in ipairs(env.regions) do
+    if r.air then env.regionAir = (env.regionAir or 0) + r.air end
+    if r.water then env.regionWater = (env.regionWater or 0) + r.water end
+    if r.abandoned then env.abandoned = true end -- nobody lives here any more (Raven Hill...)
+  end
   env.air = W.AirTemp(env)
   env.water = W.WaterTemp(env)
   return env

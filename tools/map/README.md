@@ -21,7 +21,9 @@ Regions can overlap: a small "fire" region inside a "gnoll camp" adds its detail
 Each region has a status:
 - **your note**: waiting for Claude.
 - **proposed**: Claude wrote a proposal (kind, temperatures, conditions, draft lines) in the card; we discuss it.
-- **approved**: the final values are in `final`; only these go into the addon.
+- **approved**: the final values are in `final` (each line with its trigger and conditions); only these go into the addon. `make-regions.ps1` turns them into `RegionsData.lua`:
+  `powershell -NoProfile -ExecutionPolicy Bypass -File tools\map\make-regions.ps1`
+  Run it again after repainting an approved region or changing its lines. Lines go in as drafts until they've been seen in game.
 - **changed since proposal**: you edited the note after the proposal.
 
 The grid is 200 x 200 cells per zone (0.5 % each, like the game's coordinates). Sub-zones with their own data always win over a painted region (caves under a mountain, inns...).

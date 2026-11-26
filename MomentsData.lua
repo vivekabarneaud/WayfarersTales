@@ -385,7 +385,7 @@ D.MOMENTS = {
   goIn = {
     -- calm = only when no crowd is seen around you
     { en = "The sounds of the outside fade as you step inside.", fr = "Les bruits du dehors s'estompent quand vous entrez.", when = { calm = true } },
-    { en = "Inside, everything is calm and quiet.", fr = "À l'intérieur, tout est calme et paisible.", when = { calm = true } },
+    { en = "Inside, everything is calm and quiet.", fr = "À l'intérieur, tout est calme et paisible.", when = { calm = true, inhabited = true } }, -- (not in a ruin full of bones)
     { en = "You step into the bustle: voices everywhere, people coming and going.", fr = "Vous entrez dans l'agitation : des voix de partout, des allées et venues.",
       when = { crowd = "crowded" } }, -- (lively was too easy: a few players nearby, maybe outside)
     { en = "It's packed in here. You have to squeeze your way through.", fr = "C'est bondé ici. Il faut jouer des coudes pour avancer.", when = { crowd = "crowded" } },

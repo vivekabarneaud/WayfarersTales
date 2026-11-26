@@ -435,9 +435,10 @@ function renderCard() {
       <div class="hint">Paste a screenshot (<kbd>Ctrl</kbd>+<kbd>V</kbd>), drop image files here, or <button id="fAddPhoto">Add…</button><br>They stay on your PC, in the <b>photos</b> folder inside your maps folder.</div></div></div>
     <div class="line2"><span class="chip ${r.status || "note"}">${STATUS[r.status || "note"]}</span><span class="hint">${n ? (n * 100 / (GRID * GRID)).toFixed(1) + " % of the map" : "nothing painted yet"}</span></div>
     ${r.proposal ? `<div class="box"><h3>Claude's proposal</h3><div style="white-space:pre-wrap">${esc(r.proposal)}</div></div>` : ""}
-    ${f ? `<div class="box"><h3>Approved</h3>
-      <div class="hint">${[f.kind && "Kind: " + esc(f.kind), f.air != null && "Air: " + (f.air > 0 ? "+" : "") + f.air + "°C", f.water != null && "Water: " + f.water + "°C", f.outdoorsOnly && "outdoors only", f.sub && "sub-zone: " + esc(f.sub)].filter(Boolean).join(" · ")}</div>
-      <div class="lines">${(f.lines || []).map(l => `<p>${esc(l.fr)}<br><span class="hint">${esc(l.en)}</span></p>`).join("")}</div></div>` : ""}
+    ${f ? `<div class="box"><h3>Approved: in the addon</h3>
+      <div class="hint">${[f.kind && "Kind: " + esc(f.kind), f.air != null && "Air: " + signed(f.air) + "°C vs the zone", f.water != null && "Water: " + signed(f.water) + "°C vs the zone", f.abandoned && "abandoned (no cosy indoor lines)"].filter(Boolean).join(" · ")}</div>
+      <div class="lines">${(f.lines || []).map(l => `<p><span class="chip approved">${esc(lineWhen(l))}</span><br>${esc(l.fr)}<br><span class="hint">${esc(l.en)}</span></p>`).join("")}</div>
+      <p class="hint">Repainted the area or want a line changed? Tell Claude: the addon's copy (RegionsData.lua) is rebuilt from this card.</p></div>` : ""}
     <div style="margin-top:auto;display:flex;gap:8px;justify-content:space-between"><button id="fClear" class="danger">Clear painting</button><button id="fDelete" class="danger">Delete region</button></div>`;
   $("fName").oninput = e => { r.name = e.target.value; markDirty(); renderListSoon(); };
   $("fNote").oninput = e => { r.note = e.target.value; if (r.status === "proposed" || r.status === "approved") { r.status = "changed"; renderListSoon(); } markDirty(); };
@@ -529,6 +530,20 @@ document.addEventListener("paste", e => {
 // a file dropped next to the drop zone must not open in the tab (and lose unsaved work)
 document.addEventListener("dragover", e => e.preventDefault());
 document.addEventListener("drop", e => e.preventDefault());
+const signed = n => (n > 0 ? "+" : "") + n;
+// "now and then · outdoors, walking, in view: murloc": when an approved line plays
+const TRIGGERS = { ambient: "now and then", arrive: "first visit", goIn: "stepping into a house", hour: "on the hour", yell: "when someone shouts" };
+function lineWhen(l) {
+  const w = l.when || {}, out = [];
+  const list = v => [].concat(v).join(" / ");
+  if (w.indoors === false) out.push("outdoors"); if (w.indoors === true) out.push("indoors");
+  if (w.moving) out.push("walking"); if (w.onFoot) out.push("on foot"); if (w.swimming) out.push("swimming");
+  if (w.night === false) out.push("daytime"); if (w.night === true) out.push("night");
+  if (w.calm) out.push("no crowd"); if (w.weather) out.push("weather: " + w.weather);
+  if (w.airAbove != null) out.push("air above " + w.airAbove + "°C"); if (w.airBelow != null) out.push("air below " + w.airBelow + "°C");
+  if (w.near) out.push("in view: " + list(w.near)); if (w.yeller) out.push("shouting: " + list(w.yeller));
+  return (TRIGGERS[l.on] || l.on) + (out.length ? " · " + out.join(", ") : "");
+}
 let listTimer = null;
 function renderListSoon() { clearTimeout(listTimer); listTimer = setTimeout(renderList, 250); }
 function select(id) { selId = id; renderList(); renderCard(); drawRegions(); }

@@ -31,6 +31,8 @@ local D = KT.Data
 -- seconds). Precise lines rest longer, so a place's own lines feel special.
 D.SENSES_COOLDOWN = {
   spot = 24 * 3600, subzone = 24 * 3600, zone = 24 * 3600,
+  region = 4 * 3600,      -- painted regions (RegionsData.lua): small places, few lines each
+  regionEvent = 50 * 60,  -- their event lines (the clock striking the hour, the town crier...)
   weather = 4 * 3600, biome = 4 * 3600,
   generic = 3600,
 }
@@ -1110,11 +1112,11 @@ S.subzones = {
     } },
   { id = "darkshire", zone = 1431, names = { "darkshire", "sombre-comté", "scarlet raven tavern" }, -- Duskwood
     hearth = {
-      { en = "Darkshire's inn is dim and hushed, and outside, the night never ends. You're in no real hurry to step back out there.",
-        fr = "L'auberge de Sombre-Comté est sombre et feutrée, et dehors, la nuit ne finit jamais. Vous n'avez pas vraiment hâte de ressortir.",
-        when = { indoors = true } },
-      { en = "The dim inn of Darkshire, at last. Out there, the endless night is waiting... You'd gladly linger here a little longer.",
-        fr = "La pénombre de l'auberge de Sombre-Comté, enfin. Dehors, la nuit sans fin vous attend... Vous aimeriez bien pouvoir vous éterniser un peu.",
+      -- (2026-11-26: the two old lines said the inn was dim and hushed; the user's photo shows a
+      -- roaring fire, candles everywhere and a full room)
+      { draft = true,
+        en = "The warmth of the hearth wraps around you, with the smell of warm wax, beer and burning wood. In here, you could almost forget the night outside.",
+        fr = "La chaleur de l'âtre vous enveloppe, avec l'odeur de la cire chaude, de la bière et du bois qui brûle. Ici, on en oublierait presque la nuit du dehors.",
         when = { indoors = true } },
     } },
   { id = "td_dolanaar", zone = 1438, names = { "dolanaar" }, -- Teldrassil: the first night elf village after Shadowglen
