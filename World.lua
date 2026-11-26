@@ -210,19 +210,59 @@ function W.AirTemp(env)
   env.hotSpot = hot and true or nil
   -- painted regions warmer or colder than their zone (a camp full of torches...), outdoors
   if env.regionAir and not env.indoors then c = c + env.regionAir end
-  -- right at a fire: much warmer, mild even in the snow; a fire somewhere around
-  -- (the wide "Campfire nearby" aura): only a little smoke and warmth in the air
+  -- standing at a fire: much warmer, mild even in the snow; walking past it (or just stepped
+  -- away): warmer; a player's campfire somewhere around (the wide "Campfire nearby" aura):
+  -- only a little smoke and warmth in the air
   if env.atFire then c = math.max(c + 6, 18)
+  elseif env.fireClose then c = c + 4
   elseif env.nearFire then c = c + 2 end
   return c
 end
 
--- At the fire: from the moment you get the one-minute "stay seated" buff (the game only
--- gives it right next to a fire), and as long as you don't move. Walking away loses it,
--- even if that buff is still on you (only a new one, sitting by a fire again, counts).
--- ("Campfire nearby" alone reaches far: it only means a fire somewhere around.)
+-- A fire within cooking reach (about 10 steps): any campfire (the world's or a player's), a
+-- brazier, an inn's hearth... The game says whether a recipe's "Cooking Fire" requirement is
+-- met, even for a recipe you don't know and with the cooking window closed (tested in Forever
+-- on 2026-11-26). It doesn't say where the fire is: only "in reach" or not.
+-- Returns true / false, or nil if this client can't tell.
+local FIRE_RECIPES = { 2795, 2548 } -- Beer Basted Boar Ribs, Savory Herb Pork Ribs: both need a fire
+function W.FireInRange()
+  local C = C_TradeSkillUI
+  if not (C and C.GetRecipeRequirements) then return nil end
+  for _, id in ipairs(FIRE_RECIPES) do
+    local ok, met = pcall(function()
+      local reqs = C.GetRecipeRequirements(id)
+      if type(reqs) ~= "table" or #reqs == 0 then return nil end
+      for _, q in ipairs(reqs) do if q.met == true then return true end end
+      return false
+    end)
+    if ok and met ~= nil then return met end
+  end
+  return nil
+end
+
+-- Asked at most once a second (the snapshot is taken by several modules)
+local fireCheckedAt, fireNow, fireSeenAt = -10, nil, nil
+local function FireNow()
+  local now = GetTime()
+  if now - fireCheckedAt >= 1 then
+    fireCheckedAt, fireNow = now, W.FireInRange()
+    if fireNow then fireSeenAt = now end
+  end
+  return fireNow, fireSeenAt
+end
+
+-- At the fire = a fire in reach and you're standing still. Walking within reach, or for a few
+-- seconds after stepping away (its warmth lingers on you): fireClose.
+local FIRE_LINGER = 10
 local atFire, wasSeated = false, false
 function W.AtFire(env)
+  local inReach, seenAt = FireNow()
+  if inReach ~= nil then
+    env.fireClose = inReach or (seenAt ~= nil and GetTime() - seenAt < FIRE_LINGER)
+    return inReach and not KT.Moving()
+  end
+  -- (a client without that check: sitting down by a campfire, the one-minute "stay seated"
+  -- buff, as before; "Campfire nearby" alone reaches too far to mean "at the fire")
   if env.seatedAtFire and not wasSeated then atFire = true
   elseif KT.Moving() or not env.nearFire then atFire = false end
   wasSeated = env.seatedAtFire

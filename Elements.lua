@@ -467,7 +467,7 @@ function E.Tick()
     end
     local dry = 0.15 + 0.012 * heat
     if env.indoors then dry = dry + 0.1 end
-    if env.atFire then dry = dry + 0.8 elseif env.nearFire then dry = dry + 0.1 end
+    if env.atFire then dry = dry + 0.8 elseif env.fireClose then dry = dry + 0.4 elseif env.nearFire then dry = dry + 0.1 end
     if env.taxi then dry = dry + 0.5 end -- the wind of a flight
     state.wet = Clamp(state.wet - dry * dt)
     if state.soaked and state.wet <= 5 and env.taxi then
@@ -743,7 +743,7 @@ function E.BarTip(key)
     if not env.indoors then -- (the weather: rain and snow cool the air outside)
       if env.snow then add(T.snow, DOWN) elseif env.rain then add(T.rain, DOWN) end
     end
-    if env.atFire then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
+    if env.atFire or env.fireClose then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
     if env.hotSpot then add(T.forge, UP) end
     local food = FoodTempNow() -- (cooling or warming food and drinks)
     if foodTemp and math.abs(food) >= 0.5 then
@@ -841,7 +841,7 @@ function E.HereText()
   local parts = { E.FormatAir(env.air or 15), L.EL_CLIMATE[env.temp or 0] or "?" }
   if env.indoors then parts[#parts + 1] = L.EL_INDOORS end
   if env.night then parts[#parts + 1] = L.EL_NIGHT end
-  if env.atFire then parts[#parts + 1] = L.EL_FIRE elseif env.nearFire then parts[#parts + 1] = L.EL_FIRE_NEAR end
+  if env.atFire or env.fireClose then parts[#parts + 1] = L.EL_FIRE elseif env.nearFire then parts[#parts + 1] = L.EL_FIRE_NEAR end
   if env.hotSpot then parts[#parts + 1] = L.EL_FORGE end
   if env.swimming then parts[#parts + 1] = L.EL_SWIMMING .. " (" .. E.FormatAir(env.water or 10) .. ")" end
   return string.format(L.EL_HERE, table.concat(parts, ", "))
