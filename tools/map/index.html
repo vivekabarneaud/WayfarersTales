@@ -601,14 +601,20 @@ function fileText() {
   const clean = { ...data, regions: data.regions.map(({ hidden, ...r }) => r) };
   return "// Wayfarer's Tales - map regions, painted in tools/map/index.html (see README.md).\n// Notes are yours; proposal / final / status are filled in with Claude.\nwindow.WT_REGIONS = " + JSON.stringify(clean, null, 1) + ";\n";
 }
+async function inMapsFolder(h) { try { return !!(folderHandle && await folderHandle.resolve(h)); } catch { return false; } }
 async function save() {
   data.savedAt = new Date().toISOString();
   const text = fileText();
   if (window.showSaveFilePicker) {
     try {
       // the page (and Claude) read tools/map/regions.js: any other name gets asked again
-      if (saveHandle && saveHandle.name !== "regions.js") saveHandle = null;
-      if (!saveHandle) saveHandle = await window.showSaveFilePicker({ id: "wt-regions", suggestedName: "regions.js", types: [{ description: "Regions", accept: { "text/javascript": [".js"] } }] });
+      // ...and so does a file inside the maps folder (it happened: the picker opened there)
+      if (saveHandle && (saveHandle.name !== "regions.js" || await inMapsFolder(saveHandle))) saveHandle = null;
+      if (!saveHandle) {
+        const h = await window.showSaveFilePicker({ id: "wt-regions", suggestedName: "regions.js", types: [{ description: "Regions", accept: { "text/javascript": [".js"] } }] });
+        if (await inMapsFolder(h)) { flash("Not saved: that's your maps folder. Click Save again and pick tools\\map in the WayfarersTales project (the folder of this page), over regions.js."); return; }
+        saveHandle = h;
+      }
       if ((await saveHandle.queryPermission({ mode: "readwrite" })) !== "granted" && (await saveHandle.requestPermission({ mode: "readwrite" })) !== "granted") throw new Error("permission refused");
       const w = await saveHandle.createWritable(); await w.write(text); await w.close();
       idbSet("save", saveHandle); markSaved();
