@@ -4,7 +4,9 @@ Paint areas over a zone map, write what each place is, and discuss them with Cla
 
 ## Painting
 1. Open `index.html` in Chrome or Edge (they can open a folder and save in place).
-2. **Maps folder…**: pick the folder with the zone maps (`Desktop\Wayfarers-maps`). Name each image after its zone (`Elwynn-Forest.png`, `Dun-Morogh.png`...): the page recognises it. Maps come from Wowhead's Classic maps; they stay on your PC, never in git.
+2. **Maps folder…**: pick the folder with the zone maps (`Desktop\Wayfarers-maps`). To fill it with every Classic zone map from Wowhead, run:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File tools\map\get-maps.ps1` (add `-Force` to download them again).
+   The page recognises each image by its name (`Elwynn-Forest.jpg`, `Dun-Morogh.jpg`...), so keep only one image per zone at the top of the folder; the page ignores subfolders. The maps stay on your PC, never in git.
 3. Choose a zone, **+ New region**, give it a name, paint (brush `B`, eraser `E`, size `[` `]`, undo `Ctrl+Z`, zoom `Ctrl+wheel`).
 4. Write the note: what you see, smell, hear, how it feels, warmer or colder... in your own words.
 5. **Save** (`Ctrl+S`). The first time, save as `tools/map/regions.js` (replace the file); after that it saves there directly.
