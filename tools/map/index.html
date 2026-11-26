@@ -508,10 +508,14 @@ async function save() {
   const text = fileText();
   if (window.showSaveFilePicker) {
     try {
+      // the page (and Claude) read tools/map/regions.js: any other name gets asked again
+      if (saveHandle && saveHandle.name !== "regions.js") saveHandle = null;
       if (!saveHandle) saveHandle = await window.showSaveFilePicker({ id: "wt-regions", suggestedName: "regions.js", types: [{ description: "Regions", accept: { "text/javascript": [".js"] } }] });
       if ((await saveHandle.queryPermission({ mode: "readwrite" })) !== "granted" && (await saveHandle.requestPermission({ mode: "readwrite" })) !== "granted") throw new Error("permission refused");
       const w = await saveHandle.createWritable(); await w.write(text); await w.close();
-      idbSet("save", saveHandle); markSaved(); return;
+      idbSet("save", saveHandle); markSaved();
+      if (saveHandle.name !== "regions.js") flash(`Saved as "${saveHandle.name}". The page opens tools/map/regions.js: next time, save over that file (same folder as this page).`);
+      return;
     } catch (e) { if (e.name === "AbortError") return; flash("Couldn't save there (" + e.message + "): downloading instead."); }
   }
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "text/javascript" })); a.download = "regions.js"; a.click();
@@ -594,6 +598,25 @@ window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); 
     $("bDrop").onclick = () => { lsDel(LS_KEY); b.classList.remove("show"); };
   }
   saveHandle = await idbGet("save");
+  // the file you last saved to: newer than what this page loaded? then use it
+  async function fromHandle() {
+    try {
+      const text = await (await saveHandle.getFile()).text();
+      const d = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+      if (d.savedAt && (!data.savedAt || Date.parse(d.savedAt) > Date.parse(data.savedAt))) { loadData(d); markSaved(); }
+    } catch {}
+  }
+  if (saveHandle) {
+    try {
+      if ((await saveHandle.queryPermission({ mode: "readwrite" })) === "granted") await fromHandle();
+      else {
+        const b = $("banner");
+        b.innerHTML = `Reconnect to your save file (${esc(saveHandle.name)}) to load its latest version. <button id="bReconnect" class="primary">Reconnect</button>`;
+        b.classList.add("show");
+        $("bReconnect").onclick = async () => { try { if ((await saveHandle.requestPermission({ mode: "readwrite" })) === "granted") await fromHandle(); } catch {} b.classList.remove("show"); };
+      }
+    } catch {}
+  }
   const dir = await idbGet("folder");
   renderZones(); setZone(zone);
   if (dir) {
