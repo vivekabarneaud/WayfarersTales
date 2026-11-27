@@ -259,6 +259,14 @@ function KT.Moving()
   return ok and moving or false
 end
 
+-- Away from the keyboard? In dungeons the game hides the answer (a "secret value", seen in
+-- the Deadmines on 2026-11-19: every module stopped): then we say no.
+function KT.IsAFK()
+  if not UnitIsAFK then return false end
+  local ok, afk = pcall(function() return UnitIsAFK("player") and true or false end)
+  return ok and afk or false
+end
+
 local function AddJournal(module, key, text, delta)
   lastShownAt = time()
   local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
@@ -405,6 +413,7 @@ end
 -- A line for this pet's family (bear, boar, cat...: PetFamilies.lua) that fits this
 -- moment, or nil. Pools map to the family's events.
 local FAMILY_EVENT = { idle = "idle", idleWalking = "idle", idleNight = "idle", idleResting = "idle",
+  playRequest = "playRequest", playAnswered = "playAnswered", playRequest_swim = "playRequestSwim",
   campfireRest = "campfire", affection = "affection" } -- (not campfireNear: the "nearby" buff reaches far, and these lines lie by the fire)
 local function FamilyLine(poolKey)
   if not pet or pet.demon or not D.PET_FAMILY_LINES then return nil end
@@ -716,6 +725,7 @@ local foodKindCache = {}
 local function FoodKind(itemID, link)
   if not itemID then return nil end
   if D.FOOD[itemID] then return D.FOOD[itemID] end
+  if D.NOT_FOOD_ITEMS[itemID] then return nil end
   if foodKindCache[itemID] ~= nil then return foodKindCache[itemID] or nil end
   local name = link and link:match("%[(.-)%]")
   if not name and C_Item and C_Item.GetItemNameByID then
@@ -724,6 +734,9 @@ local function FoodKind(itemID, link)
   end
   if not name then return nil end -- not loaded yet: try again next time
   name = name:lower()
+  for _, word in ipairs(D.NOT_FOOD_WORDS) do
+    if name:find(word, 1, true) then foodKindCache[itemID] = false return nil end
+  end
   local found = false
   for _, group in ipairs(D.FOOD_WORDS) do
     for _, word in ipairs(group[2]) do
@@ -803,6 +816,9 @@ local function CheckZone()
   if (UnitOnTaxi and UnitOnTaxi("player")) or (IsFlying and IsFlying()) then return end
   local zone = CurrentZone()
   if not zone then return end
+  -- still in the tunnel that leads there (Dun Algaz...): wait until you're out
+  state.tunnelZone = nil
+  if D.TUNNELS[GetSubZoneText() or ""] then state.tunnelZone = true return end
   pet.zones = pet.zones or {}
   local silent = next(pet.zones) == nil -- pets from before this feature: start counting quietly
   if pet.zones[zone] then return end
@@ -1089,6 +1105,25 @@ local function TryAttention()
   return false
 end
 
+-- A play emote while your pet asked to play (D.PLAY_EMOTES): a bonus, and a line for the
+-- game you picked (the stick, the chicken dance...) for a furry pet, else by bond and body.
+local function TryPlay(token)
+  local p = state.play
+  local style = token and D.PLAY_EMOTES[token]
+  if not (p and style and GetTime() <= p.expires and PetAlive()) then return false end
+  if p.mode == "ride" then return false end -- (a race: you answer by riding on, see MaybeAskPlay)
+  state.play = nil
+  local key = "playAnswered"
+  if style ~= "any" and not pet.archetype and M["playAnswered_" .. style] then key = "playAnswered_" .. style end
+  -- in the water: a game of splashes, whatever the emote (no running around)
+  if IsSwimming and IsSwimming() then
+    local swim = WithDrafts("playAnswered_swim", M.playAnswered_swim)
+    if swim and #swim > 0 then key = "playAnswered_swim" end
+  end
+  Say(key, nil, Gain("playAnswered"), true)
+  return true
+end
+
 -- Reaction to one of your emotes. kind comes from D.EMOTES (nil = unknown emote).
 local function OnEmote(kind, targeted, token)
   -- cheering right after a pet level-up
@@ -1152,7 +1187,7 @@ end
 
 -- Pet asks for cuddles now and then; answer with /pet in time for a bonus.
 local function MaybeAskAttention()
-  if state.attention or state.meal or InCombat() or db.settings.chatty == 0 then return false end
+  if state.attention or state.play or state.meal or InCombat() or db.settings.chatty == 0 then return false end
   if pet and pet.demon then return false end -- (a demon never asks for a cuddle)
   if not KT.LineGapOK() then return false end
   if not Ready("attention", D.ATTENTION_COOLDOWN) or not Chance(0.05 * MoodMult("attention")) then return false end
@@ -1164,6 +1199,51 @@ local function MaybeAskAttention()
     if state.attention == a then
       state.attention = nil
       if pet and Chance(0.5) then Say("attentionExpired") end
+    end
+  end)
+  return true
+end
+
+-- Pet asks to play now and then, mostly on playful days (never sleepy ones, never a demon);
+-- a play emote in time is a bonus (TryPlay).
+local function MaybeAskPlay()
+  if state.play or state.attention or state.meal or InCombat() or db.settings.chatty == 0 then return false end
+  if pet and pet.demon then return false end
+  if not KT.LineGapOK() then return false end
+  -- swimming or mounted: only games that fit there (splashing about, a race beside your
+  -- mount). Birds and bats fly above the water: no request. Only when such lines exist.
+  local mode = (IsSwimming and IsSwimming()) and "swim" or ((IsMounted and IsMounted()) and "ride" or nil)
+  local poolKey = mode and ("playRequest_" .. mode) or "playRequest"
+  if mode then
+    if pet and (pet.archetype == "bird" or D.FAMILY_SOUND[pet.family or ""] == "bat") then return false end
+    local pool = WithDrafts(poolKey, M[poolKey])
+    if not pool or #pool == 0 then return false end
+  end
+  if not Ready("playRequest", D.PLAY_COOLDOWN) or not Chance(D.PLAY_CHANCE * MoodMult("playRequest")) then return false end
+  Mark("playRequest")
+  local p = { expires = GetTime() + D.PLAY_WINDOW, mode = mode }
+  state.play = p
+  Say(poolKey)
+  -- a race: keep riding (mounted and moving) for D.PLAY_RIDE_SECONDS before the request runs out
+  if mode == "ride" then
+    local rode = 0
+    local function Tick()
+      if state.play ~= p or GetTime() > p.expires then return end
+      if IsMounted() and KT.Moving() then rode = rode + 1 end
+      if rode >= D.PLAY_RIDE_SECONDS and PetAlive() then
+        state.play = nil
+        Say("playAnswered_ride", nil, Gain("playAnswered"), true)
+        return
+      end
+      After(1, Tick)
+    end
+    After(1, Tick)
+  end
+  After(D.PLAY_WINDOW + 1, function()
+    if state.play == p then
+      state.play = nil
+      -- (the "lies down with a sigh" lines don't fit in the water or beside a mount)
+      if pet and not mode and Chance(0.6) then Say("playExpired") end
     end
   end)
   return true
@@ -1780,12 +1860,12 @@ function H.PLAYER_LOGIN()
   C_Timer.NewTicker(60, function()
     if not KT.ModuleOn("kindred") or not PetAlive() then return end
     pet.lastSeen = time()
-    if UnitIsAFK("player") then return end
+    if KT.IsAFK() then return end
     pet.stats.minutes = pet.stats.minutes + 1
     if pet.stats.minutes % 10 == 0 then Gain("time") end
     RefreshEntry()
     if EnsureMood() and db.settings.chatty > 0 then Say("mood_" .. pet.mood.key) end -- new day while playing
-    if not MaybeAskAttention() then IdleMoment() end
+    if not MaybeAskAttention() and not MaybeAskPlay() then IdleMoment() end
   end)
 
   -- See which emote command you used (/pet, /dance...), so the pet can react to
@@ -1904,6 +1984,8 @@ function H.CHAT_MSG_TEXT_EMOTE(text, sender, ...)
     return
   end
   if not targeted and not D.EMOTE_UNTARGETED[kind or ""] then return end
+  -- answering a play request with a play emote (no need to target the pet)
+  if TryPlay(token) then return end
   Debug("emote", token or "?", kind or "other", targeted and "(at pet)" or "(not at pet)")
   OnEmote(kind, targeted, token)
 end
@@ -1925,7 +2007,7 @@ local function CheckSoloWin()
   if state.actedAt and state.actedAt >= start - 2 then return end
   if not Ready("petSolo", D.PET_SOLO_COOLDOWN) then return end
   Mark("petSolo")
-  local afk = UnitIsAFK("player") and true or false
+  local afk = KT.IsAFK()
   local got = Gain("petSolo")
   FirstMemory("petSolo")
   After(1, function() if pet then Say(afk and "petSoloAfk" or "petSolo", nil, got) end end)
@@ -2004,8 +2086,27 @@ function H.PLAYER_LEAVE_COMBAT() state.meleeOn = false end
 function H.START_AUTOREPEAT_SPELL() state.shooting = true; state.actedAt = GetTime() end
 function H.STOP_AUTOREPEAT_SPELL() state.shooting = false; state.actedAt = GetTime() end
 
+-- Attacked while you're AFK: your pet jumps in to defend you (a furry pet: the lines growl
+-- and pant), and when you're back, it's still panting from the fight. The game may end your
+-- AFK when the fight starts, so "AFK a moment ago" counts too.
+local function DefendPetOK() return PetAlive() and not pet.demon and not pet.archetype end
+local function SayDefendedBack()
+  if state.afkDefended and DefendPetOK() then Say("afkDefendBack", nil, nil, true) end
+  state.afkDefended = nil
+end
+
 function H.PLAYER_REGEN_DISABLED()
   state.killsThisFight = 0
+  local wasAFK = KT.IsAFK() or state.afk or (state.afkEndedAt and GetTime() - state.afkEndedAt < 3)
+  if wasAFK and DefendPetOK() and Ready("afkDefend", 600) then
+    After(1.5, function()
+      if DefendPetOK() and UnitAffectingCombat("pet") and InCombat() then
+        Mark("afkDefend")
+        state.afkDefended = true
+        Say("afkDefend", nil, nil, true)
+      end
+    end)
+  end
 end
 
 function H.PLAYER_REGEN_ENABLED()
@@ -2013,10 +2114,17 @@ function H.PLAYER_REGEN_ENABLED()
     Mark("killReact")
   end
   state.killsThisFight = 0
+  -- the fight ended your AFK (or you came back during it): the "still panting" line now
+  if state.afkDefended and not KT.IsAFK() then After(2, SayDefendedBack) end
 end
 
 function H.PLAYER_CONTROL_GAINED() -- e.g. landing after a flight path
   After(2, CheckZone)
+end
+
+-- a new sub-zone: out of the tunnel at last? then the new zone counts
+function H.ZONE_CHANGED()
+  if state.tunnelZone then After(1, CheckZone) end
 end
 
 function H.ZONE_CHANGED_NEW_AREA()
@@ -2058,7 +2166,7 @@ end
 -- Auto-AFK (idle character sits down) vs typing /afk yourself.
 function H.PLAYER_FLAGS_CHANGED(unit)
   if unit ~= "player" then return end
-  local afk = UnitIsAFK("player") and true or false
+  local afk = KT.IsAFK()
   if afk and not state.afk then
     state.afk, state.afkSince = true, GetTime()
     state.afkAuto = GetTime() - manualAfkAt > 3
@@ -2066,6 +2174,9 @@ function H.PLAYER_FLAGS_CHANGED(unit)
     if state.afkAuto and PetAlive() and not InCombat() then Say("afkDoze") end
   elseif not afk and state.afk then
     state.afk = false
+    state.afkEndedAt = GetTime()
+    if InCombat() then return end -- (attacked: no stretching and yawning mid-fight)
+    if state.afkDefended then SayDefendedBack() return end
     if state.afkAuto and PetAlive() then
       Say((GetTime() - state.afkSince) >= 900 and "afkBackLong" or "afkBack")
     end

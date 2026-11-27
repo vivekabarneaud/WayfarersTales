@@ -208,3 +208,51 @@ Flight wind and the screen-edge flash: tested OK.
 | 11-12 17:33 | Idea | Murloc fin soup is spicy and warm: it could warm you up | todo | TODO.md: hot dishes warm you |
 | 11-12 17:34 | Idea | Quest 92 gives Redridge Goulash: warm and comforting, but spider meat! | todo | TODO.md: a line for its first taste |
 | 11-13 11:14 | Idea | Mining: "vos bras bourdonnent des chocs" | done | Mining line (draft): "Vos bras bourdonnent encore des chocs de la pioche." |
+
+## 2026-11-22 — Westfall, Stormwind, Ironforge, Loch Modan, the Wetlands, the Deadmines (Poppo's hunter), reports of 2026-11-19 and 2026-11-20
+
+Errors: 0.70.0 in the Deadmines, "secret boolean" in three modules (UnitIsAFK hidden in dungeons): fixed (KT.IsAFK). On 2026-11-20 the realm name came back empty and the character was split ("Kitty-"): Poppo restarted at 26/100. Fixed and released as 0.69.1 (automatic repair at login); the realm probe shows GetRealmName() stays empty all session in Forever now.
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 11-13 12:01 | Quest | La milice du peuple (14): Gryan names you one of the People's Militia, pretty big | todo | Hand-in line drafted (TODO.md) |
+| 11-13 12:12 | Note | "Campfire nearby" reaches too far | info | Since 0.63 it only gives +2°C; full warmth needs the seated buff |
+| 11-13 12:29 | NPC | Heather (8931), Sentinel Hill innkeeper: poor broken inn, but heart-warming | todo | Line drafted (TODO.md) |
+| 11-13 12:36 | Quest | Consultation explosive (92748): Fée Dérailleur delighted to prepare explosives | todo | Line drafted (TODO.md) |
+| 11-13 12:50 | Note | Fishing in the rain: rings of raindrops on the water | todo | Line drafted (TODO.md) |
+| 11-13 12:50 | Note | The sound of rain on Stormwind's stone | todo | Line drafted (TODO.md) |
+| 11-13 19:10 | Note | Deeprun Tram lines (first ride, general): cold metal, oil, smoke... | todo | Line drafted (TODO.md) |
+| 11-13 19:22 | NPC | Gryth Thurden (1573), Ironforge flight master, male dwarf, beef with the Wildhammer | todo | Line drafted (TODO.md) |
+| 11-14 18:38 | Idea | A line when mining gives a gem | todo | Line drafted (TODO.md) |
+| 11-14 19:04 | Note | "La première bouchée est toujours la meilleure" with stale bread | done | Unappetizing foods only get their own line, never the usual meal lines |
+| 11-15 14:19 | Idea | Goldshire inn: a line and a reminder to set the hearthstone | todo | Reminder only if the hearthstone is set elsewhere (GetBindLocation): TODO.md |
+| 11-19 17:52 | Note | Dun Morogh's peak should be colder than -5 | done | Peaks north of Ironforge (map area 58-72, 2-17): 8°C colder, air and water |
+| 11-19 17:55 | Note | "Something very dangerous" in Menethil | todo | A hostile creature 10+ levels above you; idea: name it in the line (TODO.md) |
+| 11-19 18:01 | Note | Water should be colder | done | Water has its own temperature (season not hour, zone -4°C, 1-30°C), feels 6°C colder, no warmth from swimming |
+| 11-19 19:17 | Note | The Goblin Foundry should be hot | done | Hot spot +15°C (at least 35°C) + arrival line (draft) |
+| 11-13 19:31 | Flag | Loch Modan arrival line while still in the North Gate Pass tunnel | done | D.TUNNELS: arrival lines wait until you're out |
+| 11-14 10:16 | Flag | Sealed chest from fishing: "that's cool" | todo | A line of its own for chests (TODO.md) |
+| 11-14 10:22 | Flag | Soaked boots twice close together | done | Leaving the water only says it if you had dried since |
+| 11-14 18:35 | Flag | Wrong line | info | Flagged by mistake |
+| 11-14 19:19 | Flag | Poppo's "new place" line while still in Dun Algaz | done | Same tunnel rule for the pet |
+| 11-18 20:02 | Flag | "glougloute" reads strangely | done | "des bulles crèvent à la surface de la vase" |
+| 11-18 20:19 | Flag | Rolling shoulders "to catch your breath" while running | done | Still only |
+| 11-18 20:59 | Flag | "Vos forces sont revenues" right after lying down | done | Nap 0.5/s (was 10/s), no relief line during a nap |
+| 11-19 17:53 | Flag | Poppo freezes at a danger in Menethil | todo | See the Menethil note |
+| 11-19 17:58 | Flag | Oily Blackmouth "not quite a fish" | done | D.FISH_CATCH: crafting fish count as fish |
+| 11-19 18:06 | Flag | Marsh line while swimming underwater | done | No place lines while swimming (unless written for it); arrivals wait |
+| 11-19 18:19 | Flag | Poppo eyes a Murloc Fin he can't eat | done | "aileron" matched "aile" (meat): D.NOT_FOOD_ITEMS / WORDS |
+| 11-19 18:26 | Flag | "Air frais" in the Wetlands | done | Marsh added to the foul-air biomes for that line |
+
+## 2026-11-22 to 11-26 — Wetlands, Ashenvale, Duskwood (Sweetpea, hunter, Poppo)
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 11-22 11:57 | Idea | Eating your pet's favourite food: special lines, and sharing | todo | Lines that show the pet's reaction without naming the food (TODO.md) |
+| 11-22 11:59 | Idea | Boat and zeppelin lines | todo | First a /run probe to tell when you're on a boat (TODO.md) |
+| 11-26 18:47 | Idea | "Torche du guetteur de nuit" buff: a line, and some warmth | todo | Spell ID needed (/wt auras with the buff): TODO.md |
+| 11-23 19:50 | Flag | "Une brindille craque… personne en vue" in Astranaar, full of NPCs | done | Lines about being alone need a painted region ticked "Nobody around" (friendly NPCs aren't on name plates) |
+| 11-23 19:55 | Flag | Sunlight through the leaves at Lac Iris, with no light | done | 10:00-17:00 only, not in Ashenvale / Duskwood; the rewrite is a feeling (warmth on your neck) instead of a sight |
+| 11-26 20:28 | Flag | Pulling your cloak tighter while swimming | done | Gear lines (cloak, boots, hands) don't play in the water |
+| 11-26 21:08 | Flag | Poppo chasing you while you swim | done | In the water: a splashing game (bear: slaps the water); mounted: a race, answered by riding on 20 s; birds and bats don't ask (drafts) |
+| 11-26 21:36 | Flag | Stone dust on your hands: "we could mention the gloves" | done | With gloves on: "La poussière de pierre s'incruste dans vos {gloves}" (draft) |

@@ -146,6 +146,7 @@ local function RefreshSenses(p)
     string.format(L.SN_POS, ctx.x and string.format("%.1f, %.1f (map %s)", ctx.x, ctx.y, tostring(ctx.rawMapID)) or "?", (function()
       local names = {}
       for _, sp in ipairs(S.SpotsHere(ctx)) do names[#names + 1] = S.SpotName(sp) end
+      for _, n in ipairs(S.RegionNames(ctx)) do names[#names + 1] = "+" .. n end -- painted regions
       return #names > 0 and table.concat(names, ", ") or "-"
     end)()),
   }, "\n"))

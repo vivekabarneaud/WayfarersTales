@@ -271,6 +271,17 @@ local function DiaryLine(drink, itemID, link, n)
   return false
 end
 
+-- Food that isn't appetizing, by words in its name (flavour only: your pet has its own tastes)
+local function IsBland(link)
+  local name = link:match("%[(.-)%]")
+  if not name then return false end
+  name = name:lower()
+  for _, w in ipairs(D.BLAND_WORDS) do
+    if name:find(w, 1, true) then return true end
+  end
+  return false
+end
+
 -- chained: you're still seated, starting the next item right after the last one
 local function MealLine(drink, tries, chained)
   -- (not "KT.LastFood and KT.LastFood(6)": "and" would keep only the first value, the id)
@@ -281,7 +292,13 @@ local function MealLine(drink, tries, chained)
     After(1.5, function() MealLine(drink, tries + 1, chained) end, "meal")
     return
   end
-  if link and DiaryLine(drink, itemID, link, CountMeal(itemID, drink and "drink" or "food")) then return end
+  -- not appetizing (stale bread, spider meat...): its own line, and no "first taste" delight
+  local bland = link and not drink and IsBland(link)
+  if bland then
+    CountMeal(itemID, "food") -- (still in your food diary)
+    Play("eatBland", { item = link })
+    return -- (its line resting: nothing, rather than "the first bite is always the best")
+  elseif link and DiaryLine(drink, itemID, link, CountMeal(itemID, drink and "drink" or "food")) then return end
   -- the usual "you sit down and take a first bite" only for the first item of a meal
   if chained then return end
   if not drink then
@@ -515,7 +532,7 @@ local function OnLootMessage(msg)
   if fishEndAt and GetTime() - fishEndAt < 6 then
     fishEndAt = nil
     local id = tonumber(looted:match("item:(%d+)"))
-    local isFish = id and KT.FoodKind and KT.FoodKind(id, looted) == "fish"
+    local isFish = id and (D.FISH_CATCH[id] or (KT.FoodKind and KT.FoodKind(id, looted) == "fish"))
     local state = S.State()
     if isFish and state then
       state.fishCaught = state.fishCaught or {}
@@ -576,7 +593,7 @@ end
 -- Every few seconds: flights, dawn and dusk, stepping in and out, standing still
 ---------------------------------------------------------------------------
 
-local stillSince, quietDone, taxiSince, lastNight, lastIndoors, wasDead
+local stillSince, quietDone, taxiSince, lastNight, lastIndoors, wasDead, lastHour
 local wasSick, sickEndAt -- resurrection sickness: on you last time / just wore off (GetTime)
 local sickFought         -- the "you're not up to fighting" line already played this sickness
 
@@ -630,23 +647,30 @@ local function Tick()
   lastNight = night
 
   -- stepping in or out
+  -- (a painted region may have its own line for walking into its houses: Raven Hill's ruins)
   if lastIndoors ~= nil and indoors ~= lastIndoors and not onTaxi then
-    Play(indoors and "goIn" or "goOut")
+    if not (indoors and S.RegionEvent("goIn", nil, true)) then Play(indoors and "goIn" or "goOut") end
   end
   lastIndoors = indoors
 
-  -- your hunter pet reacts to the rain now and then (the line checks the sky and the rain)
+  -- a new hour on the game clock: Darkshire's great clock strikes it (painted regions' "hour" lines)
+  local hour = GetGameTime()
+  if lastHour ~= nil and hour ~= lastHour then S.RegionEvent("hour") end
+  lastHour = hour
+
+  -- your hunter pet reacts to the rain or the snow now and then (the line checks the sky and the rain)
   if KT.ModuleOn("kindred") and UnitExists("pet") and not UnitIsDead("pet") and UnitCreatureFamily
     and UnitCreatureFamily("pet") and not onTaxi then
     local w = S.Weather()
     if w and w.confirmed and w.name == "rain" then Play("petRain", { pet = UnitName("pet") }) end
+    if w and w.confirmed and w.name == "snow" then Play("petSnow", { pet = UnitName("pet") }) end
   end
 
   -- standing still for a while (not AFK, not fighting, not swimming)
   -- fishing: no "you stop to look around" (you're busy), a fishing line instead after a while
   if fishingSince and now - fishingSince > 12 then Play("fishWait") end
   if not fishingSince and S.Moving() then movedSinceFish = true end
-  local busy = onTaxi or UnitAffectingCombat("player") or UnitIsAFK("player") or IsSwimming() or fishingSince
+  local busy = onTaxi or UnitAffectingCombat("player") or KT.IsAFK() or IsSwimming() or fishingSince
   if busy or S.Moving() then
     stillSince, quietDone = nil, nil
   else
@@ -774,9 +798,10 @@ local function NPCLine(info)
   if healer then
     if not newVisit and lineAt >= (state.diedAt or 0) then return false end -- already had this death's line
   elseif now - lineAt < D.NPC_LINE_CD then return false end
-  if Play(v.generic and "npcVisit" or "npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race,
+  local visitKey = known.persona and "npcPersona" or "npcVisit" -- (a personality replaces the generic and role lines)
+  if Play(v.generic and visitKey or "npc", { npc = NpcName(info.name, info.sex) }, { npcRace = known.race,
     npcRole = known.role, npcSex = info.sex, npcID = info.id, npcVisits = v.n, npcSince = v.since,
-    npcService = NpcService(info, known, state), ghostOK = healer }) then
+    npcService = NpcService(info, known, state), npcPersona = known.persona, ghostOK = healer }) then
     state.npcLine[info.id] = time()
     v.generic = nil
     return true
@@ -784,10 +809,39 @@ local function NPCLine(info)
   return false
 end
 
+---------------------------------------------------------------------------
+-- Under water: the breath bar shows up (MIRROR_TIMER_START "BREATH") while you hold your breath
+---------------------------------------------------------------------------
+
+local dive -- { at, air = seconds of breath at the start, max, low = said, ticker }
+local function EndDive()
+  if dive and dive.ticker then dive.ticker:Cancel() end
+  local held = dive and GetTime() - dive.at or 0
+  dive = nil
+  if held >= 20 then Play("surface") end -- a long dive: that first breath of air
+end
+local function OnBreathStart(value, maxValue, scale, paused)
+  -- the bar fills up again (scale >= 0): you're back at the surface
+  if (tonumber(scale) or -1) >= 0 then EndDive() return end
+  local max = (tonumber(maxValue) or 0) / 1000
+  if max <= 0 or dive then return end
+  dive = { at = GetTime(), air = (tonumber(value) or 0) / 1000, max = max }
+  if paused and paused ~= 0 then return end -- (water breathing: no rush)
+  dive.ticker = C_Timer.NewTicker(1, function()
+    if not dive or dive.low then return end
+    if dive.air - (GetTime() - dive.at) <= dive.max * 0.3 then
+      dive.low = true
+      Play("breathLow")
+    end
+  end)
+  local water = KT.Elements and KT.Elements.env and KT.Elements.env.water
+  if not (water and water <= 8 and Play("diveCold")) then Play("dive") end
+end
+
 local f = CreateFrame("Frame")
 for _, ev in ipairs({ "PLAYER_LOGIN", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "CHAT_MSG_SYSTEM", "CHAT_MSG_LOOT", "CINEMATIC_STOP",
   "BANKFRAME_OPENED", "MAIL_SHOW", "AUCTION_HOUSE_SHOW", "TRAINER_SHOW", "MERCHANT_SHOW", "GOSSIP_SHOW", "TAXIMAP_OPENED",
-  "QUEST_ACCEPTED", "QUEST_TURNED_IN", "UI_INFO_MESSAGE", "PLAYER_DEAD" }) do
+  "QUEST_ACCEPTED", "QUEST_TURNED_IN", "UI_INFO_MESSAGE", "PLAYER_DEAD", "MIRROR_TIMER_START", "MIRROR_TIMER_STOP" }) do
   pcall(f.RegisterEvent, f, ev)
 end
 -- only about you (not every unit around)
@@ -825,6 +879,11 @@ f:SetScript("OnEvent", function(_, event, ...)
       end
     elseif event == "PLAYER_REGEN_ENABLED" then
       FightEnded()
+    elseif event == "MIRROR_TIMER_START" then
+      local timer, value, maxValue, scale, paused = ...
+      if timer == "BREATH" then pcall(OnBreathStart, value, maxValue, scale, paused) end
+    elseif event == "MIRROR_TIMER_STOP" then
+      if ... == "BREATH" then pcall(EndDive) end
     elseif event == "PLAYER_DEAD" then
       local st = S.State()
       if st then st.diedAt = time() end -- (the spirit healer: one visit per death)

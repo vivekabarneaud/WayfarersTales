@@ -112,6 +112,11 @@ local function CheckInstance()
   if not name then return end
   st.dungeons = st.dungeons or {}
   st.dungeons[instanceID or name] = name
+  -- its entrance line, if it has one (a few seconds in, after the loading screen)
+  local key = instanceID and ("dungeon_" .. instanceID)
+  if key and D.MOMENTS[key] and KT.Moments then
+    C_Timer.After(3, Safe(function() KT.Moments.Play(key) end, "dungeon"))
+  end
 end
 
 local function CheckInn()

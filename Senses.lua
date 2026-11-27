@@ -39,6 +39,31 @@ end
 -- How many people around: nearby player name plates + people talking near you.
 -- Returns "quiet" / "lively" / "crowded", or nil when we can't tell.
 local CROWD_LIVELY, CROWD_CROWDED = 10, 25 -- players around (name plates reach ~40-60 m)
+
+-- A creature in view: its name (lowercase) and its NPC ID (from its GUID: Creature-0-...-npcID-...)
+local function NoteNear(near, name, guid)
+  pcall(function()
+    if type(name) == "string" then near.names[#near.names + 1] = name:lower() end
+    if type(guid) == "string" then
+      local id = tonumber(guid:match("^%a+%-%d+%-%d+%-%d+%-%d+%-(%d+)"))
+      if id then near.ids[id] = true end
+    end
+  end)
+end
+
+-- when.near = { 412, "murloc" }: an NPC ID, or a piece of the name (lowercase, French or English)
+local function NearMatch(list, near)
+  if not near then return false end
+  for _, v in ipairs(type(list) == "table" and list or { list }) do
+    if type(v) == "number" then
+      if near.ids[v] then return true end
+    else
+      for _, n in ipairs(near.names) do if n:find(v, 1, true) then return true end end
+    end
+  end
+  return false
+end
+S.NearMatch = NearMatch
 function S.Crowd()
   local now = GetTime()
   for i = #chatter, 1, -1 do
@@ -50,17 +75,23 @@ function S.Crowd()
   -- Creatures and NPCs with a name plate (a boar, a guard...) are counted too, for
   -- lines like "there's no one in sight".
   local players, creatures = 0, 0
-  for i = 1, 80 do
-    local unit = "nameplate" .. i
-    local ok, kind = pcall(function()
+  local near = { names = {}, ids = {} } -- creatures in view, for lines like "the murlocs smell of..."
+  local function Look(unit)
+    return pcall(function()
       if not UnitExists(unit) or UnitIsUnit(unit, "player") then return nil end
       if UnitIsPlayer(unit) then return "player" end
       if UnitIsDead(unit) then return nil end
-      return "creature"
+      return "creature", UnitName(unit), UnitGUID(unit)
     end)
-    if ok and kind == "player" then players = players + 1 end
-    if ok and kind == "creature" then creatures = creatures + 1 end
   end
+  for i = 1, 80 do
+    local ok, kind, name, guid = Look("nameplate" .. i)
+    if ok and kind == "player" then players = players + 1 end
+    if ok and kind == "creature" then creatures = creatures + 1; NoteNear(near, name, guid) end
+  end
+  local okT, kindT, nameT, guidT = Look("target") -- (counted as in view, not in the crowd)
+  if okT and kindT == "creature" then NoteNear(near, nameT, guidT) end
+  S.lastNear = near
   if players > 0 then sawPlayerPlates = true end
   if creatures > 0 then sawCreaturePlates = true end
   -- can we see creatures? (enemy name plates on, or we've seen some this session)
@@ -99,6 +130,7 @@ function S.Context()
   ctx.weather = S.Weather()
   ctx.crowd, ctx.players, ctx.chatter = S.Crowd()
   ctx.creatures = S.lastCreatures
+  ctx.near = S.lastNear
   -- alone: nobody in sight, neither players nor creatures (only if we can tell)
   ctx.alone = ctx.crowd == "quiet" and S.creaturePlatesOn and ctx.creatures == 0 or false
   ctx.subLower = (ctx.sub or ""):lower()
@@ -186,9 +218,16 @@ end
 local function Check(when, ctx)
   if not when then return true end
   if when.night ~= nil and when.night ~= ctx.night then return false, when.night and "night" or "day" end
+  -- midday: the sun high enough to reach through leaves (game clock 10:00 to 17:00)
+  if when.midday then
+    local h = GetGameTime()
+    if not (h and h >= 10 and h < 17) then return false, "midday" end
+  end
+  -- not in these zone maps (dark forests where the sun hardly gets through: Ashenvale...)
+  if when.notMaps and InList(when.notMaps, ctx.mapID) then return false, "notMaps" end
   if when.indoors ~= nil and when.indoors ~= ctx.indoors then return false, when.indoors and "indoors" or "outdoors" end
   if when.resting and not ctx.resting then return false, "resting" end
-  if when.swimming and not ctx.swimming then return false, "swimming" end
+  if when.swimming ~= nil and when.swimming ~= ctx.swimming then return false, "swimming" end -- (false = not in water)
   if when.moving and not ctx.moving then return false, "moving" end
   if when.sky and (ctx.indoors or ctx.roofed) then return false, "sky" end
   if when.still and ctx.moving then return false, "still" end
@@ -202,6 +241,7 @@ local function Check(when, ctx)
   if when.npcID and not InList(when.npcID, ctx.npcID) then return false, "npc" end
   -- what the NPC does for you (innkeeper, banker, flight_master, auctioneer, trainer, vendor)
   if when.service and not InList(when.service, ctx.npcService) then return false, "npc" end
+  if when.persona and when.persona ~= ctx.npcPersona then return false, "npc" end -- (D.NPCS[id].persona)
   if when.city and ctx.biome ~= "city" then return false, "city" end -- in a capital
   -- how many times you came back to this NPC (a visit = after more than 30 minutes away,
   -- or each death for the spirit healer), and how long since the visit before this one
@@ -249,7 +289,23 @@ local function Check(when, ctx)
   local inten = ctx.weather and tonumber(ctx.weather.intensity)
   if when.intensityAbove and not (inten and inten > when.intensityAbove) then return false, "intensity" end
   if when.intensityBelow and not (inten and inten < when.intensityBelow) then return false, "intensity" end
-  if when.alone and not ctx.alone then return false, "alone" end
+  -- alone: no one on the name plates AND a painted region ticked "Nobody around" (the game
+  -- doesn't show friendly NPCs on plates: a town full of them would look empty)
+  if when.alone and not (ctx.alone and ctx.nobody) then return false, "alone" end
+  -- a creature in view (name plates or your target): murlocs, boars, Stitches...
+  if when.near and not NearMatch(when.near, ctx.near) then return false, "near" end
+  -- a place where people live (not an abandoned village: see the painted regions)
+  if when.inhabited and ctx.abandoned then return false, "abandoned" end
+  -- on your own feet: not mounted, not in an animal form ("an apple rolls under your foot")
+  if when.onFoot and (ctx.mounted or ctx.form) then return false, "onFoot" end
+  -- someone shouting (the town crier...): a piece of their name, lowercase
+  if when.yeller then
+    local found = false
+    for _, s in ipairs(type(when.yeller) == "table" and when.yeller or { when.yeller }) do
+      if ctx.yeller and ctx.yeller:find(s, 1, true) then found = true break end
+    end
+    if not found then return false, "yeller" end
+  end
   if when.crowd then
     if not ctx.crowd then return false, "crowdUnknown" end
     local ok = false
@@ -328,6 +384,9 @@ function S.Candidates(ctx, kind)
   for _, sp in ipairs(S.SpotsHere(ctx)) do
     add("spot", sp[kind], 4, "spot:" .. sp.id .. ":" .. kind)
   end
+  for _, r in ipairs(ctx.regions or {}) do -- painted regions (tools/map)
+    add("region", r[kind], 3.5, "region:" .. r.id .. ":" .. kind)
+  end
   local sz = FindSubzone(ctx)
   if sz then add("subzone", sz[kind], 3, "sub:" .. sz.id .. ":" .. kind) end
   local z = ctx.mapID and D.SENSES.zones[ctx.mapID]
@@ -398,13 +457,20 @@ end
 -- then the weather, then the landscape, then generic lines. The most precise level
 -- that still has a line available wins; lines played recently are skipped, so once
 -- a place's own lines have played, the next level takes over until they come back.
-local TIER = { spot = 0, subzone = 1, zone = 2, weather = 3, biome = 4, generic = 5 }
+-- (a painted region is usually smaller than a sub-zone: its lines come first)
+local TIER = { spot = 0, region = 0.5, subzone = 1, zone = 2, weather = 3, biome = 4, generic = 5 }
+
+-- in the water: only place lines written for it (frogs in the reeds, the ground underfoot... are wrong there)
+local function WaterOK(c, ctx)
+  return not ctx.swimming or (c.line.when and c.line.when.swimming) or false
+end
 
 function S.PickFrom(list, ctx)
   local pool, total, best = {}, 0, 99
   for _, c in ipairs(list) do
     local w = c.weight * StyleFactor(c)
-    if w > 0 and (not c.line.draft or S.Testing()) and Check(c.line.when, ctx) and not IsRecent(c.id) and not Cooldown(c) then
+    if w > 0 and (not c.line.draft or S.Testing()) and WaterOK(c, ctx) and Check(c.line.when, ctx)
+      and not IsRecent(c.id) and not Cooldown(c) then
       local tier = TIER[c.src] or 5
       if tier < best then
         -- a more precise level has something: start over with only that level
@@ -473,6 +539,7 @@ function S.Tags(c, ctx)
   end
   -- where the line comes from (neutral: always true for lines listed here)
   if c.src == "spot" then add(T.spot)
+  elseif c.src == "region" or c.src == "regionEvent" then add(T.region)
   elseif c.src == "subzone" then add(T.subzone)
   elseif c.src == "zone" then add(T.zone)
   elseif c.src == "biome" then add(string.format(T.biome, L.SN_BIOMES[c.biome] or tostring(c.biome)))
@@ -486,6 +553,7 @@ function S.Tags(c, ctx)
   local w = c.line and c.line.when
   if w then
     if w.night ~= nil then add(w.night and T.night or T.day, w.night == ctx.night) end
+    if w.midday then local h = GetGameTime(); add(T.midday, h and h >= 10 and h < 17 or false) end
     if w.indoors ~= nil then add(w.indoors and T.indoors or T.outdoors, w.indoors == ctx.indoors) end
     if w.resting then add(T.resting, ctx.resting) end
     if w.swimming then add(T.swimming, ctx.swimming) end
@@ -501,7 +569,15 @@ function S.Tags(c, ctx)
     if w.race then add(string.format(T.race, type(w.race) == "table" and table.concat(w.race, "/") or w.race), InList(w.race, ctx.race)) end
     if w.notRace then add(string.format(T.notRace, type(w.notRace) == "table" and table.concat(w.notRace, "/") or w.notRace), not InList(w.notRace, ctx.race)) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
-    if w.alone then add(T.alone, ctx.alone) end
+    if w.alone then add(T.alone, ctx.alone and ctx.nobody or false) end
+    if w.near then
+      local names = {}
+      for _, v in ipairs(type(w.near) == "table" and w.near or { w.near }) do names[#names + 1] = tostring(v) end
+      add(string.format(T.near, table.concat(names, "/")), NearMatch(w.near, ctx.near))
+    end
+    if w.inhabited then add(T.inhabited, not ctx.abandoned) end
+    if w.onFoot then add(T.onFoot, not ctx.mounted and not ctx.form) end
+    if w.yeller then add(string.format(T.yeller, type(w.yeller) == "table" and w.yeller[1] or w.yeller)) end
     if w.fishFresh then add(T.fishFresh) end
     local inten = ctx.weather and tonumber(ctx.weather.intensity)
     if w.intensityAbove then add(string.format(T.intensityAbove, w.intensityAbove), inten and inten > w.intensityAbove or false) end
@@ -588,7 +664,7 @@ local function CanSpeak(ghostOK)
   if not state or not KT.ModuleOn("senses") or Rhythm() == 0 then return false end
   if UnitIsDeadOrGhost("player") and not ghostOK then return false end
   if UnitAffectingCombat("player") then return false end
-  if UnitIsAFK and UnitIsAFK("player") then return false end -- away from the keyboard: nobody to tell
+  if KT.IsAFK() then return false end -- away from the keyboard: nobody to tell
   if UnitOnTaxi and UnitOnTaxi("player") then return false end
   return true
 end
@@ -618,6 +694,36 @@ local function AmbientTick()
   if c then S.Show(c) else ambientDue = time() + 60 end -- nothing fits here: try again a bit later
 end
 
+-- Something happens in a painted region: the clock strikes the hour ("hour"), you step into a
+-- house ("goIn"), someone shouts ("yell")... One of the region's lines for it, if one fits.
+-- These lines come with an event, so the "recently played" list doesn't hold them back: only
+-- their own cooldown (D.SENSES_COOLDOWN.regionEvent). gap = also wait after any other line.
+-- Returns true if a line was shown.
+function S.RegionEvent(kind, extra, gap)
+  if not CanSpeak() then return false end
+  if gap and not KT.LineGapOK() then return false end
+  local ctx = S.Context()
+  for k, v in pairs(extra or {}) do ctx[k] = v end
+  local pool = {}
+  for _, r in ipairs(ctx.regions or {}) do
+    for i, line in ipairs(r[kind] or {}) do
+      local id = "region:" .. r.id .. ":" .. kind .. ":" .. i
+      local c = { line = S.Effective(line, id), id = id, src = "regionEvent", kind = kind }
+      if (not line.draft or S.Testing()) and Check(c.line.when, ctx) and not Cooldown(c) then pool[#pool + 1] = c end
+    end
+  end
+  if #pool == 0 then return false end
+  S.Show(pool[math.random(#pool)])
+  return true
+end
+
+-- The names of the painted regions you're in (for the dev panel)
+function S.RegionNames(ctx)
+  local names = {}
+  for _, r in ipairs(ctx.regions or {}) do names[#names + 1] = r.name or r.id end
+  return names
+end
+
 -- for Moments.lua (little moments: after a fight, eating, dawn...)
 S.Check = Check
 S.CanSpeak = CanSpeak
@@ -635,6 +741,10 @@ end
 -- Returns true if a line was shown.
 local function FirstVisit(ctx)
   local subKey = ctx.subLower ~= "" and ("subname:" .. ctx.subLower) or nil
+
+  -- still in the tunnel that leads there (you can't see the place yet), or swimming (its lines
+  -- are about the land): checked again a few seconds later
+  if ctx.swimming or D.TUNNELS[GetSubZoneText() or ""] then return false end
 
   -- a new zone: its arrival line (long ones favoured), and its sub-zone counts as visited
   if ctx.mapID and not state.visited[ctx.mapID] then
@@ -654,6 +764,23 @@ local function FirstVisit(ctx)
         local list = {}
         for i, line in ipairs(sp.arrive) do
           list[#list + 1] = { line = S.Effective(line, "spot:" .. sp.id .. ":arrive:" .. i), weight = 4, id = "spot:" .. sp.id .. ":arrive:" .. i, src = "spot", kind = "arrive" }
+        end
+        local c = S.PickFrom(list, ctx)
+        if c then ShowArrival(c, ctx) return true end
+      end
+    end
+  end
+
+  -- a painted region you've never been in, if it has arrival lines
+  for _, r in ipairs(ctx.regions or {}) do
+    local key = "region:" .. r.id
+    if not state.visited[key] then
+      state.visited[key] = time()
+      if r.arrive then
+        local list = {}
+        for i, line in ipairs(r.arrive) do
+          local id = "region:" .. r.id .. ":arrive:" .. i
+          list[#list + 1] = { line = S.Effective(line, id), weight = 3.5, id = id, src = "region", kind = "arrive" }
         end
         local c = S.PickFrom(list, ctx)
         if c then ShowArrival(c, ctx) return true end
@@ -689,14 +816,39 @@ local function EnteredSubzone(ctx)
   end
 end
 
-local lastSub -- the sub-zone at the previous check (nil right after login: no line then)
+-- Walking into a painted region: one of its own ambient lines, on the same timer as above.
+local function EnteredRegion(ctx, r)
+  local rh = RHYTHM[Rhythm()]
+  if not rh or time() - (state.lastEntry or 0) < rh.entry then return false end
+  if time() - (state.lastLine or 0) < ENTRY_AFTER_LINE or not KT.LineGapOK() then return false end
+  local list = {}
+  for i, line in ipairs(r.ambient or {}) do
+    local id = "region:" .. r.id .. ":ambient:" .. i
+    list[#list + 1] = { line = S.Effective(line, id), weight = 3.5, id = id, src = "region", kind = "ambient" }
+  end
+  local c = S.PickFrom(list, ctx)
+  if not c then return false end
+  state.lastEntry = time()
+  S.Show(c)
+  return true
+end
+
+local lastSub     -- the sub-zone at the previous check (nil right after login: no line then)
+local lastRegions -- the painted regions at the previous check (same)
 
 local function CheckArrival()
   if not CanSpeak() or S.InFlight() then return end
   local ctx = S.Context()
-  local prevSub = lastSub
+  local prevSub, prevRegions = lastSub, lastRegions
   lastSub = ctx.subLower
+  lastRegions = {}
+  for _, r in ipairs(ctx.regions or {}) do lastRegions[r.id] = true end
   if FirstVisit(ctx) then return end
+  if prevRegions then
+    for _, r in ipairs(ctx.regions or {}) do
+      if not prevRegions[r.id] and EnteredRegion(ctx, r) then return end
+    end
+  end
   if prevSub and ctx.subLower ~= "" and ctx.subLower ~= prevSub then EnteredSubzone(ctx) end
 end
 
@@ -804,6 +956,7 @@ for _, ev in ipairs({ "PLAYER_LOGIN", "ZONE_CHANGED_NEW_AREA", "ZONE_CHANGED", "
   pcall(f.RegisterEvent, f, ev)
 end
 pcall(f.RegisterEvent, f, "WEATHER_CHANGED")
+pcall(f.RegisterEvent, f, "CHAT_MSG_MONSTER_YELL") -- an NPC shouting (Darkshire's town crier...): painted regions react
 
 -- run a function, and save its error (if any) to the error log
 local function Safe(fn, name)
@@ -846,6 +999,14 @@ f:SetScript("OnEvent", function(_, event, ...)
       CheckCreature("target")
     elseif event == "WEATHER_CHANGED" then
       OnWeatherChanged()
+    elseif event == "CHAT_MSG_MONSTER_YELL" then
+      -- no painted regions in dungeons (and the game may hide the names there)
+      if IsInInstance and IsInInstance() then return end
+      local who = select(2, ...)
+      local okN, yeller = pcall(function() return type(who) == "string" and who ~= "" and who:lower() or nil end)
+      if okN and yeller then
+        C_Timer.After(1.5, Safe(function() S.RegionEvent("yell", { yeller = yeller }) end, "yell")) -- after the shout
+      end
     else
       -- someone else talking or emoting near you: the place is lively
       local sender, guid = select(2, ...), select(12, ...)

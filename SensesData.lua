@@ -31,6 +31,8 @@ local D = KT.Data
 -- seconds). Precise lines rest longer, so a place's own lines feel special.
 D.SENSES_COOLDOWN = {
   spot = 24 * 3600, subzone = 24 * 3600, zone = 24 * 3600,
+  region = 4 * 3600,      -- painted regions (RegionsData.lua): small places, few lines each
+  regionEvent = 50 * 60,  -- their event lines (the clock striking the hour, the town crier...)
   weather = 4 * 3600, biome = 4 * 3600,
   generic = 3600,
 }
@@ -66,7 +68,7 @@ D.DANGER_FLAVOR = {
 }
 
 D.WEATHER_TYPES = { [0] = "clear", [1] = "rain", [2] = "snow", [3] = "sand" }
-D.WEATHER_CONFIRMED = { clear = true, rain = true } -- rain = type 1, seen in Stormwind on 2026-11-11 (intensity 0.88)
+D.WEATHER_CONFIRMED = { clear = true, rain = true, snow = true } -- rain = type 1, seen in Stormwind on 2026-11-11 (intensity 0.88); snow = type 2, seen in Loch Modan (Thelsamar) on 2026-11-14, intensity 1
 
 -- Places the game counts as "outdoors" but with a roof over your head: lines that
 -- need the open sky (sky = true) skip them. map = map ID (raw, as for spots), x/y in %.
@@ -83,7 +85,7 @@ D.ROOFED = {
 local OUT = { indoors = false }
 local OUT_WALK = { indoors = false, moving = true } -- lines about your steps: only while you walk
 -- landscapes where "fresh air" would be wrong (foul, dusty or dry air)
-local NOT_FOUL_AIR = { volcanic = true, plague = true, swamp = true, undercity = true, corrupted = true,
+local NOT_FOUL_AIR = { volcanic = true, plague = true, swamp = true, marsh = true, undercity = true, corrupted = true,
   farmland = true, desert = true, savanna = true, badlands = true, canyon = true, wasteland = true, forge = true }
 
 D.SENSES = {}
@@ -99,7 +101,8 @@ S.generic = {
                 fr = "Une brise légère vous effleure le visage et emporte un instant la fatigue de la route." } },
   { en = "You take a deep breath of fresh air.", fr = "Vous prenez une grande inspiration d'air frais.",
     when = { indoors = false, notBiomes = NOT_FOUL_AIR } },
-  { en = "You roll your shoulders, loosening up.", fr = "Vous faites rouler vos épaules pour vous détendre." },
+  { en = "You roll your shoulders, loosening up.", fr = "Vous faites rouler vos épaules pour vous détendre.",
+    when = { still = true } }, -- (a breather: not while running)
   { en = "Stars glitter overhead.", fr = "Les étoiles scintillent au-dessus de vous.",
     when = { indoors = false, sky = true, night = true, weather = "clear", notBiomes = { undercity = true, gloom = true } } },
   { en = "Light warms your face for a moment.", fr = "La lumière vous réchauffe un instant le visage.",
@@ -200,6 +203,40 @@ S.weather = {
     en = "The patter of the rain on the roof fills the room with a soothing murmur. You're in no hurry to go back out.",
     fr = "Le crépitement de la pluie sur le toit emplit la salle d'un murmure apaisant. Vous n'êtes pas pressé{|e|·e} de ressortir.",
     when = { indoors = true, resting = true, weather = "rain", notBiomes = { forge = true, undercity = true } } },
+  -- Snow (drafts, 2026-11-14: first snow seen, Loch Modan). Nothing about snow on the ground:
+  -- it may only be falling.
+  { draft = true,
+    en = "Snowflakes catch in your eyelashes. You blink them away, smiling despite yourself.",
+    fr = "Des flocons se prennent dans vos cils. Vous clignez des yeux, en souriant malgré vous.",
+    when = { indoors = false, sky = true, weather = "snow", shifted = false } },
+  { draft = true,
+    en = "The snow falls in silence. Even the wind seems to hold its breath.",
+    fr = "La neige tombe en silence. Même le vent semble retenir son souffle.",
+    when = { indoors = false, sky = true, weather = "snow" } },
+  { draft = true,
+    en = "Big flakes swirl around you and melt the moment they touch your skin.",
+    fr = "De gros flocons tourbillonnent autour de vous et fondent dès qu'ils touchent votre peau.",
+    when = { indoors = false, sky = true, weather = "snow", shifted = false } },
+  { draft = true,
+    en = "A snowflake lands on the back of your hand and melts at once.",
+    fr = "Un flocon se pose sur le dos de votre main et fond aussitôt.",
+    when = { indoors = false, sky = true, weather = "snow", shifted = false } },
+  { draft = true,
+    en = "Snow gathers on the shoulders of your {cloak}. You shake it off with a shrug.",
+    fr = "La neige s'amasse sur les épaules de votre {cloak}. Vous l'en chassez d'un haussement d'épaules.",
+    when = { indoors = false, sky = true, weather = "snow", cloak = true } },
+  { draft = true,
+    en = "Snowflakes settle in your hair and slowly melt.",
+    fr = "Des flocons se posent dans vos cheveux et fondent lentement.",
+    when = { indoors = false, sky = true, weather = "snow", helm = false, shifted = false } },
+  { draft = true,
+    en = "Snow settles on your fur without melting. You shake yourself, and a little white cloud flies off.",
+    fr = "La neige se dépose sur votre fourrure sans fondre. Vous vous ébrouez, et un petit nuage blanc s'envole.",
+    when = { indoors = false, sky = true, weather = "snow", form = "furry" } },
+  { draft = true,
+    en = "Outside, the snow keeps falling. Sheltered and warm, you're in no hurry to go back out.",
+    fr = "Dehors, la neige continue de tomber. À l'abri et au chaud, vous n'êtes pas pressé{|e|·e} de ressortir.",
+    when = { indoors = true, resting = true, weather = "snow", notBiomes = { forge = true, undercity = true } } },
 }
 
 -- When the weather changes (outdoors only)
@@ -228,7 +265,7 @@ S.biomes = {
                     fr = "Une brindille craque non loin. Il n'y a personne en vue, pourtant.",
                     when = { indoors = false, alone = true } } },
       { en = "An owl hoots in the dark.", fr = "Une chouette hulule dans l'obscurité.", when = { indoors = false, night = true } },
-      { en = "Light filters through the leaves.", fr = "La lumière filtre à travers les feuilles.", when = { indoors = false, night = false, weather = "clear" } },
+      { en = "Light filters through the leaves.", fr = "La lumière filtre à travers les feuilles.", when = { indoors = false, night = false, weather = "clear", midday = true, notMaps = { 1440, 1431 } } }, -- (not in Ashenvale / Duskwood: too dark)
       { en = "A squirrel darts up a tree trunk.", fr = "Un écureuil file le long d'un tronc.", when = { indoors = false, night = false } },
       { long = true,
         en = "Night has fallen over the forest. The air cools on your skin, and every snapping twig sounds closer than it is.",
@@ -963,6 +1000,13 @@ S.spots = {
 -- Sub-zones (matched by name, English and French)
 ---------------------------------------------------------------------------
 S.subzones = {
+  -- the Deadmines (inside a dungeon the game gives no zone map: by name only)
+  { id = "dm_foundry", names = { "fonderie des gobelins", "goblin foundry", "the goblin foundry" },
+    arrive = {
+      { draft = true, long = true,
+        en = "The heat hits you in the face: the goblins' furnaces glow red, and the air smells of molten metal.",
+        fr = "La chaleur vous saute au visage : les fourneaux des gobelins rougeoient, et l'air sent le métal fondu." },
+    } },
   { id = "sw_trade", zone = 1453, names = { "trade district", "quartier commerçant", "the gilded rose", "la rose dorée" },
     ambient = {
       { en = "Merchants' signs creak in the breeze.", fr = "Les enseignes des marchands grincent dans la brise.", when = OUT },
@@ -1068,11 +1112,11 @@ S.subzones = {
     } },
   { id = "darkshire", zone = 1431, names = { "darkshire", "sombre-comté", "scarlet raven tavern" }, -- Duskwood
     hearth = {
-      { en = "Darkshire's inn is dim and hushed, and outside, the night never ends. You're in no real hurry to step back out there.",
-        fr = "L'auberge de Sombre-Comté est sombre et feutrée, et dehors, la nuit ne finit jamais. Vous n'avez pas vraiment hâte de ressortir.",
-        when = { indoors = true } },
-      { en = "The dim inn of Darkshire, at last. Out there, the endless night is waiting... You'd gladly linger here a little longer.",
-        fr = "La pénombre de l'auberge de Sombre-Comté, enfin. Dehors, la nuit sans fin vous attend... Vous aimeriez bien pouvoir vous éterniser un peu.",
+      -- (2026-11-26: the two old lines said the inn was dim and hushed; the user's photo shows a
+      -- roaring fire, candles everywhere and a full room)
+      { draft = true,
+        en = "The warmth of the hearth wraps around you, with the smell of warm wax, beer and burning wood. In here, you could almost forget the night outside.",
+        fr = "La chaleur de l'âtre vous enveloppe, avec l'odeur de la cire chaude, de la bière et du bois qui brûle. Ici, on en oublierait presque la nuit du dehors.",
         when = { indoors = true } },
     } },
   { id = "td_dolanaar", zone = 1438, names = { "dolanaar" }, -- Teldrassil: the first night elf village after Shadowglen

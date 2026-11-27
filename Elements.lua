@@ -213,12 +213,21 @@ local function FoodTempNow()
   return foodTemp.deg * k
 end
 
+-- In the water: it takes your heat much faster than air, so it feels this much colder than it
+-- is, and swimming doesn't warm you (moving stirs the cold water against your skin).
+local WATER_CHILL = 6
+
 function E.Target(env, still)
-  local felt = (env.air or 15) + (still and 0 or Effort(env)) + FoodTempNow()
-  if env.taxi then felt = felt - FLIGHT_WIND end
+  local felt
+  if env.swimming then
+    felt = (env.water or 10) - WATER_CHILL + FoodTempNow()
+  else
+    felt = (env.air or 15) + (still and 0 or Effort(env)) + FoodTempNow()
+    if env.taxi then felt = felt - FLIGHT_WIND end
+  end
   local target = 50 + (felt - 20) * 2.2   -- 20°C feels just right, standing still
-  if env.swimming then target = target - 10 end
-  if state.wet > 30 then target = target - 15 * (state.wet / 100) end
+  -- wet clothes (in the water, the water itself already counts)
+  if state.wet > 30 and not env.swimming then target = target - 15 * (state.wet / 100) end
   if env.indoors and env.resting then target = 50 + (target - 50) * 0.5 end -- inns are cosy
   if env.atFire then target = math.max(target, 56) end -- at a fire: cosy whatever the climate, never scorching
   return Clamp(target)
@@ -304,7 +313,8 @@ local function CheckRelief(env)
     local p = state[sk] or "ok"
     if p ~= "ok" and NeedState(state[n.key], p, n.states) == "ok" then
       state[sk] = "ok"
-      local now = n.key == "energy" or (n.key == "thirst" and env.drinking) or (n.key == "hunger" and env.eating)
+      -- (napping: the wake-up line says it)
+      local now = (n.key == "energy" and not napping) or (n.key == "thirst" and env.drinking) or (n.key == "hunger" and env.eating)
       if now and not said then
         Say(n.relief, nil, true)
         said = true
@@ -368,7 +378,7 @@ local function CheckStates(env)
         Say("body_" .. s, nil, true)
         Mark(n.key .. "Remind")
         E.Flash(NEED_FLASH[n.key], NeedRank(s, n.states))
-      elseif s == "ok" then
+      elseif s == "ok" and not (n.key == "energy" and napping) then -- napping: the wake-up line says it
         Say(n.relief, nil, true)
       end
       state[sk] = s
@@ -433,19 +443,23 @@ function E.Tick()
   -- Wetness
   -- in the rain, outdoors and not under a roof (Aldrassil, Teldrassil's canopy...)
   local inRain = env.rain and not env.indoors and not (KT.Senses and KT.Senses.Roofed and KT.Senses.Roofed(env))
+  -- snow melting on your clothes: wets you three times slower than rain
+  local inSnow = env.snow and not env.indoors and not (KT.Senses and KT.Senses.Roofed and KT.Senses.Roofed(env))
   if env.swimming then
     swimStart = swimStart or GetTime()
     state.wet = 100
-  elseif inRain then
+  elseif inRain or inSnow then
     -- soaked in about 2 to 6 minutes, depending on how hard it rains
-    state.wet = Clamp(state.wet + (0.25 + 0.5 * env.rain) * dt)
+    local fall = inRain and (0.25 + 0.5 * env.rain) or (0.25 + 0.5 * env.snow) / 3
+    state.wet = Clamp(state.wet + fall * dt)
     if state.wet >= 80 and not state.soaked and KT.LineGapOK() then
       state.soaked = true
       Say("soaked")
     end
   else
     if swimStart then
-      if GetTime() - swimStart >= 5 then
+      -- (still soaked from the last swim: nothing new to say)
+      if GetTime() - swimStart >= 5 and not state.soaked then
         state.soaked = true
         Say("soaked")
       end
@@ -453,7 +467,7 @@ function E.Tick()
     end
     local dry = 0.15 + 0.012 * heat
     if env.indoors then dry = dry + 0.1 end
-    if env.atFire then dry = dry + 0.8 elseif env.nearFire then dry = dry + 0.1 end
+    if env.atFire then dry = dry + 0.8 elseif env.fireClose then dry = dry + 0.4 elseif env.nearFire then dry = dry + 0.1 end
     if env.taxi then dry = dry + 0.5 end -- the wind of a flight
     state.wet = Clamp(state.wet - dry * dt)
     if state.soaked and state.wet <= 5 and env.taxi then
@@ -726,7 +740,10 @@ function E.BarTip(key)
       add(T.still, NEUTRAL)
     end
     if env.taxi then add(T.wind, DOWN) end
-    if env.atFire then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
+    if not env.indoors then -- (the weather: rain and snow cool the air outside)
+      if env.snow then add(T.snow, DOWN) elseif env.rain then add(T.rain, DOWN) end
+    end
+    if env.atFire or env.fireClose then add(T.fire, UP) elseif env.nearFire then add(T.smoke, UP) end
     if env.hotSpot then add(T.forge, UP) end
     local food = FoodTempNow() -- (cooling or warming food and drinks)
     if foodTemp and math.abs(food) >= 0.5 then
@@ -824,9 +841,9 @@ function E.HereText()
   local parts = { E.FormatAir(env.air or 15), L.EL_CLIMATE[env.temp or 0] or "?" }
   if env.indoors then parts[#parts + 1] = L.EL_INDOORS end
   if env.night then parts[#parts + 1] = L.EL_NIGHT end
-  if env.atFire then parts[#parts + 1] = L.EL_FIRE elseif env.nearFire then parts[#parts + 1] = L.EL_FIRE_NEAR end
+  if env.atFire or env.fireClose then parts[#parts + 1] = L.EL_FIRE elseif env.nearFire then parts[#parts + 1] = L.EL_FIRE_NEAR end
   if env.hotSpot then parts[#parts + 1] = L.EL_FORGE end
-  if env.swimming then parts[#parts + 1] = L.EL_SWIMMING end
+  if env.swimming then parts[#parts + 1] = L.EL_SWIMMING .. " (" .. E.FormatAir(env.water or 10) .. ")" end
   return string.format(L.EL_HERE, table.concat(parts, ", "))
 end
 

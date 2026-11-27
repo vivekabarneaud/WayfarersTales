@@ -540,6 +540,52 @@ M.attentionAnswered = {
 M.attentionExpired = {
   "{pet} s'éloigne en reniflant le sol.",
 }
+-- Demandes de jeu (2026-11-14) : surtout les jours joueurs ; répondre par une emote de jeu à temps.
+M.playRequest = {
+  {
+    "{pet} pousse un caillou vers vous du {snout}, puis recule d'un pas, sans trop savoir. Une invitation à jouer ?",
+    "{pet} fait un petit bond devant vous, puis s'immobilise. Un peu d'audace, beaucoup d'hésitation : ça ressemble à une invitation à jouer.",
+  },
+  {
+    "{pet} lâche un bâton à vos pieds et lève vers vous des yeux brillants. On joue ?",
+    "{pet} bondit autour de vous, puis s'arrête et vous fixe, comme pour dire : à vous de jouer.",
+  },
+  {
+    "{pet} se ramasse sur ses pattes, l'arrière-train en l'air. Au moindre geste de votre part, la course-poursuite commence.",
+    "{pet} vous bouscule d'un coup de tête, puis détale en se retournant : attrape-moi si tu peux !",
+  },
+}
+M.playAnswered = {
+  {
+    "{pet} entre dans le jeu, un peu maladroitement, en vous jetant des regards comme pour vérifier que c'est permis.",
+    "Quelques bonds hésitants, puis d'autres plus assurés. {pet} commence à y prendre goût.",
+  },
+  {
+    "{pet} s'élance à votre poursuite, et pendant un moment, vous ne faites plus que jouer, sans le moindre souci.",
+    "{pet} se roule par terre, aux anges. C'était exactement le jeu qu'il fallait.",
+  },
+  {
+    "Vous jouez jusqu'à en perdre haleine. {pet} se laisse tomber contre vous, le bonheur à l'état pur.",
+    "{pet} connaît tous vos jeux par cœur, et pourtant chaque partie semble être la meilleure de toutes.",
+  },
+}
+M.playAnswered_chicken = { "Vous battez des bras, et c'est parti : {pet} vous court après dans tous les sens." }
+M.playAnswered_dance = { "{pet} sautille maladroitement au rythme de votre danse." }
+M.playAnswered_tickle = { "{pet} se tortille sous vos doigts et les mordille, tout doucement." }
+M.playAnswered_stick = { "Vous faites semblant de lancer le bâton. {pet} file, revient, vous lance un regard outré… puis en redemande." }
+M.playExpired = {
+  "{pet} renonce à jouer et se couche avec un petit soupir.",
+  "{pet} attend encore un peu, puis s'éloigne pour jouer de son côté.",
+}
+M.playRequest_bird = {
+  "{pet} sautille autour de vous, les ailes entrouvertes, et pousse un petit cri : on joue ?",
+  "{pet} laisse tomber une plume à vos pieds et penche la tête, dans l'attente.",
+}
+M.playAnswered_bird = { "{pet} voltige autour de vous en décrivant des cercles, aux anges." }
+M.playRequest_scaly = { "{pet} fouette l'air de sa queue et claque des mâchoires dans le vide, pour jouer." }
+M.playAnswered_scaly = { "{pet} file à gauche et à droite autour de vous, avec la vivacité d'un lézard au soleil." }
+M.playRequest_chitin = { "{pet} décrit un cercle autour de vous en trottinant, avec des cliquetis excités." }
+M.playAnswered_chitin = { "{pet} vous court après dans un cliquetis de pattes. Aucun doute : c'est un jeu." }
 M.comfort = {
   "{pet} se serre contre vous. Votre réconfort compte beaucoup après ce combat.",
   "{pet} pousse un petit soupir de soulagement à votre contact.",
@@ -852,6 +898,8 @@ L.EL_TIP = {
   fading  = "+ La chaleur de l'effort retombe (%s)",
   still   = "Vous ne bougez pas : votre corps revient vers la température de l'air",
   wind    = "- Le vent du vol vous refroidit",
+  rain    = "- La pluie rafraîchit l'air",
+  snow    = "- La neige refroidit l'air",
   fire    = "+ Le feu vous réchauffe",
   smoke   = "+ Un feu quelque part pas loin réchauffe un peu l'air",
   forge   = "+ La chaleur des forges et du métal en fusion",
@@ -1024,7 +1072,7 @@ L.SN_TAGS = {
   day = "en journée", night = "la nuit", indoors = "à l'intérieur", outdoors = "dehors", resting = "ville ou auberge",
   swimming = "en nageant", weather = "météo : %s", crowd = "monde : %s",
   airBelow = "air sous %s", airAbove = "air au-dessus de %s", notBiomes = "sauf : %s", place = "lieu : %s",
-  long = "longue", spot = "cet endroit", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", alone = "personne en vue", fishFresh = "début de pêche", sky = "ciel ouvert", draft = "brouillon", rewrite = "réécriture (test)", still = "immobile", form = "forme : %s", shifted = "forme animale", unshifted = "forme normale",
+  long = "longue", midday = "10h-17h", spot = "cet endroit", region = "cette zone peinte", near = "en vue : %s", inhabited = "lieu habité", onFoot = "à pied", yeller = "quand %s crie", moving = "en marchant", hearth = "pierre de foyer", calm = "sans foule", alone = "personne en vue", fishFresh = "début de pêche", sky = "ciel ouvert", draft = "brouillon", rewrite = "réécriture (test)", still = "immobile", form = "forme : %s", shifted = "forme animale", unshifted = "forme normale",
   cloak = "avec une cape", no_cloak = "sans cape", boots = "avec des bottes", no_boots = "sans bottes", gloves = "avec des gants", no_gloves = "sans gants", helm = "avec un casque", no_helm = "sans casque", intensityAbove = "plus fort que %s", intensityBelow = "plus faible que %s", armor = "armure : %s", race = "race : %s", notRace = "sauf : %s",
 }
 L.SN_POS = "Position : %s   Endroit : %s"
@@ -1100,7 +1148,8 @@ L.SN_REASONS = {
   biome = "pas dans ce paysage", sub = "seulement dans un lieu précis",
   weatherWait = "en attente des données météo", weather = "pas avec cette météo",
   crowdUnknown = "a besoin de savoir qui est là", crowd = "pas avec ce monde-là",
-  cooldown = "déjà jouée, revient dans %s", moving = "seulement en marchant", calm = "pas quand il y a foule", alone = "seulement quand personne n'est en vue (joueur ou créature)", sky = "seulement à ciel ouvert", draft = "brouillon, en attente de validation", still = "seulement sans bouger",
+  cooldown = "déjà jouée, revient dans %s", midday = "seulement de 10h à 17h (heure du jeu)", notMaps = "pas dans cette zone", moving = "seulement en marchant", calm = "pas quand il y a foule", alone = "seulement quand personne n'est en vue (joueur ou créature), dans une zone peinte cochée « Personne alentour »", sky = "seulement à ciel ouvert", draft = "brouillon, en attente de validation", still = "seulement sans bouger",
+  near = "seulement quand une certaine créature est en vue", abandoned = "pas dans un lieu abandonné", onFoot = "seulement à pied", yeller = "seulement quand quelqu'un crie",
   form = "pas sous cette forme", cloak = "dépend de votre cape", boots = "dépend de vos bottes", gloves = "dépend de vos gants", armor = "dépend de votre armure", helm = "dépend de votre casque", intensity = "dépend de la force de la pluie", race = "raconté autrement pour votre race", npc = "dépend du PNJ", fish = "seulement en début de pêche", need = "dépend de votre faim, soif ou fatigue",
 }
 L.SN_BIOMES = {
