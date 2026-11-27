@@ -2086,8 +2086,27 @@ function H.PLAYER_LEAVE_COMBAT() state.meleeOn = false end
 function H.START_AUTOREPEAT_SPELL() state.shooting = true; state.actedAt = GetTime() end
 function H.STOP_AUTOREPEAT_SPELL() state.shooting = false; state.actedAt = GetTime() end
 
+-- Attacked while you're AFK: your pet jumps in to defend you (a furry pet: the lines growl
+-- and pant), and when you're back, it's still panting from the fight. The game may end your
+-- AFK when the fight starts, so "AFK a moment ago" counts too.
+local function DefendPetOK() return PetAlive() and not pet.demon and not pet.archetype end
+local function SayDefendedBack()
+  if state.afkDefended and DefendPetOK() then Say("afkDefendBack", nil, nil, true) end
+  state.afkDefended = nil
+end
+
 function H.PLAYER_REGEN_DISABLED()
   state.killsThisFight = 0
+  local wasAFK = KT.IsAFK() or state.afk or (state.afkEndedAt and GetTime() - state.afkEndedAt < 3)
+  if wasAFK and DefendPetOK() and Ready("afkDefend", 600) then
+    After(1.5, function()
+      if DefendPetOK() and UnitAffectingCombat("pet") and InCombat() then
+        Mark("afkDefend")
+        state.afkDefended = true
+        Say("afkDefend", nil, nil, true)
+      end
+    end)
+  end
 end
 
 function H.PLAYER_REGEN_ENABLED()
@@ -2095,6 +2114,8 @@ function H.PLAYER_REGEN_ENABLED()
     Mark("killReact")
   end
   state.killsThisFight = 0
+  -- the fight ended your AFK (or you came back during it): the "still panting" line now
+  if state.afkDefended and not KT.IsAFK() then After(2, SayDefendedBack) end
 end
 
 function H.PLAYER_CONTROL_GAINED() -- e.g. landing after a flight path
@@ -2153,6 +2174,9 @@ function H.PLAYER_FLAGS_CHANGED(unit)
     if state.afkAuto and PetAlive() and not InCombat() then Say("afkDoze") end
   elseif not afk and state.afk then
     state.afk = false
+    state.afkEndedAt = GetTime()
+    if InCombat() then return end -- (attacked: no stretching and yawning mid-fight)
+    if state.afkDefended then SayDefendedBack() return end
     if state.afkAuto and PetAlive() then
       Say((GetTime() - state.afkSince) >= 900 and "afkBackLong" or "afkBack")
     end

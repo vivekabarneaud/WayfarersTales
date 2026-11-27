@@ -357,6 +357,15 @@ D.BODY_MORE = {
 -- Message pools (pet, body, danger feelings): extra lines while testing
 ---------------------------------------------------------------------------
 D.POOL_DRAFTS = {
+  -- attacked while AFK (2026-11-27): your pet defends you, then you come back to it
+  afkDefend = {
+    { en = "{pet} leaps forward with a growl and plants itself between you and your attacker.",
+      fr = "{pet} bondit en grondant et se plante entre vous et l'agresseur." },
+  },
+  afkDefendBack = {
+    { en = "{pet} is still panting from the fight it fought while you were away, and presses against you: no one is touching you.",
+      fr = "{pet} halète encore du combat mené pendant votre absence, et se serre contre vous : personne ne vous touchera." },
+  },
   -- play requests while swimming or mounted (2026-11-27): no running around there
   playRequest_swim = {
     { en = "{pet} swims circles around you, ducks under and comes up shaking off the water. {pet} is waiting for you.",
