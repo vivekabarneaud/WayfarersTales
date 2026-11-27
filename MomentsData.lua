@@ -343,7 +343,9 @@ D.MOMENTS = {
     { en = "You tuck your harvest away carefully.", fr = "Vous rangez soigneusement votre récolte." },
   },
   mine = {
-    { en = "Stone dust clings to your hands.", fr = "De la poussière de pierre vous colle aux mains." },
+    { en = "Stone dust clings to your hands.", fr = "De la poussière de pierre vous colle aux mains.", when = { gloves = false } },
+    { draft = true, when = { gloves = true }, -- (flag 2026-11-26: "we could mention the gloves")
+      en = "Stone dust works its way into your {gloves}.", fr = "La poussière de pierre s'incruste dans vos {gloves}." },
     { en = "Your arms ache a little from swinging the pick.", fr = "Vos bras sont un peu endoloris d'avoir manié la pioche." },
     { en = "Little chips of rock lie scattered at your feet.", fr = "De petits éclats de roche jonchent le sol à vos pieds." },
     { draft = true, -- (noted 2026-11-13, the Deadmines)
@@ -645,19 +647,19 @@ D.BODY_PERSON_POOLS = {
 local CLOAK_COLD = { draft = true,
   en = "You pull your {cloak} tighter around your neck. The icy wind still finds a way in.",
   fr = "Vous resserrez votre {cloak} autour de votre cou. Le vent glacé parvient quand même à s'y faufiler.",
-  when = { cloak = true, indoors = false } }
+  when = { cloak = true, indoors = false, swimming = false } }
 local NOCLOAK_COLD = { draft = true,
   en = "You fold your arms across your chest to keep in a little warmth. A cloak would be welcome.",
   fr = "Vous croisez les bras sur votre poitrine pour garder un peu de chaleur. Une cape ne serait pas de refus.",
-  when = { cloak = false, indoors = false } }
+  when = { cloak = false, indoors = false, swimming = false } }
 local HANDS_STILL = { draft = true,
   en = "You blow into your hands and rub them together, trying to warm them. Your fingers tingle.",
   fr = "Vous soufflez dans vos mains et les frottez l'une contre l'autre pour tenter de les réchauffer. Vos doigts picotent.",
-  when = { still = true, gloves = false } }
+  when = { still = true, gloves = false, swimming = false } }
 local GLOVES_STILL = { draft = true,
   en = "You clap your hands together, muffled by your {gloves}, and stamp your feet to get the blood flowing.",
   fr = "Vous frappez vos mains l'une contre l'autre, étouffées par vos {gloves}, et tapez des pieds pour faire circuler le sang.",
-  when = { still = true, gloves = true } }
+  when = { still = true, gloves = true, swimming = false } }
 local PLATE_COLD = { draft = true,
   en = "The cold seeps through your plate armor, and the icy metal bites your skin.",
   fr = "Le froid traverse votre armure de plaques, et le métal glacé vous mord la peau.",
@@ -685,23 +687,23 @@ local FUR_HOT = { draft = true,
 local CLOAK_HOT = { draft = true,
   en = "Your {cloak} is far too warm. You dream of taking it off.",
   fr = "Votre {cloak} vous tient bien trop chaud. Vous rêvez de l'enlever.",
-  when = { cloak = true } }
+  when = { cloak = true, swimming = false } }
 local FAN_STILL = { draft = true,
   en = "You fan yourself with your hand, to little effect. The scorching air doesn't stir.",
   fr = "Vous vous éventez de la main, sans grand effet. L'air brûlant ne bouge pas d'un souffle.",
-  when = { still = true, shifted = false } }
+  when = { still = true, shifted = false, swimming = false } }
 local BOOTS_WET = { draft = true,
   en = "Your {boots} are soaked through, and every step makes a little squelch.",
   fr = "Vos {boots} ont pris l'eau, et chaque pas fait un petit bruit mouillé.",
-  when = { boots = true } }
+  when = { boots = true, swimming = false } }
 local NOBOOTS_WET = { draft = true,
   en = "With nothing on your feet, you feel cold water and mud at every step.",
   fr = "Sans rien aux pieds, vous sentez l'eau froide et la boue à chaque pas.",
-  when = { boots = false } }
+  when = { boots = false, swimming = false } }
 local CLOAK_WET = { draft = true,
   en = "Water has soaked into your {cloak}, which weighs on your shoulders and drips down your back.",
   fr = "L'eau a imbibé votre {cloak}, qui vous pèse sur les épaules et goutte dans votre dos.",
-  when = { cloak = true } }
+  when = { cloak = true, swimming = false } }
 local FUR_WET = { draft = true,
   en = "Your soaked fur clings to your skin. You shake yourself hard, sending water flying everywhere.",
   fr = "Votre fourrure trempée vous colle à la peau. Vous vous ébrouez vigoureusement, en projetant de l'eau partout.",
@@ -713,7 +715,7 @@ local FUR_DRY = { draft = true,
 local CLOAK_FIRE = { draft = true,
   en = "You open the folds of your {cloak} to let the fire's warmth in.",
   fr = "Vous écartez les pans de votre {cloak} pour laisser entrer la chaleur du feu.",
-  when = { cloak = true } }
+  when = { cloak = true, swimming = false } }
 local FUR_FIRE = { draft = true,
   en = "You draw close to the fire, and its warmth slowly seeps into your fur.",
   fr = "Vous vous approchez du feu, et sa chaleur pénètre doucement votre fourrure.",

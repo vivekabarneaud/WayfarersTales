@@ -265,7 +265,7 @@ S.biomes = {
                     fr = "Une brindille craque non loin. Il n'y a personne en vue, pourtant.",
                     when = { indoors = false, alone = true } } },
       { en = "An owl hoots in the dark.", fr = "Une chouette hulule dans l'obscurité.", when = { indoors = false, night = true } },
-      { en = "Light filters through the leaves.", fr = "La lumière filtre à travers les feuilles.", when = { indoors = false, night = false, weather = "clear" } },
+      { en = "Light filters through the leaves.", fr = "La lumière filtre à travers les feuilles.", when = { indoors = false, night = false, weather = "clear", midday = true, notMaps = { 1440, 1431 } } }, -- (not in Ashenvale / Duskwood: too dark)
       { en = "A squirrel darts up a tree trunk.", fr = "Un écureuil file le long d'un tronc.", when = { indoors = false, night = false } },
       { long = true,
         en = "Night has fallen over the forest. The air cools on your skin, and every snapping twig sounds closer than it is.",

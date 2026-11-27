@@ -243,3 +243,16 @@ Errors: 0.70.0 in the Deadmines, "secret boolean" in three modules (UnitIsAFK hi
 | 11-19 18:06 | Flag | Marsh line while swimming underwater | done | No place lines while swimming (unless written for it); arrivals wait |
 | 11-19 18:19 | Flag | Poppo eyes a Murloc Fin he can't eat | done | "aileron" matched "aile" (meat): D.NOT_FOOD_ITEMS / WORDS |
 | 11-19 18:26 | Flag | "Air frais" in the Wetlands | done | Marsh added to the foul-air biomes for that line |
+
+## 2026-11-22 to 11-26 — Wetlands, Ashenvale, Duskwood (Sweetpea, hunter, Poppo)
+
+| When | Kind | Note | Status | What we did |
+|---|---|---|---|---|
+| 11-22 11:57 | Idea | Eating your pet's favourite food: special lines, and sharing | todo | Lines that show the pet's reaction without naming the food (TODO.md) |
+| 11-22 11:59 | Idea | Boat and zeppelin lines | todo | First a /run probe to tell when you're on a boat (TODO.md) |
+| 11-26 18:47 | Idea | "Torche du guetteur de nuit" buff: a line, and some warmth | todo | Spell ID needed (/wt auras with the buff): TODO.md |
+| 11-23 19:50 | Flag | "Une brindille craque… personne en vue" in Astranaar, full of NPCs | done | Lines about being alone need a painted region ticked "Nobody around" (friendly NPCs aren't on name plates) |
+| 11-23 19:55 | Flag | Sunlight through the leaves at Lac Iris, with no light | done | 10:00-17:00 only, not in Ashenvale / Duskwood; the rewrite is a feeling (warmth on your neck) instead of a sight |
+| 11-26 20:28 | Flag | Pulling your cloak tighter while swimming | done | Gear lines (cloak, boots, hands) don't play in the water |
+| 11-26 21:08 | Flag | Poppo chasing you while you swim | done | In the water: a splashing game (bear: slaps the water); mounted: a race, answered by riding on 20 s; birds and bats don't ask (drafts) |
+| 11-26 21:36 | Flag | Stone dust on your hands: "we could mention the gloves" | done | With gloves on: "La poussière de pierre s'incruste dans vos {gloves}" (draft) |

@@ -357,6 +357,23 @@ D.BODY_MORE = {
 -- Message pools (pet, body, danger feelings): extra lines while testing
 ---------------------------------------------------------------------------
 D.POOL_DRAFTS = {
+  -- play requests while swimming or mounted (2026-11-27): no running around there
+  playRequest_swim = {
+    { en = "{pet} swims circles around you, ducks under and comes up shaking off the water. {pet} is waiting for you.",
+      fr = "{pet} nage en cercle autour de vous, plonge la tête sous l'eau et ressort en s'ébrouant. {pet} vous attend." },
+  },
+  playAnswered_swim = {
+    { en = "You thrash the water with your arms: {pet} dives straight into the splashes.",
+      fr = "Vous battez l'eau des bras : {pet} se jette dans les éclaboussures." },
+  },
+  playRequest_ride = {
+    { en = "{pet} lopes beside your mount and speeds up whenever you slow down. Race?",
+      fr = "{pet} galope à côté de votre monture et accélère dès que vous ralentissez. On fait la course ?" },
+  },
+  playAnswered_ride = { -- (after riding on for D.PLAY_RIDE_SECONDS)
+    { en = "{pet} finishes the race out of breath, looking delighted.",
+      fr = "{pet} finit la course hors d'haleine, l'air enchanté." },
+  },
   -- you thanked your pet (/thank, /praise) for something it just brought you
   thanked = {
     { en = "{pet} puffs out its chest, bursting with pride. That find was a masterpiece.",

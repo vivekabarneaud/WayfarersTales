@@ -413,7 +413,7 @@ end
 -- A line for this pet's family (bear, boar, cat...: PetFamilies.lua) that fits this
 -- moment, or nil. Pools map to the family's events.
 local FAMILY_EVENT = { idle = "idle", idleWalking = "idle", idleNight = "idle", idleResting = "idle",
-  playRequest = "playRequest", playAnswered = "playAnswered",
+  playRequest = "playRequest", playAnswered = "playAnswered", playRequest_swim = "playRequestSwim",
   campfireRest = "campfire", affection = "affection" } -- (not campfireNear: the "nearby" buff reaches far, and these lines lie by the fire)
 local function FamilyLine(poolKey)
   if not pet or pet.demon or not D.PET_FAMILY_LINES then return nil end
@@ -1111,9 +1111,15 @@ local function TryPlay(token)
   local p = state.play
   local style = token and D.PLAY_EMOTES[token]
   if not (p and style and GetTime() <= p.expires and PetAlive()) then return false end
+  if p.mode == "ride" then return false end -- (a race: you answer by riding on, see MaybeAskPlay)
   state.play = nil
   local key = "playAnswered"
   if style ~= "any" and not pet.archetype and M["playAnswered_" .. style] then key = "playAnswered_" .. style end
+  -- in the water: a game of splashes, whatever the emote (no running around)
+  if IsSwimming and IsSwimming() then
+    local swim = WithDrafts("playAnswered_swim", M.playAnswered_swim)
+    if swim and #swim > 0 then key = "playAnswered_swim" end
+  end
   Say(key, nil, Gain("playAnswered"), true)
   return true
 end
@@ -1204,15 +1210,40 @@ local function MaybeAskPlay()
   if state.play or state.attention or state.meal or InCombat() or db.settings.chatty == 0 then return false end
   if pet and pet.demon then return false end
   if not KT.LineGapOK() then return false end
+  -- swimming or mounted: only games that fit there (splashing about, a race beside your
+  -- mount). Birds and bats fly above the water: no request. Only when such lines exist.
+  local mode = (IsSwimming and IsSwimming()) and "swim" or ((IsMounted and IsMounted()) and "ride" or nil)
+  local poolKey = mode and ("playRequest_" .. mode) or "playRequest"
+  if mode then
+    if pet and (pet.archetype == "bird" or D.FAMILY_SOUND[pet.family or ""] == "bat") then return false end
+    local pool = WithDrafts(poolKey, M[poolKey])
+    if not pool or #pool == 0 then return false end
+  end
   if not Ready("playRequest", D.PLAY_COOLDOWN) or not Chance(D.PLAY_CHANCE * MoodMult("playRequest")) then return false end
   Mark("playRequest")
-  local p = { expires = GetTime() + D.PLAY_WINDOW }
+  local p = { expires = GetTime() + D.PLAY_WINDOW, mode = mode }
   state.play = p
-  Say("playRequest")
+  Say(poolKey)
+  -- a race: keep riding (mounted and moving) for D.PLAY_RIDE_SECONDS before the request runs out
+  if mode == "ride" then
+    local rode = 0
+    local function Tick()
+      if state.play ~= p or GetTime() > p.expires then return end
+      if IsMounted() and KT.Moving() then rode = rode + 1 end
+      if rode >= D.PLAY_RIDE_SECONDS and PetAlive() then
+        state.play = nil
+        Say("playAnswered_ride", nil, Gain("playAnswered"), true)
+        return
+      end
+      After(1, Tick)
+    end
+    After(1, Tick)
+  end
   After(D.PLAY_WINDOW + 1, function()
     if state.play == p then
       state.play = nil
-      if pet and Chance(0.6) then Say("playExpired") end
+      -- (the "lies down with a sigh" lines don't fit in the water or beside a mount)
+      if pet and not mode and Chance(0.6) then Say("playExpired") end
     end
   end)
   return true

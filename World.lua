@@ -312,6 +312,7 @@ function W.Snapshot()
     if r.air then env.regionAir = (env.regionAir or 0) + r.air end
     if r.water then env.regionWater = (env.regionWater or 0) + r.water end
     if r.abandoned then env.abandoned = true end -- nobody lives here any more (Raven Hill...)
+    if r.nobody then env.nobody = true end -- no one around at all (ticked on the map page)
   end
   env.air = W.AirTemp(env)
   env.water = W.WaterTemp(env)

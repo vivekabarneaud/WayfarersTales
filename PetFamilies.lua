@@ -304,6 +304,9 @@ D.PET_FAMILY_LINES = {
 -- Play requests and games (2026-11-14), on top of the general play lines
 local PLAY = {
   bear = {
+    playRequestSwim = { { draft = true, -- (while swimming)
+      en = "{pet} slaps the water with a big paw, as if fishing, then looks at you: your turn.",
+      fr = "{pet} frappe l'eau d'un grand coup de patte, comme pour pêcher, puis vous regarde : à vous." } },
     playRequest = { { draft = true,
       en = "{pet} rears up on its hind legs and waves a big paw at you. A little play-fight?",
       fr = "{pet} se dresse sur ses pattes arrière et agite une grosse patte vers vous. Une petite bagarre pour rire ?" } },

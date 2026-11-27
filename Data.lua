@@ -120,6 +120,7 @@ D.ATTENTION_COOLDOWN = 2400
 D.PLAY_WINDOW   = 120
 D.PLAY_COOLDOWN = 2400
 D.PLAY_CHANCE   = 0.015 -- per minute, before the mood (x4 on playful days: like a cuddle request)
+D.PLAY_RIDE_SECONDS = 20 -- mounted: a race beside your mount, answered by riding on this long
 D.PLAY_EMOTES = {
   POINT = "stick", BECKON = "stick", CHEER = "any",
   CHICKEN = "chicken", FLAP = "chicken", STRUT = "chicken", ROAR = "any", GROWL = "any", CHARGE = "any",

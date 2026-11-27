@@ -431,6 +431,7 @@ function renderCard() {
   box.innerHTML = `
     <div class="field"><span>Name</span><div class="line2"><input id="fName" type="text" value="${esc(r.name)}" placeholder="e.g. Crystal Lake"><input id="fColor" type="color" value="${r.color}" title="Colour on the map"></div></div>
     <div class="field"><span>Your note</span><textarea id="fNote" rows="8" placeholder="What is this place? What do you see, smell, hear? How does it feel? Warmer or colder? Anything that changes at night or in the rain?">${esc(r.note)}</textarea></div>
+    <label class="hint" style="display:flex;gap:6px;align-items:center" title="Lines like 'a twig snaps, and yet there's no one in sight' only play inside regions ticked here"><input id="fNobody" type="checkbox" ${r.nobody ? "checked" : ""}> Nobody around (no NPCs, nobody lives here): lines about being alone can play</label>
     <div class="field"><span>Photos</span><div class="dropzone" id="fDrop"><div class="photos" id="fPhotos"></div>
       <div class="hint">Paste a screenshot (<kbd>Ctrl</kbd>+<kbd>V</kbd>), drop image files here, or <button id="fAddPhoto">Add…</button><br>They stay on your PC, in the <b>photos</b> folder inside your maps folder.</div></div></div>
     <div class="line2"><span class="chip ${r.status || "note"}">${STATUS[r.status || "note"]}</span><span class="hint">${n ? (n * 100 / (GRID * GRID)).toFixed(1) + " % of the map" : "nothing painted yet"}</span></div>
@@ -442,6 +443,7 @@ function renderCard() {
     <div style="margin-top:auto;display:flex;gap:8px;justify-content:space-between"><button id="fClear" class="danger">Clear painting</button><button id="fDelete" class="danger">Delete region</button></div>`;
   $("fName").oninput = e => { r.name = e.target.value; markDirty(); renderListSoon(); };
   $("fNote").oninput = e => { r.note = e.target.value; if (r.status === "proposed" || r.status === "approved") { r.status = "changed"; renderListSoon(); } markDirty(); };
+  $("fNobody").onchange = e => { if (e.target.checked) r.nobody = true; else delete r.nobody; markDirty(); };
   $("fColor").oninput = e => { r.color = e.target.value; markDirty(); drawRegions(); renderListSoon(); };
   $("fClear").onclick = () => { if (!confirm(`Erase everything painted for "${r.name || "this region"}"?`)) return; undo.push({ id: r.id, bits: bitsOf(r).slice() }); bitmaps.set(r.id, new Uint8Array(GRID * GRID)); layers.delete(r.id); markDirty(); drawRegions(); renderCard(); };
   $("fDelete").onclick = () => { if (!confirm(`Delete "${r.name || "this region"}" and its note?`)) return; data.regions = data.regions.filter(x => x !== r); bitmaps.delete(r.id); layers.delete(r.id); selId = null; markDirty(); renderList(); renderCard(); drawRegions(); };

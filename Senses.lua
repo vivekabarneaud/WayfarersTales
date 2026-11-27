@@ -218,9 +218,16 @@ end
 local function Check(when, ctx)
   if not when then return true end
   if when.night ~= nil and when.night ~= ctx.night then return false, when.night and "night" or "day" end
+  -- midday: the sun high enough to reach through leaves (game clock 10:00 to 17:00)
+  if when.midday then
+    local h = GetGameTime()
+    if not (h and h >= 10 and h < 17) then return false, "midday" end
+  end
+  -- not in these zone maps (dark forests where the sun hardly gets through: Ashenvale...)
+  if when.notMaps and InList(when.notMaps, ctx.mapID) then return false, "notMaps" end
   if when.indoors ~= nil and when.indoors ~= ctx.indoors then return false, when.indoors and "indoors" or "outdoors" end
   if when.resting and not ctx.resting then return false, "resting" end
-  if when.swimming and not ctx.swimming then return false, "swimming" end
+  if when.swimming ~= nil and when.swimming ~= ctx.swimming then return false, "swimming" end -- (false = not in water)
   if when.moving and not ctx.moving then return false, "moving" end
   if when.sky and (ctx.indoors or ctx.roofed) then return false, "sky" end
   if when.still and ctx.moving then return false, "still" end
@@ -282,7 +289,9 @@ local function Check(when, ctx)
   local inten = ctx.weather and tonumber(ctx.weather.intensity)
   if when.intensityAbove and not (inten and inten > when.intensityAbove) then return false, "intensity" end
   if when.intensityBelow and not (inten and inten < when.intensityBelow) then return false, "intensity" end
-  if when.alone and not ctx.alone then return false, "alone" end
+  -- alone: no one on the name plates AND a painted region ticked "Nobody around" (the game
+  -- doesn't show friendly NPCs on plates: a town full of them would look empty)
+  if when.alone and not (ctx.alone and ctx.nobody) then return false, "alone" end
   -- a creature in view (name plates or your target): murlocs, boars, Stitches...
   if when.near and not NearMatch(when.near, ctx.near) then return false, "near" end
   -- a place where people live (not an abandoned village: see the painted regions)
@@ -544,6 +553,7 @@ function S.Tags(c, ctx)
   local w = c.line and c.line.when
   if w then
     if w.night ~= nil then add(w.night and T.night or T.day, w.night == ctx.night) end
+    if w.midday then local h = GetGameTime(); add(T.midday, h and h >= 10 and h < 17 or false) end
     if w.indoors ~= nil then add(w.indoors and T.indoors or T.outdoors, w.indoors == ctx.indoors) end
     if w.resting then add(T.resting, ctx.resting) end
     if w.swimming then add(T.swimming, ctx.swimming) end
@@ -559,7 +569,7 @@ function S.Tags(c, ctx)
     if w.race then add(string.format(T.race, type(w.race) == "table" and table.concat(w.race, "/") or w.race), InList(w.race, ctx.race)) end
     if w.notRace then add(string.format(T.notRace, type(w.notRace) == "table" and table.concat(w.notRace, "/") or w.notRace), not InList(w.notRace, ctx.race)) end
     if w.calm then add(T.calm, ctx.crowd ~= "lively" and ctx.crowd ~= "crowded") end
-    if w.alone then add(T.alone, ctx.alone) end
+    if w.alone then add(T.alone, ctx.alone and ctx.nobody or false) end
     if w.near then
       local names = {}
       for _, v in ipairs(type(w.near) == "table" and w.near or { w.near }) do names[#names + 1] = tostring(v) end

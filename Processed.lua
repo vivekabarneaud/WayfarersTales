@@ -14,6 +14,7 @@ D.PROCESSED = {
     [1794570611] = true, [1794570642] = true, [1794593456] = true, [1794594149] = true, -- rain rings, rain on stone, tram, Gryth
     [1794677884] = true, [1794679457] = true, [1794748743] = true, [1795107179] = true, -- gem, stale bread, Goldshire, Dun Morogh
     [1795107321] = true, [1795107700] = true, [1795112258] = true, -- danger in Menethil, cold water, Goblin Foundry
+    [1795345054] = true, [1795345157] = true, [1795715220] = true, -- favourite food, boats, night watch torch
   },
   flags = {
     [1794338113] = true, -- "Vous mangeriez bien quelque chose" below 25% hunger
@@ -21,6 +22,8 @@ D.PROCESSED = {
     [1794680384] = true, [1795028576] = true, [1795029592] = true, [1795031983] = true, -- Dun Algaz, glougloute, shoulders, nap
     [1795107230] = true, [1795107539] = true, [1795108001] = true, [1795108772] = true, -- danger, blackmouth, underwater, murloc fin
     [1795109172] = true, -- fresh air in the Wetlands
+    [1795459844] = true, [1795460140] = true, [1795721286] = true, [1795723688] = true, -- twig in Astranaar, light, cloak + play while swimming
+    [1795725401] = true, -- mining with gloves
   },
   -- by the minute shown in the report (when the exact time isn't known)
   notesAt = {
@@ -49,7 +52,9 @@ D.PROCESSED = {
     ["2026-11-11 19:27"] = true, ["2026-11-11 20:05"] = true, ["2026-11-11 20:29"] = true, -- still line, bustle, Dolanaar
     ["2026-11-12 16:45"] = true, ["2026-11-12 17:35"] = true, -- bustle, "food"
     ["2026-11-13 10:38"] = true, ["2026-11-13 11:19"] = true, -- Westfall Defias, Erika
+    [1795459844] = true, [1795460140] = true, [1795721286] = true, [1795723688] = true, -- twig in Astranaar, light, cloak + play while swimming
+    [1795725401] = true, -- mining with gloves
   },
-  -- errors logged by versions older than this were fixed (secret values, v0.31)
-  errorsBefore = "0.31.0",
+  -- errors logged by versions older than this were fixed (secret values: v0.31, then in dungeons v0.70.1)
+  errorsBefore = "0.70.1",
 }
