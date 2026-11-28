@@ -647,7 +647,7 @@ D.BODY_PERSON_POOLS = {
 local CLOAK_COLD = { draft = true,
   en = "You pull your {cloak} tighter around your neck. The icy wind still finds a way in.",
   fr = "Vous resserrez votre {cloak} autour de votre cou. Le vent glacé parvient quand même à s'y faufiler.",
-  when = { cloak = true, indoors = false, swimming = false } }
+  when = { cloak = true, indoors = false, dry = true } } -- (a soaked cloak: not this line, rain or swim)
 local NOCLOAK_COLD = { draft = true,
   en = "You fold your arms across your chest to keep in a little warmth. A cloak would be welcome.",
   fr = "Vous croisez les bras sur votre poitrine pour garder un peu de chaleur. Une cape ne serait pas de refus.",

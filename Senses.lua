@@ -136,6 +136,10 @@ function S.Context()
   ctx.subLower = (ctx.sub or ""):lower()
   ctx.moving = S.Moving()
   ctx.roofed = S.Roofed(ctx)
+  -- how wet you are (the body gauge, 0 to 100): rain, swimming...
+  local El = KT.Elements
+  local st = El and El.GetState and El.GetState()
+  ctx.wet = st and st.wet or 0
   S.Gear(ctx)
   return ctx
 end
@@ -230,6 +234,9 @@ local function Check(when, ctx)
   if when.indoors ~= nil and when.indoors ~= ctx.indoors then return false, when.indoors and "indoors" or "outdoors" end
   if when.resting and not ctx.resting then return false, "resting" end
   if when.swimming ~= nil and when.swimming ~= ctx.swimming then return false, "swimming" end -- (false = not in water)
+  -- dry / wet: your clothes, from the wetness gauge (over 30 = wet, when wet clothes chill you)
+  if when.dry and (ctx.wet or 0) > 30 then return false, "dry" end
+  if when.wet and (ctx.wet or 0) <= 30 then return false, "wet" end
   if when.moving and not ctx.moving then return false, "moving" end
   if when.sky and (ctx.indoors or ctx.roofed) then return false, "sky" end
   if when.still and ctx.moving then return false, "still" end
@@ -557,6 +564,8 @@ function S.Tags(c, ctx)
     if w.night ~= nil then add(w.night and T.night or T.day, w.night == ctx.night) end
     if w.midday then local h = GetGameTime(); add(T.midday, h and h >= 10 and h < 17 or false) end
     if w.fire then add(T.fire, (ctx.atFire or ctx.fireClose) and true or false) end
+    if w.dry then add(T.dry, (ctx.wet or 0) <= 30) end
+    if w.wet then add(T.wet, (ctx.wet or 0) > 30) end
     if w.indoors ~= nil then add(w.indoors and T.indoors or T.outdoors, w.indoors == ctx.indoors) end
     if w.resting then add(T.resting, ctx.resting) end
     if w.swimming then add(T.swimming, ctx.swimming) end
