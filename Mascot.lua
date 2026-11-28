@@ -44,6 +44,8 @@ D.MASCOT_GAIN = {
   nap      = { amount = 1,   cap = 2 },   -- a nap together (/sleep)
   rain     = { amount = 1 },              -- the first rain together
 }
+D.MASCOT_SUMMON_CD = 600   -- a line when you summon it, at most every 10 minutes
+D.MASCOT_AWAY_DAYS = 7     -- not summoned for a week: it lets you know (summonAway)
 D.MASCOT_IDLE_CD   = 600   -- an idle line at most every 10 minutes
 D.MASCOT_CUDDLE_CD = 900
 D.MASCOT_PLACE_CD  = 600   -- a line about a new place at most every 10 minutes
@@ -565,6 +567,31 @@ local LINES = {
         en = "{pet} suddenly puffs up to twice its size, and looks at you as if that should be enough to scare the enemy away.",
         fr = "{pet} se gonfle d'un coup, deux fois sa taille, et vous regarde comme si c'était suffisant pour faire fuir l'ennemi." },
     },
+    -- When you summon it: it gets used to you, summon after summon (minSummons /
+    -- maxSummons: how many times you've called it, this one included). 2026-11-28
+    summon = {
+      { draft = true, maxSummons = 3,
+        en = "{pet} blinks at you, blinks again, then looks around as if wondering where it has landed.",
+        fr = "{pet} cligne des yeux, puis encore, et regarde autour de soi comme pour comprendre où on l'a fait atterrir." },
+      { draft = true, maxSummons = 3,
+        en = "A faint smell of pond water and old parchment lingers where {pet} has just appeared.",
+        fr = "Une légère odeur d'eau de mare et de vieux parchemin flotte là où {pet} vient de surgir." },
+      { draft = true, minSummons = 4, maxSummons = 15,
+        en = "{pet} immediately starts looking for flies. Clearly, {pet} knows the routine.",
+        fr = "{pet} se met aussitôt à chercher des mouches. Visiblement, {pet} connaît la routine." },
+      { draft = true, minSummons = 16,
+        en = "{pet} arrives with a croak that sounds a lot like \"finally\".",
+        fr = "{pet} arrive avec un coassement qui ressemble beaucoup à « enfin »." },
+      { draft = true, minSummons = 16,
+        en = "{pet} hops straight onto your foot, as it does every time now.",
+        fr = "{pet} saute droit sur votre pied, comme à chaque fois maintenant." },
+    },
+    -- summoned again after more than a week (D.MASCOT_AWAY_DAYS), once you know each other
+    summonAway = {
+      { draft = true,
+        en = "{pet} stares at you for a long moment, cheeks puffed. It's been a while, and it wants you to know it.",
+        fr = "{pet} vous fixe un long moment, les joues gonflées. Ça faisait longtemps, et {pet} tient à vous le faire savoir." },
+    },
   },
   -- The panda cub (2026-11-13): round, clumsy, always rolling over, black eye patches,
   -- thick fur that's coarser than it looks. Likes fruit (no bamboo in the game).
@@ -841,6 +868,10 @@ local MAGE = {
           fr = "{pet} regarde le mouton, puis vous, puis se roule sur le dos. Apparemment, c'est sa réponse à tout." } },
     },
     frog = {
+      summon = {
+        { draft = true,
+          en = "Your fingers still tingle from the summoning. {pet} croaks once, as if answering the call.",
+          fr = "Vos doigts picotent encore de l'invocation. {pet} coasse une fois, comme pour répondre à l'appel." } },
       spell_polymorph = {
         { draft = true,
           en = "{pet} hops a few careful steps away from you. Just in case.",
@@ -1128,6 +1159,8 @@ local function Record(guid, info)
       stats = { minutes = 0, outings = 0, places = 0, cuddles = 0, campfires = 0, naps = 0 } }
     db[key] = rec
   end
+  -- real summons (not logins): older mascots start from their outings, close enough
+  if rec.stats.summons == nil then rec.stats.summons = rec.stats.outings or 0 end
   rec.name, rec.customName, rec.speciesID = info.name, info.customName, info.speciesID
   rec.displayID, rec.creatureID, rec.level = info.displayID, info.creatureID, info.level
   rec.kind = Kind(info.name)
@@ -1205,7 +1238,9 @@ local function Say(event, vars, important, delta)
   local ctx
   local fits = {}
   for _, line in ipairs(list) do
+    local summons = cur.stats.summons or 0
     if band >= (line.minBand or 1) and band <= (line.maxBand or 3)
+      and summons >= (line.minSummons or 0) and summons <= (line.maxSummons or math.huge)
       and (not line.draft or testing) and line.notPetType ~= cur.petType
       and (not line.onlyName or NameHas(line.onlyName)) and not (line.notName and NameHas(line.notName))
       and (not (line.en or ""):find("{place}", 1, true) or (vars and vars.place)) then
@@ -1256,6 +1291,7 @@ end
 local lastPlaces, wasSeated, wasNapping, wasRain, minuteAcc, lastTick
 local wasSit, wasCold, wasEating, wasAFK, afkOnLap, rainSince, rainEnded
 local wasNight, dawnAt
+local settled, goneGUID, goneAt -- (Check: telling a real summon from a login)
 
 local function PlaceCount()
   if not (KT.Discovery and KT.Discovery.Counts) then return nil end
@@ -1264,12 +1300,25 @@ local function PlaceCount()
   return (c.zones or 0) + (c.subzones or 0) + (c.spots or 0)
 end
 
-local function OnSummon(guid)
+-- real = you just called it (not a login or /reload with it already out, not the game
+-- bringing it back after a flight or a loading screen)
+local function OnSummon(guid, real)
   local info = Info(guid)
   if not info then cur, curGUID = nil, nil return end
   cur, curGUID = Record(guid, info), guid
+  local prevSeen = cur.lastSeen
   cur.stats.outings = cur.stats.outings + 1
   cur.lastSeen = time()
+  if real then
+    cur.stats.summons = cur.stats.summons + 1
+    if Ready(cur, "summon", D.MASCOT_SUMMON_CD) then
+      local away = prevSeen and time() - prevSeen > D.MASCOT_AWAY_DAYS * 86400 and cur.stats.summons > 3
+      C_Timer.After(2, function()
+        if not cur or curGUID ~= guid then return end
+        if (away and Say("summonAway")) or Say("summon") then Mark(cur, "summon") end
+      end)
+    end
+  end
   local zone = GetRealZoneText()
   FirstMemory(cur, "met", { zone = (zone and zone ~= "") and zone or "Azeroth" })
   lastPlaces = PlaceCount()
@@ -1283,9 +1332,18 @@ local function Check()
   local ok, guid = pcall(C_PetJournal.GetSummonedPetGUID)
   guid = ok and guid or nil
   if guid ~= curGUID then
-    if guid then OnSummon(guid) else cur, curGUID = nil, nil end
+    if guid then
+      -- the first look after logging in finds it already out; the same one back within
+      -- a minute is the game bringing it back, not you calling it
+      local back = guid == goneGUID and goneAt and GetTime() - goneAt < 60
+      OnSummon(guid, settled and not back)
+    else
+      goneGUID, goneAt = curGUID, GetTime()
+      cur, curGUID = nil, nil
+    end
     if KT.RefreshPanel then KT.RefreshPanel() end
   end
+  if not guid or cur then settled = true end
 end
 
 local function Tick()

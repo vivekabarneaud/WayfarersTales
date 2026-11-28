@@ -225,6 +225,8 @@ local function Check(when, ctx)
   end
   -- not in these zone maps (dark forests where the sun hardly gets through: Ashenvale...)
   if when.notMaps and InList(when.notMaps, ctx.mapID) then return false, "notMaps" end
+  -- at a fire (or just stepped away from one): see World.AtFire
+  if when.fire and not (ctx.atFire or ctx.fireClose) then return false, "fire" end
   if when.indoors ~= nil and when.indoors ~= ctx.indoors then return false, when.indoors and "indoors" or "outdoors" end
   if when.resting and not ctx.resting then return false, "resting" end
   if when.swimming ~= nil and when.swimming ~= ctx.swimming then return false, "swimming" end -- (false = not in water)
@@ -554,6 +556,7 @@ function S.Tags(c, ctx)
   if w then
     if w.night ~= nil then add(w.night and T.night or T.day, w.night == ctx.night) end
     if w.midday then local h = GetGameTime(); add(T.midday, h and h >= 10 and h < 17 or false) end
+    if w.fire then add(T.fire, (ctx.atFire or ctx.fireClose) and true or false) end
     if w.indoors ~= nil then add(w.indoors and T.indoors or T.outdoors, w.indoors == ctx.indoors) end
     if w.resting then add(T.resting, ctx.resting) end
     if w.swimming then add(T.swimming, ctx.swimming) end

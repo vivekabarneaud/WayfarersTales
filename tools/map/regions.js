@@ -357,6 +357,22 @@ window.WT_REGIONS = {
                                                                  },
                                                         "fr":  "Une odeur de fourrure mouillée et de sang séché flotte entre les arbres. Les worgens ont fait de ce verger le leur.",
                                                         "en":  "A smell of wet fur and dried blood hangs between the trees. The worgens have made this orchard their own."
+                                                    },
+                                                    {
+                                                        "on":  "ambient",
+                                                        "when":  {
+                                                                     "indoors":  false
+                                                                 },
+                                                        "fr":  "Le vent apporte une fumée qui sent le poil brûlé et l'os calciné. Mieux vaut ne pas se demander ce que brûlent les worgens.",
+                                                        "en":  "The wind carries a smoke that smells of burnt hair and bone. Better not to wonder what the worgens are burning."
+                                                    },
+                                                    {
+                                                        "on":  "ambient",
+                                                        "when":  {
+                                                                     "fire":  true
+                                                                 },
+                                                        "fr":  "Parmi les braises, une forme noircie : un os, fendu par la chaleur.",
+                                                        "en":  "Among the embers, a blackened shape: a bone, cracked by the heat."
                                                     }
                                                 ]
                                   }
